@@ -1,0 +1,22 @@
+{
+  "name": "hentai",
+  "version": "1.0.0",
+  "description": "calibur.tv backend project",
+  "author": "falstack",
+  "private": true,
+  "scripts": {
+    "deploy": "bash deploy.sh",
+    "test": "echo 1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": [
+        "./vendor/bin/phplint"
+      ]
+    }
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "husky": "^2.7.0"
+  }
+}
