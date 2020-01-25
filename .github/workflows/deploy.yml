@@ -1,0 +1,38 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  merge:
+    name: merge
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Merge to deploy branch
+        uses: devmasx/merge-branch@v1.1.0
+        with:
+          type: now
+          target_branch: 'deploy'
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+  publish:
+    needs: merge
+    name: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.PRIVATE_KEY_PEM }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd ${{ secrets.SERVER_PATH }}
+            git pull
+            service supervisord restart
+
