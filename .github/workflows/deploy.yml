@@ -33,6 +33,6 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ${{ secrets.SERVER_PATH }}
-            git pull
+            git pull origin deploy
             service supervisord restart
 
