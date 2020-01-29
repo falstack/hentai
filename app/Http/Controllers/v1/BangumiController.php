@@ -89,11 +89,11 @@ class BangumiController extends Controller
 
     public function rank250(Request $request)
     {
-        $page = $request->get('page') ?: 0;
-        $take = $request->get('take') ?: 20;
+        $page = $request->get('page') ?: 1;
+        $take = $request->get('take') ?: 10;
 
         $bangumiRepository = new BangumiRepository();
-        $idsObj = $bangumiRepository->rank($page, $take);
+        $idsObj = $bangumiRepository->rank($page - 1, $take);
 
         if (empty($idsObj['result']))
         {

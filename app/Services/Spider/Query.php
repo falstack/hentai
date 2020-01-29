@@ -139,6 +139,29 @@ class Query
         }
     }
 
+    public function getBangumiTags($id)
+    {
+        try
+        {
+            $url = "http://bgm.tv/subject/{$id}";
+            $ql = QueryList::get($url);
+
+            return $ql
+                ->find('.subject_tag_section')
+                ->eq(0)
+                ->find('a')
+                ->map(function ($link)
+                {
+                    return trim(strtolower($link->find('span')->eq(0)->text()));
+                });
+        }
+        catch (\Exception $e)
+        {
+            Log::info("[--spider--]：get bangumi {$id} tags failed");
+            return [];
+        }
+    }
+
     public function getBangumiList($page)
     {
         try

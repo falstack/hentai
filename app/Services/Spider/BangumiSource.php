@@ -5,6 +5,7 @@ namespace App\Services\Spider;
 
 
 use App\Models\Bangumi;
+use App\Models\BangumiTag;
 use App\Models\Idol;
 use App\Models\Search;
 use App\Services\Qiniu\Qshell;
@@ -156,6 +157,7 @@ class BangumiSource
         if ($type === 0)
         {
             $this->getBangumiIdols($source['id'], $bangumiSlug);
+            $this->importBangumiTags($source['id'], $bangumiSlug);
         }
 
         Search::create([
@@ -256,6 +258,52 @@ class BangumiSource
         ]);
 
         return $slug;
+    }
+
+    public function importBangumiTags($sourceId, $bangumiSlug)
+    {
+        $query = new Query();
+        $tags = $query->getBangumiTags($sourceId);
+
+        if (empty($tags))
+        {
+            return;
+        }
+
+        foreach ($tags as $name)
+        {
+            $tag = BangumiTag::where('name', $name)->first();
+            if (!$tag)
+            {
+                $tag = BangumiTag::create([
+                    'name' => $name
+                ]);
+
+                $tag->update([
+                    'slug' => id2slug($tag->id)
+                ]);
+            }
+
+            $has = DB
+                ::table('bangumi_tag_relations')
+                ->where('bangumi_slug', $bangumiSlug)
+                ->where('tag_slug', $tag->slug)
+                ->count();
+
+            if ($has)
+            {
+                continue;
+            }
+
+            DB
+                ::table('bangumi_tag_relations')
+                ->insert([
+                    'bangumi_slug' => $bangumiSlug,
+                    'tag_slug' => $tag->slug
+                ]);
+        }
+
+        return;
     }
 
     protected function getHottestBangumi($page)

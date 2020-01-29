@@ -40,40 +40,16 @@ class Test extends Command
     public function handle()
     {
         $bangumi = Bangumi
-            ::where('migration_state', 0)
+            ::where('migration_state', '<>', 7)
             ->take(1000)
             ->get();
 
+        $bangumiSource = new BangumiSource();
         foreach ($bangumi as $item)
         {
-            \App\Models\Search::create([
-                'type' => 4,
-                'slug' => $item->slug,
-                'text' => str_replace('|', ',', $item->alias),
-                'score' => 0
-            ]);
-
+            $bangumiSource->importBangumiTags($item->source_id, $item->slug);
             $item->update([
-                'migration_state' => 1
-            ]);
-        }
-
-        $idol = Idol
-            ::where('migration_state', 0)
-            ->take(1000)
-            ->get();
-
-        foreach ($idol as $item)
-        {
-            \App\Models\Search::create([
-                'type' => 5,
-                'slug' => $item->slug,
-                'text' => str_replace('|', ',', $item->alias),
-                'score' => 0
-            ]);
-
-            $item->update([
-                'migration_state' => 1
+                'migration_state' => 7
             ]);
         }
 
