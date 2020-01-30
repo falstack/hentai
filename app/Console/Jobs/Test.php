@@ -39,20 +39,6 @@ class Test extends Command
      */
     public function handle()
     {
-        $bangumi = Bangumi
-            ::where('migration_state', '<>', 7)
-            ->take(1000)
-            ->get();
-
-        $bangumiSource = new BangumiSource();
-        foreach ($bangumi as $item)
-        {
-            $bangumiSource->importBangumiTags($item->source_id, $item->slug);
-            $item->update([
-                'migration_state' => 7
-            ]);
-        }
-
         return true;
     }
 }
