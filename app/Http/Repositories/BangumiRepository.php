@@ -23,6 +23,7 @@ class BangumiRepository extends Repository
         {
             $idol = Bangumi
                 ::where('slug', $slug)
+                ->with('tags')
                 ->first();
 
             if (is_null($idol))

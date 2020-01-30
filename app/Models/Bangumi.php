@@ -44,4 +44,16 @@ class Bangumi extends Model
     {
         return patchImage($avatar, 'default-avatar');
     }
+
+    public function tags()
+    {
+        return $this->belongsToMany(
+            'App\Models\BangumiTag',
+            'bangumi_tag_relations',
+            'bangumi_slug',
+            'tag_slug',
+            'slug',
+            'slug'
+        );
+    }
 }
