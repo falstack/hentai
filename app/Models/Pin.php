@@ -113,13 +113,7 @@ class Pin extends Model
         return $this->morphMany('App\Models\Report', 'reportable');
     }
 
-    public static function createPin(
-        $content,
-        $content_type,
-        $publish,
-        $user,
-        $main_notebook_slug = ''
-    )
+    public static function createPin($content, $content_type, $publish, $user)
     {
         $richContentService = new RichContentService();
         $content = $richContentService->preFormatContent($content);
@@ -134,8 +128,7 @@ class Pin extends Model
         $data = [
             'user_slug' => $user->slug,
             'content_type' => $content_type,
-            'last_edit_at' => $now,
-            'main_notebook_slug' => $main_notebook_slug
+            'last_edit_at' => $now
         ];
         if ($publish)
         {
@@ -152,19 +145,14 @@ class Pin extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
         $pin->content = $richContent->text;
-        $tags = [$main_notebook_slug];
+        $tags = [];
 
         event(new \App\Events\Pin\Create($pin, $user, $tags, $publish));
 
         return $pin;
     }
 
-    public function updatePin(
-        $content,
-        $publish,
-        $user,
-        $main_notebook_slug = ''
-    )
+    public function updatePin($content, $publish, $user)
     {
         $richContentService = new RichContentService();
         if (!$this->published_at)
@@ -211,8 +199,7 @@ class Pin extends Model
         $doPublish = !$this->published_at && $publish;
         $now = Carbon::now();
         $data = [
-            'last_edit_at' => $now,
-            'main_notebook_slug' => $main_notebook_slug
+            'last_edit_at' => $now
         ];
         if ($doPublish)
         {
@@ -225,7 +212,7 @@ class Pin extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
         $this->content = $richContent->text;
-        $tags = [$main_notebook_slug];
+        $tags = [];
 
         event(new \App\Events\Pin\Update($this, $user, $tags, $doPublish));
 
