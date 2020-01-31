@@ -28,6 +28,7 @@ class UpdatePinTagRelation
      */
     public function handle(\App\Events\Pin\Update $event)
     {
+        return;
         $pin = $event->pin;
         $arr = array_filter($event->tags, function ($item)
         {

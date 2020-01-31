@@ -143,7 +143,6 @@ class PinController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'content' => 'required|array',
-            'notebook' => 'required|string',
             'publish' => 'required|boolean'
         ]);
 
@@ -152,42 +151,19 @@ class PinController extends Controller
             return $this->resErrParams($validator);
         }
 
-        $tagRepository = new TagRepository();
         $user = $request->user();
-
-        $notebookSlug = $request->get('notebook') ?: '';
-        $notebook = $tagRepository->checkTagIsMarked($notebookSlug, $user);
-        if (null === $notebook)
-        {
-            return $this->resErrNotFound('不存在的专栏');
-        }
-        if (false === $notebook)
-        {
-            return $this->resErrRole('不属于自己的专栏');
-        }
-        if ($notebook->parent_slug !== config('app.tag.notebook'))
-        {
-            return $this->resErrBad('非法的专栏');
-        }
-
         $contentType = 1;
+
         $pin = Pin::createPin(
             $request->get('content'),
             $contentType,
             $request->get('publish'),
-            $user,
-            $notebookSlug
+            $user
         );
 
         if (is_null($pin))
         {
             return $this->resErrBad('请勿发表敏感内容');
-        }
-
-        if (!$pin->published_at)
-        {
-            $pinRepository = new PinRepository();
-            return $this->resCreated($pinRepository->encrypt($pin->slug));
         }
 
         return $this->resCreated($pin->slug);
@@ -198,7 +174,6 @@ class PinController extends Controller
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
             'content' => 'required|array',
-            'notebook' => 'required|string',
             'publish' => 'required|boolean'
         ]);
 
@@ -224,40 +199,15 @@ class PinController extends Controller
             return $this->resErrRole('不能修改别人的文章');
         }
 
-        $tagRepository = new TagRepository();
-        $user = $request->user();
-
-        $notebookSlug = $request->get('notebook') ?: '';
-        $notebook = $tagRepository->checkTagIsMarked($notebookSlug, $user);
-        if (null === $notebook)
-        {
-            return $this->resErrNotFound('不存在的专栏');
-        }
-        if (false === $notebook)
-        {
-            return $this->resErrRole('不属于自己的专栏');
-        }
-        if ($notebook->parent_slug !== config('app.tag.notebook'))
-        {
-            return $this->resErrBad('非法的专栏');
-        }
-
         $result = $pin->updatePin(
             $request->get('content'),
             $request->get('publish'),
-            $user,
-            $notebookSlug
+            $user
         );
 
         if (!$result)
         {
             return $this->resErrBad('请勿发表敏感内容');
-        }
-
-        if (!$pin->published_at)
-        {
-            $pinRepository = new PinRepository();
-            return $this->resOK($pinRepository->encrypt($pin->slug));
         }
 
         return $this->resOK($pin->slug);
