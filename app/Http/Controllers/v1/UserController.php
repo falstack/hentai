@@ -104,21 +104,20 @@ class UserController extends Controller
     public function likeBangumi(Request $request)
     {
         $slug = $request->get('slug');
-        $page = $request->get('page') ?: 1;
-        $take = $request->get('take') ?: 15;
+        $defaultArea = '54xcl';
 
         $userRepository = new UserRepository();
-
-        $idsObj = $userRepository->likeBangumi($slug, $page - 1, $take);
-        if (empty($idsObj['result']))
-        {
-            return $this->resOK($idsObj);
-        }
+        $ids = $userRepository->likeBangumi($slug);
+        array_unshift($ids, $defaultArea);
 
         $bangumiRepository = new BangumiRepository();
-        $idsObj['result'] = $bangumiRepository->list($idsObj['result']);
+        $result = $bangumiRepository->list($ids);
 
-        return $this->resOK($idsObj);
+        return $this->resOK([
+            'result' => $result,
+            'total' => count($result),
+            'no_more' => true
+        ]);
     }
 
     public function timeline(Request $request)
