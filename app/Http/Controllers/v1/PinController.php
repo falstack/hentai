@@ -143,6 +143,7 @@ class PinController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'content' => 'required|array',
+            'bangumi_slug' => 'string',
             'publish' => 'required|boolean'
         ]);
 
@@ -152,13 +153,15 @@ class PinController extends Controller
         }
 
         $user = $request->user();
+        $bangumiSlug = $request->get('bangumi_slug') ?: '54xcl';
         $contentType = 1;
 
         $pin = Pin::createPin(
             $request->get('content'),
             $contentType,
             $request->get('publish'),
-            $user
+            $user,
+            $bangumiSlug
         );
 
         if (is_null($pin))
@@ -174,6 +177,7 @@ class PinController extends Controller
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
             'content' => 'required|array',
+            'bangumi_slug' => 'string',
             'publish' => 'required|boolean'
         ]);
 
@@ -184,6 +188,7 @@ class PinController extends Controller
 
         $user = $request->user();
         $slug = $request->get('slug');
+        $bangumiSlug = $request->get('bangumi_slug') ?: '54xcl';
 
         $pin = Pin
             ::where('slug', $slug)
@@ -202,7 +207,8 @@ class PinController extends Controller
         $result = $pin->updatePin(
             $request->get('content'),
             $request->get('publish'),
-            $user
+            $user,
+            $bangumiSlug
         );
 
         if (!$result)
