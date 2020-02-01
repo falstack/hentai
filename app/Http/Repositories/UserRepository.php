@@ -198,9 +198,9 @@ class UserRepository extends Repository
         return $this->filterIdsByPage($list, $page, $take);
     }
 
-    public function likeBangumi($slug, $page, $take, $refresh = false)
+    public function likeBangumi($slug, $refresh = false)
     {
-        $list = $this->RedisSort($this->userLikeBanguiCacheKey($slug), function () use ($slug)
+        return $this->RedisSort($this->userLikeBanguiCacheKey($slug), function () use ($slug)
         {
             $user = User
                 ::where('slug', $slug)
@@ -219,8 +219,6 @@ class UserRepository extends Repository
                 ->toArray();
 
         }, ['force' => $refresh, 'is_time' => true]);
-
-        return $this->filterIdsByPage($list, $page, $take);
     }
 
     public function managers($refresh = false)
