@@ -12,7 +12,7 @@ class Create
 
     public $pin;
     public $user;
-    public $tags;
+    public $bangumiSlug;
     public $doPublish;
 
     /**
@@ -20,11 +20,11 @@ class Create
      *
      * @return void
      */
-    public function __construct(Pin $pin, User $user, array $tags, bool $publish)
+    public function __construct(Pin $pin, User $user, string $bangumiSlug, bool $publish)
     {
         $this->pin = $pin;
         $this->user = $user;
-        $this->tags = $tags;
+        $this->bangumiSlug = $bangumiSlug;
         $this->doPublish = $publish;
     }
 }

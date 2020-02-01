@@ -29,17 +29,13 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\Create\InitPinTimeline',
             'App\Listeners\Pin\Create\RefreshUserDrafts',
             'App\Listeners\Pin\Create\UpdateAuthorTimeline',
-            'App\Listeners\Pin\Create\AddPinToSearch',
-            'App\Listeners\Pin\Create\AddPinTagRelation',
-            'App\Listeners\Pin\Create\Trial',
+            'App\Listeners\Pin\Create\AddPinToSearch'
         ],
         'App\Events\Pin\Update' => [
             'App\Listeners\Pin\Update\UpdatePinTimeline',
             'App\Listeners\Pin\Update\UpdateAuthorTimeline',
             'App\Listeners\Pin\Update\RefreshCache',
-            'App\Listeners\Pin\Update\UpdatePinSearch',
-            'App\Listeners\Pin\Update\UpdatePinTagRelation',
-            'App\Listeners\Pin\Update\Trial',
+            'App\Listeners\Pin\Update\UpdatePinSearch'
         ],
         'App\Events\Pin\Move' => [
             'App\Listeners\Pin\Move\UpdatePinTimeline',

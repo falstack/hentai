@@ -20,8 +20,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Pin extends Model
 {
-    use SoftDeletes, HasRoles,
-        CanBeVoted, CanBeBookmarked, CanBeFavorited;
+    use SoftDeletes, HasRoles, CanBeVoted, CanBeBookmarked, CanBeFavorited;
 
     protected $guard_name = 'api';
 
@@ -113,21 +112,24 @@ class Pin extends Model
         return $this->morphMany('App\Models\Report', 'reportable');
     }
 
-    public static function createPin($content, $content_type, $publish, $user)
+    public static function createPin($content, $content_type, $publish, $user, $bangumi_slug)
     {
         $richContentService = new RichContentService();
         $content = $richContentService->preFormatContent($content);
-        $risk = $richContentService->detectContentRisk($content, false);
 
-        if ($risk['risk_score'] > 0)
+        if ($publish)
         {
-            return null;
+            $risk = $richContentService->detectContentRisk($content, false);
+            if ($risk['risk_score'] > 0) {
+                return null;
+            }
         }
 
         $now = Carbon::now();
         $data = [
             'user_slug' => $user->slug,
             'content_type' => $content_type,
+            'bangumi_slug' => $bangumi_slug,
             'last_edit_at' => $now
         ];
         if ($publish)
@@ -141,18 +143,16 @@ class Pin extends Model
             'slug' => id2slug($pin->id)
         ]);
 
-        $richContent = $pin->content()->create([
+        $pin->content()->create([
             'text' => $richContentService->saveRichContent($content)
         ]);
-        $pin->content = $richContent->text;
-        $tags = [];
 
-        event(new \App\Events\Pin\Create($pin, $user, $tags, $publish));
+        event(new \App\Events\Pin\Create($pin, $user, $bangumi_slug, $publish));
 
         return $pin;
     }
 
-    public function updatePin($content, $publish, $user)
+    public function updatePin($content, $publish, $user, $bangumi_slug)
     {
         $richContentService = new RichContentService();
         if (!$this->published_at)
@@ -189,18 +189,22 @@ class Pin extends Model
                 }
             }
         }
-        $risk = $richContentService->detectContentRisk($content, false);
 
-        if ($risk['risk_score'] > 0)
+        if ($publish || $this->published_at)
         {
-            return false;
+            $risk = $richContentService->detectContentRisk($content, false);
+            if ($risk['risk_score'] > 0)
+            {
+                return false;
+            }
         }
 
-        $doPublish = !$this->published_at && $publish;
         $now = Carbon::now();
         $data = [
-            'last_edit_at' => $now
+            'last_edit_at' => $now,
+            'bangumi_slug' => $bangumi_slug
         ];
+        $doPublish = !$this->published_at && $publish;
         if ($doPublish)
         {
             $data['published_at'] = $now;
@@ -208,10 +212,9 @@ class Pin extends Model
 
         $this->update($data);
 
-        $richContent = $this->content()->create([
+        $this->content()->create([
             'text' => $richContentService->saveRichContent($content)
         ]);
-        $this->content = $richContent->text;
         $tags = [];
 
         event(new \App\Events\Pin\Update($this, $user, $tags, $doPublish));
@@ -224,13 +227,5 @@ class Pin extends Model
         $this->delete();
 
         event(new \App\Events\Pin\Delete($this, $user));
-    }
-
-    public function reviewPin($type)
-    {
-        // 进入审核
-        $this->update([
-            'trial_type' => $type
-        ]);
     }
 }
