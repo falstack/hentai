@@ -38,14 +38,6 @@ class PinRepository extends Repository
                 return 'nil';
             }
 
-            if ($pin->main_notebook_slug)
-            {
-                $pin->notebook = Tag
-                    ::where('slug', $pin->main_notebook_slug)
-                    ->with('content')
-                    ->first();
-            }
-
             return new PinResource($pin);
         }, $refresh);
 
