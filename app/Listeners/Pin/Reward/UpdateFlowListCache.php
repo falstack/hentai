@@ -2,8 +2,7 @@
 
 namespace App\Listeners\Pin\Reward;
 
-use App\Http\Repositories\FlowRepository;
-use App\Models\Pin;
+use App\Http\Repositories\BangumiRepository;
 use Carbon\Carbon;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -34,13 +33,8 @@ class UpdateFlowListCache
             return;
         }
 
-        $tags = $pin->tags()->pluck('slug')->toArray();
-        $flowRepository = new FlowRepository();
-
-        foreach ($tags as $tagSlug)
-        {
-            $flowRepository->update_pin($tagSlug, $pin->slug);
-        }
+        $bangumiRepository = new BangumiRepository();
+        $bangumiRepository->update_pin($pin->bangumi_slug, $pin->slug);
 
         $pin->update([
             'updated_at' => Carbon::now()

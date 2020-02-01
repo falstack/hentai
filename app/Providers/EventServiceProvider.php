@@ -29,25 +29,25 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\Create\InitPinTimeline',
             'App\Listeners\Pin\Create\RefreshUserDrafts',
             'App\Listeners\Pin\Create\UpdateAuthorTimeline',
+            'App\Listeners\Pin\Create\AddPinToFlow',
             'App\Listeners\Pin\Create\AddPinToSearch'
         ],
         'App\Events\Pin\Update' => [
             'App\Listeners\Pin\Update\UpdatePinTimeline',
             'App\Listeners\Pin\Update\UpdateAuthorTimeline',
             'App\Listeners\Pin\Update\RefreshCache',
+            'App\Listeners\Pin\Update\UpdatePinFlow',
             'App\Listeners\Pin\Update\UpdatePinSearch'
         ],
         'App\Events\Pin\Move' => [
             'App\Listeners\Pin\Move\UpdatePinTimeline',
-            'App\Listeners\Pin\Move\RefreshCache',
-            'App\Listeners\Pin\Move\UpdatePinTagRelation',
+            'App\Listeners\Pin\Move\RefreshCache'
         ],
         'App\Events\Pin\Delete' => [
             'App\Listeners\Pin\Delete\UpdatePinTimeline',
             'App\Listeners\Pin\Delete\UpdateAuthorTimeline',
-            'App\Listeners\Pin\Delete\UpdateTagCounter',
             'App\Listeners\Pin\Delete\RefreshCache',
-            'App\Listeners\Pin\Delete\UpdateFlowList',
+            'App\Listeners\Pin\Delete\RemovePinFlow',
             'App\Listeners\Pin\Delete\RemovePinSearch',
         ],
         'App\Events\Tag\Create' => [
@@ -101,7 +101,7 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\ReVote\UpdateVoteCounter',
         ],
         'App\Events\Pin\Reward' => [
-            'App\Listeners\Pin\Reward\UpdateLikeCounter',
+            'App\Listeners\Pin\Reward\UpdateRewardCounter',
             'App\Listeners\Pin\Reward\UpdateFlowListCache',
         ],
         'App\Events\Tag\RemovePin' => [

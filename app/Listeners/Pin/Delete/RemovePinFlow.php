@@ -2,11 +2,11 @@
 
 namespace App\Listeners\Pin\Delete;
 
-use App\Http\Modules\Counter\TagPatchCounter;
+use App\Http\Repositories\BangumiRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class UpdateTagCounter
+class RemovePinFlow
 {
     /**
      * Create the event listener.
@@ -21,7 +21,7 @@ class UpdateTagCounter
     /**
      * Handle the event.
      *
-     * @param  \App\Events\Pin\Delete  $event
+     * @param  \App\Events\Pin\Create  $event
      * @return void
      */
     public function handle(\App\Events\Pin\Delete $event)
@@ -31,14 +31,7 @@ class UpdateTagCounter
             return;
         }
 
-        $list = $event->pin->tags()
-            ->pluck('slug')
-            ->toArray();
-
-        $tagPatchCounter = new TagPatchCounter();
-        foreach ($list as $slug)
-        {
-            $tagPatchCounter->add($slug, 'pin_count', -1);
-        }
+        $bangumiRepository = new BangumiRepository();
+        $bangumiRepository->del_pin($event->pin->bangumi_slug, $event->pin->slug);
     }
 }

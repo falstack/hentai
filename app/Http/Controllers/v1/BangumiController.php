@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\BangumiPatchCounter;
 use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\IdolRepository;
+use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\UserRepository;
 use App\Models\Bangumi;
 use App\Models\BangumiQuestion;
@@ -13,6 +14,8 @@ use App\Models\Search;
 use App\Services\Spider\BangumiSource;
 use App\Services\Spider\Query;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class BangumiController extends Controller
 {
@@ -125,6 +128,64 @@ class BangumiController extends Controller
 
         $userRepository = new UserRepository();
         $idsObj['result'] = $userRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
+    }
+
+    public function pins(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'slug' => 'required|string',
+            'sort' => [
+                'required',
+                Rule::in(['newest', 'hottest', 'active']),
+            ],
+            'time' => 'required',
+            Rule::in(['3-day', '7-day', '30-day', 'all']),
+            'is_up' => 'required|integer',
+            'spec_id' => 'present|string'
+        ]);
+
+        if ($validator->fails())
+        {
+            return $this->resErrParams($validator);
+        }
+
+        $slug = $request->get('slug');
+        $sort = $request->get('sort');
+        $time = $request->get('time');
+        $take = $request->get('take') ?: 10;
+        $isUp = $request->get('is_up');
+
+        if ($sort === 'newest')
+        {
+            $specId = $request->get('spec_id');
+        }
+        else
+        {
+            $specId = $request->get('spec_id') ? explode(',', $request->get('spec_id')) : [];
+        }
+
+        $bangumiRepository = new BangumiRepository();
+        $bangumi = $bangumiRepository->item($slug);
+
+        if (is_null($bangumi))
+        {
+            return $this->resOK([
+                'result' => [],
+                'total' => 0,
+                'no_more' => true
+            ]);
+        }
+
+        $idsObj = $bangumiRepository->pins($slug, $sort, $isUp, $specId, $time, $take);
+        if (empty($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $pinRepository = new PinRepository();
+        $idsObj['result'] = $pinRepository->list($idsObj['result']);
 
         return $this->resOK($idsObj);
     }

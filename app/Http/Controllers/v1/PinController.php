@@ -245,6 +245,7 @@ class PinController extends Controller
 
     public function movePin(Request $request)
     {
+        return $this->resErrServiceUnavailable();
         $slug = $request->get('slug');
         if (!$slug)
         {

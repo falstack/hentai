@@ -9,7 +9,7 @@
 namespace App\Http\Transformers;
 
 use App\Http\Modules\RichContentService;
-use App\Http\Transformers\Tag\TagItemResource;
+use App\Http\Transformers\Bangumi\BangumiItemResource;
 use App\Http\Transformers\User\UserItemResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -60,6 +60,7 @@ class PinResource extends JsonResource
             'media' => $media,
             'banner' => $richContentService->parseRichBanner($content),
             'intro' => $richContentService->paresPureContent($content),
+            'bangumi' => new BangumiItemResource($this->bangumi_slug),
             'author' => new UserItemResource($this->author),
             'trial_type' => $this->trial_type,
             'content_type' => $this->content_type,
