@@ -135,20 +135,13 @@ class BangumiRepository extends Repository
         return $idsObj;
     }
 
-    public function indexPin($seenIds, $take, $refresh = false)
+    public function recommended_pin($seenIds, $take, $refresh = false)
     {
         $ids =  $this->RedisSort($this->index_pin_cache_key(), function ()
         {
             return Pin
-                ::where('trial_type', 0)
-                ->where('can_up', 1)
+                ::whereNotNull('recommended_at')
                 ->where('content_type', 1)
-                ->whereNotNull('published_at')
-                ->whereNotIn('bangumi_slug', [
-                    config('app.tag.default_daily'),
-                    config('app.tag.default_news')
-                ])
-                ->select('slug', 'updated_at')
                 ->orderBy('updated_at', 'DESC')
                 ->pluck('updated_at', 'slug')
                 ->toArray();
