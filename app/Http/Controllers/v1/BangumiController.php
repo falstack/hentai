@@ -155,14 +155,9 @@ class BangumiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
-            'sort' => [
-                'required',
-                Rule::in(['newest', 'hottest', 'active']),
-            ],
-            'time' => 'required',
-            Rule::in(['3-day', '7-day', '30-day', 'all']),
             'is_up' => 'required|integer',
-            'spec_id' => 'present|string'
+            'sort' => ['required', Rule::in(['newest', 'hottest', 'active'])],
+            'time' => ['required', Rule::in(['3-day', '7-day', '30-day', 'all'])]
         ]);
 
         if ($validator->fails())
@@ -178,11 +173,11 @@ class BangumiController extends Controller
 
         if ($sort === 'newest')
         {
-            $specId = $request->get('spec_id');
+            $specId = $request->get('last_id');
         }
         else
         {
-            $specId = $request->get('spec_id') ? explode(',', $request->get('spec_id')) : [];
+            $specId = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
         }
 
         $bangumiRepository = new BangumiRepository();
