@@ -121,6 +121,8 @@ return [
         'pin' => '1o2bqt',              // 文章标签
         'qa' => '1o34sa',               // 答题
         'idol' => '1ogn45',             // 偶像
+        'default_daily' => '54xcl',     // 日常
+        'default_news' => '54xzu',      // 新闻
     ],
 
     'qiniu' => [

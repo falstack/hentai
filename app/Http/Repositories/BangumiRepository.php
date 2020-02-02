@@ -144,6 +144,10 @@ class BangumiRepository extends Repository
                 ->where('can_up', 1)
                 ->where('content_type', 1)
                 ->whereNotNull('published_at')
+                ->whereNotIn('bangumi_slug', [
+                    config('app.tag.default_daily'),
+                    config('app.tag.default_news')
+                ])
                 ->select('slug', 'updated_at')
                 ->orderBy('updated_at', 'DESC')
                 ->pluck('updated_at', 'slug')
