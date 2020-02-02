@@ -138,7 +138,7 @@ class BangumiController extends Controller
         $take = $request->get('take') ?: 10;
 
         $bangumiRepository = new BangumiRepository();
-        $idsObj = $bangumiRepository->indexPin($seenIds, $take);
+        $idsObj = $bangumiRepository->recommended_pin($seenIds, $take);
 
         if (empty($idsObj['result']))
         {
