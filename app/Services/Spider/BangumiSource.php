@@ -127,13 +127,16 @@ class BangumiSource
             return null;
         }
 
-        $bangumi = Bangumi
-            ::where('source_id', $source['id'])
-            ->first();
-
-        if ($bangumi)
+        if ($source['id'])
         {
-            return $bangumi;
+            $bangumi = Bangumi
+                ::where('source_id', $source['id'])
+                ->first();
+
+            if ($bangumi)
+            {
+                return $bangumi;
+            }
         }
 
         $QShell = new Qshell();
