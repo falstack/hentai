@@ -132,6 +132,25 @@ class BangumiController extends Controller
         return $this->resOK($idsObj);
     }
 
+    public function recommendedPins(Request $request)
+    {
+        $seenIds = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
+        $take = $request->get('take') ?: 10;
+
+        $bangumiRepository = new BangumiRepository();
+        $idsObj = $bangumiRepository->indexPin($seenIds, $take);
+
+        if (empty($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $pinRepository = new PinRepository();
+        $idsObj['result'] = $pinRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
+    }
+
     public function pins(Request $request)
     {
         $validator = Validator::make($request->all(), [

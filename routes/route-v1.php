@@ -97,6 +97,8 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
 
     $route->get('pins', 'BangumiController@pins');
 
+    $route->get('recommended_pins', 'BangumiController@recommendedPins');
+
     $route->group(['middleware' => 'user'], function () use ($route)
     {
         $route->get('patch', 'BangumiController@patch');

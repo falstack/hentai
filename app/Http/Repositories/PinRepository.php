@@ -26,7 +26,7 @@ class PinRepository extends Repository
         {
             $pin = Pin
                 ::withTrashed()
-                ->with(['author', 'content' => function ($query)
+                ->with(['author', 'bangumi' ,'content' => function ($query)
                 {
                     $query->orderBy('created_at', 'desc');
                 }])

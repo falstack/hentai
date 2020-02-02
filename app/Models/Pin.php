@@ -51,6 +51,11 @@ class Pin extends Model
         return $this->belongsTo('App\User', 'user_slug', 'slug');
     }
 
+    public function bangumi()
+    {
+        return $this->belongsTo('App\Models\Bangumi', 'bangumi_slug', 'slug');
+    }
+
     public function tags()
     {
         return $this->morphToMany('App\Models\Tag', 'taggable');
