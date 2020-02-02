@@ -104,7 +104,7 @@ class UserController extends Controller
     public function likeBangumi(Request $request)
     {
         $slug = $request->get('slug');
-        $defaultArea = '54xcl';
+        $defaultArea = config('app.tag.default_daily');
 
         $userRepository = new UserRepository();
         $ids = $userRepository->likeBangumi($slug);

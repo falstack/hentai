@@ -153,7 +153,7 @@ class PinController extends Controller
         }
 
         $user = $request->user();
-        $bangumiSlug = $request->get('bangumi_slug') ?: '54xcl';
+        $bangumiSlug = $request->get('bangumi_slug') ?: config('app.tag.default_daily');
         $contentType = 1;
 
         $pin = Pin::createPin(
@@ -188,7 +188,7 @@ class PinController extends Controller
 
         $user = $request->user();
         $slug = $request->get('slug');
-        $bangumiSlug = $request->get('bangumi_slug') ?: '54xcl';
+        $bangumiSlug = $request->get('bangumi_slug') ?: config('app.tag.default_daily');
 
         $pin = Pin
             ::where('slug', $slug)
