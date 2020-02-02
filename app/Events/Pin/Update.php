@@ -12,21 +12,23 @@ class Update
 
     public $pin;
     public $user;
-    public $tags;
     public $doPublish;
     public $published;
+    public $oldBangumiSlug;
+    public $newBangumiSlug;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Pin $pin, User $user, array $tags, bool $publish)
+    public function __construct(Pin $pin, User $user, bool $publish, string $oldBangumiSlug, string $newBangumiSlug)
     {
         $this->pin = $pin;
         $this->user = $user;
-        $this->tags = $tags;
         $this->doPublish = $publish;
         $this->published = !!$pin->published_at;
+        $this->oldBangumiSlug = $oldBangumiSlug;
+        $this->newBangumiSlug = $newBangumiSlug;
     }
 }

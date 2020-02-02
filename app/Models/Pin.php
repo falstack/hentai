@@ -51,6 +51,11 @@ class Pin extends Model
         return $this->belongsTo('App\User', 'user_slug', 'slug');
     }
 
+    public function bangumi()
+    {
+        return $this->belongsTo('App\Models\Bangumi', 'bangumi_slug', 'slug');
+    }
+
     public function tags()
     {
         return $this->morphToMany('App\Models\Tag', 'taggable');
@@ -209,6 +214,7 @@ class Pin extends Model
         {
             $data['published_at'] = $now;
         }
+        $oldBangumiSlug = $this->bangumi_slug;
 
         $this->update($data);
 
@@ -217,7 +223,7 @@ class Pin extends Model
         ]);
         $tags = [];
 
-        event(new \App\Events\Pin\Update($this, $user, $tags, $doPublish));
+        event(new \App\Events\Pin\Update($this, $user, $doPublish, $oldBangumiSlug, $bangumi_slug));
 
         return true;
     }

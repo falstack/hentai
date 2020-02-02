@@ -7,7 +7,7 @@ use App\Http\Modules\Counter\PinPatchCounter;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class UpdateLikeCounter
+class UpdateRewardCounter
 {
     /**
      * Create the event listener.

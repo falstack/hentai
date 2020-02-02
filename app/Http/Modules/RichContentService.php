@@ -196,20 +196,6 @@ class RichContentService
                     ])
                 ];
             }
-            else if ($type === 'music')
-            {
-                if (!preg_match('/https?:\/\/music\.163\.com/', $row['data']['source']))
-                {
-                    continue;
-                }
-                $text = trim($row['data']['caption']);
-                $result[] = [
-                    'type' => $type,
-                    'data' => array_merge($row['data'], [
-                        'caption' => $text ? Purifier::clean($text) : ''
-                    ])
-                ];
-            }
             else if ($type === 'baidu')
             {
                 $url = trim($row['data']['url']);
@@ -304,6 +290,10 @@ class RichContentService
         else if ($max_select >= count($items))
         {
             $max_select = count($items) - 1;
+        }
+
+        if (strtotime($expired_at) <= time()) {
+            $expired_at = 0;
         }
 
         return [
@@ -442,6 +432,50 @@ class RichContentService
             'banner' => $banner,
             'images' => array_slice($images, 0, 3)
         ];
+    }
+
+    public function parseRichBanner($data)
+    {
+        $images = [];
+        foreach ($data as $row)
+        {
+            if ($row['type'] === 'image')
+            {
+                $images[] = $row['data']['file'];
+            }
+        }
+
+        $filterImage = array_filter($images, function ($image)
+        {
+            return $image['width'] >= 400 && $image['height'] >= 400;
+        });
+
+        if (count($filterImage) >= 3)
+        {
+            return array_slice($filterImage, 0, 3);
+        }
+
+        $filterImage = array_filter($images, function ($image)
+        {
+            return $image['width'] >= 600 && $image['height'] >= 600;
+        });
+
+        if (count($filterImage) >= 2)
+        {
+            return array_slice($filterImage, 0, 2);
+        }
+
+        $filterImage = array_filter($images, function ($image)
+        {
+            return $image['width'] >= 800 && $image['height'] >= 400;
+        });
+
+        if (count($filterImage) >= 1)
+        {
+            return $filterImage[0];
+        }
+
+        return [];
     }
 
     public function detectContentRisk($data, $withImage = true)
