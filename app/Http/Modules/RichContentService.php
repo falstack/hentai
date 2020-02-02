@@ -475,7 +475,13 @@ class RichContentService
             return $filterImage[0];
         }
 
-        return [];
+        return [[
+            'url' => 'https://m1.calibur.tv/wen.png',
+            'mime' => 'image/png',
+            'width' => 4000,
+            'height' => 2001,
+            'size' => 96256
+        ]];
     }
 
     public function detectContentRisk($data, $withImage = true)
