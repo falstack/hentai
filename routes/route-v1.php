@@ -243,6 +243,8 @@ $route->group(['prefix' => 'pin'], function () use ($route)
 
         $route->post('move', 'PinController@movePin');
 
+        $route->post('recommend', 'PinController@recommendPin');
+
         $route->get('drafts', 'PinController@userDrafts');
     });
 
