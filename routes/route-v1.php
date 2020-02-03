@@ -47,12 +47,12 @@ $route->group(['prefix' => 'user'], function () use ($route)
 
     $route->get('managers', 'UserController@managers');
 
-    $route->get('like_bangumi', 'UserController@likeBangumi');
-
     $route->get('idols', 'UserController@idols');
 
     $route->group(['middleware' => 'user'], function () use ($route)
     {
+        $route->get('like_bangumi', 'UserController@likeBangumi');
+
         $route->get('detect_relation', 'UserController@detectUserRelation');
 
         $route->get('patch', 'UserController@patch');
