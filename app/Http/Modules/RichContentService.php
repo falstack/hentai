@@ -182,20 +182,6 @@ class RichContentService
                     ]
                 ];
             }
-            else if ($type === 'video')
-            {
-                if (!preg_match('/https?:\/\/(www|m)\.bilibili\.com/', $row['data']['source']))
-                {
-                    continue;
-                }
-                $text = trim($row['data']['caption']);
-                $result[] = [
-                    'type' => $type,
-                    'data' => array_merge($row['data'], [
-                        'caption' => $text ? Purifier::clean($text) : ''
-                    ])
-                ];
-            }
             else if ($type === 'baidu')
             {
                 $url = trim($row['data']['url']);
@@ -218,19 +204,26 @@ class RichContentService
 
     public function parseRichContent(string $data)
     {
-        return json_decode($data, true);
         $data = json_decode($data, true);
         $result = [];
         foreach ($data as $row)
         {
-            if ($row['type'] === 'vote')
+//            if ($row['type'] === 'vote')
+//            {
+//                // 过滤掉答案
+//                unset($row['data']['right_ids']);
+//                $result[] = [
+//                    'type' => 'vote',
+//                    'data' => $row['data']
+//                ];
+//            }
+            if ($row['type'] === 'video')
             {
-                // 过滤掉答案
-                unset($row['data']['right_ids']);
-                $result[] = [
-                    'type' => 'vote',
-                    'data' => $row['data']
-                ];
+                continue;
+            }
+            else if ($row['type'] === 'music')
+            {
+                continue;
             }
             else
             {
@@ -343,14 +336,6 @@ class RichContentService
             {
                 $result .= $row['data']['caption'];
             }
-            else if ($type === 'video')
-            {
-                $result .= $row['data']['caption'];
-            }
-            else if ($type === 'music')
-            {
-                $result .= $row['data']['caption'];
-            }
             else if ($type === 'baidu')
             {
                 $result .= '[百度资源]';
@@ -381,22 +366,6 @@ class RichContentService
                     $firstImage = $row;
                 }
                 $images[] = $row['data']['file'];
-            }
-            else if ($type === 'video')
-            {
-                $videoCount++;
-                if (!$firstVideo)
-                {
-                    $firstVideo = $row;
-                }
-            }
-            else if ($type === 'music')
-            {
-                $musicCount++;
-                if (!$firstMusic)
-                {
-                    $firstMusic = $row;
-                }
             }
         }
 
@@ -556,14 +525,6 @@ class RichContentService
                 {
                     $words .= $item['text'];
                 }
-            }
-            else if ($type === 'video')
-            {
-                $words .= $row['data']['caption'];
-            }
-            else if ($type === 'music')
-            {
-                $words .= $row['data']['caption'];
             }
 
             if ($words)
