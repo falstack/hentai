@@ -109,7 +109,7 @@ class UserController extends Controller
         $ids = $userRepository->likeBangumi($slug);
 
         $user = $request->user();
-        if ($user && $user->can('write_news'))
+        if ($user && $user->can('create_news'))
         {
             array_unshift($ids, config('app.tag.default_news'));
         }
