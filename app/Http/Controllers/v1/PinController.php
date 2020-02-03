@@ -11,6 +11,7 @@ use App\Http\Repositories\UserRepository;
 use App\Models\Pin;
 use App\Models\PinAnswer;
 use App\Services\Spider\Query;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -324,6 +325,31 @@ class PinController extends Controller
             ->first();
 
         return $this->resOK($result);
+    }
+
+    public function recommendPin(Request $request)
+    {
+        $slug = $request->get('slug');
+        $user = $request->user();
+        if ($user->cant('recommend_pin'))
+        {
+            return $this->resErrRole();
+        }
+
+        $pin = Pin::where('slug', $slug)->first();
+        if (is_null($pin))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $result = $request->get('result');
+        $pin->update([
+            'recommended_at' => $result ? Carbon::now() : null
+        ]);
+
+        event(new \App\Events\Pin\Recommend($pin, $user, $result));
+
+        return $this->resOK();
     }
 
     public function fetchSiteMeta(Request $request)

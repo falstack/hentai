@@ -35,6 +35,10 @@ class UpdateFlowListCache
 
         $bangumiRepository = new BangumiRepository();
         $bangumiRepository->update_pin($pin->bangumi_slug, $pin->slug);
+        if ($pin->recommended_at)
+        {
+            $bangumiRepository->recommend_pin($pin->slug);
+        }
 
         $pin->update([
             'updated_at' => Carbon::now()

@@ -250,14 +250,21 @@ class BangumiRepository extends Repository
     {
         $this->SortAdd($this->newest_pin_cache_key($bangumiSlug), $pinSlug);
         $this->SortAdd($this->active_pin_cache_key($bangumiSlug), $pinSlug);
-        $this->SortAdd($this->index_pin_cache_key(), $pinSlug);
     }
 
     public function update_pin($bangumiSlug, $pinSlug)
     {
         $this->SortAdd($this->newest_pin_cache_key($bangumiSlug), $pinSlug);
         $this->SortAdd($this->active_pin_cache_key($bangumiSlug), $pinSlug);
-        $this->SortAdd($this->index_pin_cache_key(), $pinSlug);
+    }
+
+    public function recommend_pin($pinSlug, $result = true)
+    {
+        if ($result) {
+            $this->SortAdd($this->index_pin_cache_key(), $pinSlug);
+        } else {
+            $this->SortRemove($this->index_pin_cache_key(), $pinSlug);
+        }
     }
 
     public function del_pin($bangumiSlug, $pinSlug)

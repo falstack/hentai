@@ -43,6 +43,11 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\Move\UpdatePinTimeline',
             'App\Listeners\Pin\Move\RefreshCache'
         ],
+        'App\Events\Pin\Recommend' => [
+            'App\Listeners\Pin\Recommend\UpdatePinTimeline',
+            'App\Listeners\Pin\Recommend\UpdateFlowListCache',
+            'App\Listeners\Pin\Recommend\RefreshCache'
+        ],
         'App\Events\Pin\Delete' => [
             'App\Listeners\Pin\Delete\UpdatePinTimeline',
             'App\Listeners\Pin\Delete\UpdateAuthorTimeline',

@@ -80,6 +80,8 @@ class Pin extends Model
          * 3 => 公开帖子
          * 4 => 被推荐
          * 5 => 移动帖子
+         * 6 => 推荐
+         * 7 => 取消推荐
          */
         return $this->morphMany('App\Models\Timeline', 'timelineable');
     }
