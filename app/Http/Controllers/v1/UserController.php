@@ -104,11 +104,16 @@ class UserController extends Controller
     public function likeBangumi(Request $request)
     {
         $slug = $request->get('slug');
-        $defaultArea = config('app.tag.default_daily');
 
         $userRepository = new UserRepository();
         $ids = $userRepository->likeBangumi($slug);
-        array_unshift($ids, $defaultArea);
+
+        $user = $request->user();
+        if ($user && $user->can('write_news'))
+        {
+            array_unshift($ids, config('app.tag.default_news'));
+        }
+        array_unshift($ids, config('app.tag.default_daily'));
 
         $bangumiRepository = new BangumiRepository();
         $result = $bangumiRepository->list($ids);
