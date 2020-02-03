@@ -472,7 +472,7 @@ class RichContentService
 
         if (count($filterImage) >= 1)
         {
-            return [$filterImage[0]];
+            return array_slice($filterImage, 0, 1);
         }
 
         return [[
