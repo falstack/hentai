@@ -49,6 +49,8 @@ $route->group(['prefix' => 'user'], function () use ($route)
 
     $route->get('idols', 'UserController@idols');
 
+    $route->get('pins', 'UserController@publishedPin');
+
     $route->group(['middleware' => 'user'], function () use ($route)
     {
         $route->get('like_bangumi', 'UserController@likeBangumi');

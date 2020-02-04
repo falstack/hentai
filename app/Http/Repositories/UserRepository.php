@@ -12,6 +12,7 @@ namespace App\Http\Repositories;
 use App\Http\Transformers\User\UserHomeResource;
 use App\Models\Bangumi;
 use App\Models\IdolFans;
+use App\Models\Pin;
 use App\Services\Qiniu\Http\Client;
 use App\User;
 use Spatie\Permission\Models\Role;
@@ -198,6 +199,32 @@ class UserRepository extends Repository
         return $this->filterIdsByPage($list, $page, $take);
     }
 
+    public function pins($slug, $page, $take, $refresh = false)
+    {
+        $list = $this->RedisSort($this->userPublishedPinCacheKey($slug), function () use ($slug)
+        {
+            return Pin
+                ::where('user_slug', $slug)
+                ->where('content_type', 1)
+                ->whereNotNull('published_at')
+                ->orderBy('published_at', 'DESC')
+                ->pluck('published_at', 'slug')
+                ->toArray();
+
+        }, ['force' => $refresh, 'is_time' => true]);
+
+        return $this->filterIdsByPage($list, $page, $take);
+    }
+
+    public function toggle_pin($userSlug, $pinSlug, $delete = false)
+    {
+        if ($delete) {
+            $this->SortRemove($this->userPublishedPinCacheKey($userSlug), $pinSlug);
+        } else {
+            $this->SortAdd($this->userPublishedPinCacheKey($userSlug), $pinSlug);
+        }
+    }
+
     public function likeBangumi($slug, $refresh = false)
     {
         return $this->RedisSort($this->userLikeBanguiCacheKey($slug), function () use ($slug)
@@ -339,6 +366,11 @@ class UserRepository extends Repository
     public function userIdolsCacheKey($slug)
     {
         return "user-{$slug}-idol-slug";
+    }
+
+    public function userPublishedPinCacheKey($slug)
+    {
+        return "user-{$slug}-published-pin-slug";
     }
 
     public function userLikeBanguiCacheKey($slug)

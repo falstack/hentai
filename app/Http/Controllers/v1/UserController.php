@@ -125,6 +125,33 @@ class UserController extends Controller
         ]);
     }
 
+    public function publishedPin(Request $request)
+    {
+        $slug = $request->get('slug');
+        $page = $request->get('page') ?: 1;
+        $take = $request->get('take') ?: 10;
+
+        $userRepository = new UserRepository();
+
+        $user = $userRepository->item($slug);
+        if (is_null($user))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $idsObj = $userRepository->pins($slug, $page, $take);
+
+        if (empty($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $pinRepository = new PinRepository();
+        $idsObj['result'] = $pinRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
+    }
+
     public function timeline(Request $request)
     {
         $validator = Validator::make($request->all(), [
