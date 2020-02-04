@@ -141,7 +141,7 @@ class BangumiRepository extends Repository
         {
             return Pin
                 ::whereNotNull('recommended_at')
-                ->where('content_type', 1)
+                ->whereNot('content_type', 2)
                 ->orderBy('updated_at', 'DESC')
                 ->pluck('updated_at', 'slug')
                 ->toArray();
@@ -178,7 +178,7 @@ class BangumiRepository extends Repository
                     return $query->where('published_at', '>=', $date);
                 })
                 ->where('trial_type', 0)
-                ->where('content_type', 1)
+                ->whereNot('content_type', 2)
                 ->where('can_up', 1)
                 ->whereNotNull('published_at')
                 ->select('slug', 'visit_count', 'comment_count', 'like_count', 'mark_count', 'reward_count', 'created_at')
@@ -223,7 +223,7 @@ class BangumiRepository extends Repository
             return Pin
                 ::where('bangumi_slug', $slug)
                 ->where('can_up', 1)
-                ->where('content_type', 1)
+                ->whereNot('content_type', 2)
                 ->whereNotNull('published_at')
                 ->orderBy('published_at', 'DESC')
                 ->pluck('published_at', 'slug');
@@ -238,7 +238,7 @@ class BangumiRepository extends Repository
             return Pin
                 ::where('bangumi_slug', $slug)
                 ->where('can_up', 1)
-                ->where('content_type', 1)
+                ->whereNot('content_type', 2)
                 ->whereNotNull('published_at')
                 ->orderBy('updated_at', 'DESC')
                 ->pluck('updated_at', 'slug');

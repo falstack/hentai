@@ -205,7 +205,7 @@ class UserRepository extends Repository
         {
             return Pin
                 ::where('user_slug', $slug)
-                ->where('content_type', 1)
+                ->whereNot('content_type', 2)
                 ->whereNotNull('published_at')
                 ->orderBy('published_at', 'DESC')
                 ->pluck('published_at', 'slug')
