@@ -139,7 +139,7 @@ class UserController extends Controller
             return $this->resErrNotFound();
         }
 
-        $idsObj = $userRepository->pins($slug, $page, $take);
+        $idsObj = $userRepository->pins($slug, $page - 1, $take);
 
         if (empty($idsObj['result']))
         {
@@ -225,7 +225,7 @@ class UserController extends Controller
     public function idols(Request $request)
     {
         $slug = $request->get('slug');
-        $page = $request->get('page') ?: 0;
+        $page = $request->get('page') ?: 1;
         $take = $request->get('take') ?: 20;
 
         $userRepository = new UserRepository();
@@ -235,7 +235,7 @@ class UserController extends Controller
             return $this->resErrNotFound();
         }
 
-        $idsObj = $userRepository->idol_slugs($slug, $page, $take);
+        $idsObj = $userRepository->idol_slugs($slug, $page - 1, $take);
         if (empty($idsObj['result']))
         {
             return $this->resOK($idsObj);
