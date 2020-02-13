@@ -30,7 +30,11 @@ class JoinController extends Controller
         {
             $rule = [
                 'right_rate' => 80,
-                'question_count' => 30
+                'question_count' => 30,
+                'qa_minutes' => 30,
+                'rule_type' => 0,
+                'result_type' => 0,
+                'is_open' => 1
             ];
         }
 

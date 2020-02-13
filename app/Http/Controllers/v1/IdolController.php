@@ -251,7 +251,7 @@ class IdolController extends Controller
             ::where('slug', $slug)
             ->where('type', 5)
             ->update([
-                'alias' => str_replace('|', ',', $alias)
+                'text' => str_replace('|', ',', $alias)
             ]);
 
         $idolRepository->item($slug, true);
