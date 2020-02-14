@@ -188,7 +188,8 @@ class JoinController extends Controller
             return $this->resErrNotFound();
         }
         $question->update([
-            'status' => 1
+            'status' => 1,
+            'right_id' => $request->get('right_id')
         ]);
 
         return $this->resNoContent();
