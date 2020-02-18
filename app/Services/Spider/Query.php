@@ -246,12 +246,14 @@ class Query
                 return null;
             }
 
+            $extra['alias'] = array_unique($extra['alias']);
+
             return [
                 'id' => $id,
                 'avatar' => "http:{$avatar}",
                 'name' => $extra['alias'][0],
                 'intro' => $detail,
-                'alias' => $extra['alias']
+                'alias' => array_values($extra['alias'])
             ];
         }
         catch (\Exception $e)
@@ -321,7 +323,7 @@ class Query
                 'avatar' => "http:{$avatar}",
                 'ep_total' => $count,
                 'published_at' => $publish,
-                'alias' => $alias,
+                'alias' => array_values($alias),
                 'intro' => $intro,
                 'tags' => $tags
             ];
