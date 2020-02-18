@@ -87,7 +87,7 @@ class Test extends Command
             }
 
             $answers = [];
-            foreach ($vote['items'] as $item)
+            foreach ($vote->items as $item)
             {
                 $answers[$item['id']] = $item['text'];
             }
@@ -97,7 +97,7 @@ class Test extends Command
                 'bangumi_slug' => $bangumiSlug,
                 'user_slug' => $pin->author->slug,
                 'answers' => json_encode($answers),
-                'right_id' => $vote['right_ids'][0],
+                'right_id' => $vote->right_ids[0],
                 'status' => 0
             ]);
 
