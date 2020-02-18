@@ -89,7 +89,7 @@ class Test extends Command
             $answers = [];
             foreach ($vote->items as $item)
             {
-                $answers[$item['id']] = $item['text'];
+                $answers[$item->id] = $item->text;
             }
 
             BangumiQuestion::create([
