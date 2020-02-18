@@ -15,6 +15,7 @@ use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
 use App\Http\Repositories\UserRepository;
 use App\Models\Bangumi;
+use App\Models\Pin;
 use App\Models\Tag;
 use App\Services\Spider\BangumiSource;
 use App\Services\Spider\Query;
@@ -26,15 +27,12 @@ class WebController extends Controller
 {
     public function index(Request $request)
     {
-        $ids = Tag
-            ::where('pin_count', '>', 0)
-            ->whereNull('migration_slug')
-            ->whereIn('parent_slug', [
-                config('app.tag.bangumi'),
-                config('app.tag.topic'),
-                config('app.tag.game')
-            ])
-            ->pluck('slug')
+        $ids = Pin
+            ::where('pins.content_type', 2)
+            ->where('pins.main_area_slug', '<>', '')
+            ->leftJoin('tags', 'pins.main_area_slug', '=', 'tags.slug')
+            ->whereNull('tags.migration_slug')
+            ->pluck('tags.slug')
             ->toArray();
 
         $tagRepository = new TagRepository();
