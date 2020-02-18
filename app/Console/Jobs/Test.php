@@ -70,13 +70,13 @@ class Test extends Command
             $title = '';
             foreach ($content as $row)
             {
-                if ($row['type'] === 'vote')
+                if ($row->type === 'vote')
                 {
-                    $vote = $row['data'];
+                    $vote = $row->data;
                 }
-                if ($row['type'] === 'title')
+                else if ($row->type === 'title')
                 {
-                    $title = $row['data']['text'];
+                    $title = $row->data['text'];
                 }
             }
 
