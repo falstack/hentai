@@ -42,7 +42,7 @@ class Test extends Command
     {
         $list = Pin
             ::where('content_type', 2)
-            ->whereNotNull('main_area_slug')
+            ->where('main_area_slug', '', '<>')
             ->pluck('slug', 'main_area_slug');
 
         $pinRepository = new PinRepository();
