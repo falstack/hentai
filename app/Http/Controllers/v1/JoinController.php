@@ -189,6 +189,7 @@ class JoinController extends Controller
         }
         $question->update([
             'status' => 1,
+            'title' => $request->get('title'),
             'right_id' => $request->get('right_id')
         ]);
 
