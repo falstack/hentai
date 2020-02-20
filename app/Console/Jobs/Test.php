@@ -17,6 +17,7 @@ use App\Services\Spider\Query;
 use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 
 class Test extends Command
@@ -55,6 +56,10 @@ class Test extends Command
 
             if (!$bangumiSlug)
             {
+                Log::info('migration qa no bangumi', [
+                    'tag' => $tagSlug,
+                    'pin' => $pinSlug
+                ]);
                 continue;
             }
 
@@ -62,6 +67,10 @@ class Test extends Command
             if (!$pin)
             {
                 Pin::where('slug', $pinSlug)->delete();
+                Log::info('migration qa no pin', [
+                    'tag' => $tagSlug,
+                    'pin' => $pinSlug
+                ]);
                 continue;
             }
 
@@ -83,6 +92,10 @@ class Test extends Command
             if (!$vote)
             {
                 Pin::where('slug', $pinSlug)->delete();
+                Log::info('migration qa no vote', [
+                    'tag' => $tagSlug,
+                    'pin' => $pinSlug
+                ]);
                 continue;
             }
 
