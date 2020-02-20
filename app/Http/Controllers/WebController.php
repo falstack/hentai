@@ -27,18 +27,6 @@ class WebController extends Controller
 {
     public function index(Request $request)
     {
-        $ids = Pin
-            ::where('pins.content_type', 2)
-            ->where('pins.main_topic_slug', '<>', '')
-            ->leftJoin('tags', 'pins.main_topic_slug', '=', 'tags.slug')
-            ->whereNull('tags.migration_slug')
-            ->pluck('tags.slug')
-            ->toArray();
-
-        $tagRepository = new TagRepository();
-
-        $list = $tagRepository->list($ids);
-
-        return $this->resOK($list);
+        return $this->resOK('hope happy end');
     }
 }

@@ -56,16 +56,12 @@ class Test extends Command
 
             $content = $pin->content;
             $vote = '';
-            $title = '';
+            $title = $pin->title['text'];
             foreach ($content as $row)
             {
                 if ($row->type === 'vote')
                 {
                     $vote = $row->data;
-                }
-                else if ($row->type === 'title')
-                {
-                    $title = $row->data['text'];
                 }
             }
 
