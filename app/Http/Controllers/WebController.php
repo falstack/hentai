@@ -27,10 +27,17 @@ class WebController extends Controller
 {
     public function index(Request $request)
     {
-        $list = Pin
-            ::where('content_type', 2)
-            ->where('main_area_slug', '<>', '')
-            ->pluck('slug', 'main_area_slug');
+        $ids = Pin
+            ::where('pins.content_type', 2)
+            ->where('pins.main_topic_slug', '<>', '')
+            ->leftJoin('tags', 'pins.main_topic_slug', '=', 'tags.slug')
+            ->whereNull('tags.migration_slug')
+            ->pluck('tags.slug')
+            ->toArray();
+
+        $tagRepository = new TagRepository();
+
+        $list = $tagRepository->list($ids);
 
         return $this->resOK($list);
     }
