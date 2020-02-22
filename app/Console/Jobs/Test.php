@@ -31,25 +31,14 @@ class Test extends Command
      */
     public function handle()
     {
-        $list = DB
-            ::table('followables')
-            ->where('followable_type', 'App\Models\Tag')
-            ->where('relation', 'bookmark')
-            ->get()
+        $list = Tag
+            ::where('migration_state', '<>', 8)
+            ->whereNotNull('migration_slug')
+            ->pluck('migration_slug', 'id')
             ->toArray();
 
-        foreach ($list as $relation)
+        foreach ($list as $tagId => $bangumiSlug)
         {
-            $bangumiSlug = Tag
-                ::where('id', $relation->followable_id)
-                ->pluck('migration_slug')
-                ->first();
-
-            if (!$bangumiSlug)
-            {
-                continue;
-            }
-
             $bangumiId = Bangumi
                 ::where('slug', $bangumiSlug)
                 ->pluck('id')
@@ -57,11 +46,19 @@ class Test extends Command
 
             DB
                 ::table('followables')
-                ->where('id', $relation->id)
+                ->where('followable_id', $tagId)
+                ->where('followable_type', 'App\Models\Tag')
+                ->where('relation', 'bookmark')
                 ->update([
                     'relation' => 'like',
                     'followable_type' => 'App\Models\Bangumi',
                     'followable_id' => $bangumiId
+                ]);
+
+            Tag
+                ::where('id', $tagId)
+                ->update([
+                    'migration_state' => 8
                 ]);
         }
 
