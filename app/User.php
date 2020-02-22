@@ -48,8 +48,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'wechat_unique_id',
         'wechat_open_id',
         'title',                        // 头衔
-        'level',                        // 网页端等级
-        'level2',                       // 小程序等级
+        'level',                        // 等级
         'virtual_coin',                 // 团子数量
         'money_coin',                   // 光玉数量
         'banned_to',                    // 封禁结束时间

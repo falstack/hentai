@@ -13,6 +13,6 @@ class UpgradeUserLevel
 
     public function handle(\App\Events\Bangumi\Pass $event)
     {
-        $event->user->increment('level2');
+        $event->user->increment('level');
     }
 }
