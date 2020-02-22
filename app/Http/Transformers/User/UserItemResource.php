@@ -20,8 +20,7 @@ class UserItemResource extends JsonResource
             'avatar' => $this->avatar,
             'title' => $this->title,
             'sex' => $this->sex,
-            'level' => $this->level,
-            'level2' => $this->level2,
+            'level' => $this->level
         ];
     }
 }

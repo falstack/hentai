@@ -7,6 +7,7 @@ use App\Models\Bangumi;
 use App\Models\BangumiQuestion;
 use App\Models\Pin;
 use App\Models\Tag;
+use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -31,33 +32,25 @@ class Test extends Command
      */
     public function handle()
     {
-        $list = Tag
+        $list = User
             ::where('migration_state', '<>', 8)
-            ->whereNotNull('migration_slug')
-            ->pluck('migration_slug', 'id')
+            ->take(5000)
+            ->pluck('id')
             ->toArray();
 
-        foreach ($list as $tagId => $bangumiSlug)
+        foreach ($list as $userId)
         {
-            $bangumiId = Bangumi
-                ::where('slug', $bangumiSlug)
-                ->pluck('id')
-                ->first();
-
-            DB
+            $count = DB
                 ::table('followables')
-                ->where('followable_id', $tagId)
-                ->where('followable_type', 'App\Models\Tag')
-                ->where('relation', 'bookmark')
-                ->update([
-                    'relation' => 'like',
-                    'followable_type' => 'App\Models\Bangumi',
-                    'followable_id' => $bangumiId
-                ]);
+                ->where('user_id', $userId)
+                ->where('followable_type', 'App\Models\Bangumi')
+                ->where('relation', 'like')
+                ->count();
 
-            Tag
-                ::where('id', $tagId)
+            User
+                ::where('id', $userId)
                 ->update([
+                    'level' => $count + 1,
                     'migration_state' => 8
                 ]);
         }
