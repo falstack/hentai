@@ -3,10 +3,12 @@
 namespace App\Console\Jobs;
 
 use App\Http\Repositories\PinRepository;
+use App\Models\Bangumi;
 use App\Models\BangumiQuestion;
 use App\Models\Pin;
 use App\Models\Tag;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class Test extends Command
 {
@@ -29,16 +31,17 @@ class Test extends Command
      */
     public function handle()
     {
-        $list = Pin
-            ::where('content_type', 2)
-            ->where('main_area_slug', '<>', '')
-            ->pluck('slug', 'main_area_slug');
+        $list = DB
+            ::table('followables')
+            ->where('followable_type', 'App\Models\Tag')
+            ->where('relation', 'bookmark')
+            ->get()
+            ->toArray();
 
-        $pinRepository = new PinRepository();
-        foreach ($list as $tagSlug => $pinSlug)
+        foreach ($list as $relation)
         {
             $bangumiSlug = Tag
-                ::where('slug', $tagSlug)
+                ::where('id', $relation->followable_id)
                 ->pluck('migration_slug')
                 ->first();
 
@@ -47,46 +50,19 @@ class Test extends Command
                 continue;
             }
 
-            $pin = $pinRepository->item($pinSlug);
-            if (!$pin)
-            {
-                Pin::where('slug', $pinSlug)->delete();
-                continue;
-            }
+            $bangumiId = Bangumi
+                ::where('slug', $bangumiSlug)
+                ->pluck('id')
+                ->first();
 
-            $content = $pin->content;
-            $vote = '';
-            $title = $pin->title->text;
-            foreach ($content as $row)
-            {
-                if ($row->type === 'vote')
-                {
-                    $vote = $row->data;
-                }
-            }
-
-            if (!$vote)
-            {
-                Pin::where('slug', $pinSlug)->delete();
-                continue;
-            }
-
-            $answers = [];
-            foreach ($vote->items as $item)
-            {
-                $answers[$item->id] = $item->text;
-            }
-
-            BangumiQuestion::create([
-                'title' => $title,
-                'bangumi_slug' => $bangumiSlug,
-                'user_slug' => $pin->author->slug,
-                'answers' => json_encode($answers),
-                'right_id' => $vote->right_ids[0],
-                'status' => 0
-            ]);
-
-            Pin::where('slug', $pinSlug)->delete();
+            DB
+                ::table('followables')
+                ->where('id', $relation->id)
+                ->update([
+                    'relation' => 'like',
+                    'followable_type' => 'App\Models\Bangumi',
+                    'followable_id' => $bangumiId
+                ]);
         }
 
         return true;
