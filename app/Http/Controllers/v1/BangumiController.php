@@ -241,7 +241,7 @@ class BangumiController extends Controller
     public function idols(Request $request)
     {
         $slug = $request->get('slug');
-        $page = $request->get('page') ?: 0;
+        $page = $request->get('page') ?: 1;
         $take = $request->get('take') ?: 20;
 
         $bangumiRepository = new BangumiRepository();
@@ -251,7 +251,7 @@ class BangumiController extends Controller
             return $this->resErrNotFound();
         }
 
-        $idsObj = $bangumiRepository->idol_slugs($slug, $page, $take);
+        $idsObj = $bangumiRepository->idol_slugs($slug, $page - 1, $take);
         if (empty($idsObj['result']))
         {
             return $this->resOK($idsObj);
