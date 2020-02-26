@@ -242,6 +242,7 @@ class UserRepository extends Repository
                 ->likes(Bangumi::class)
                 ->withPivot('created_at')
                 ->orderBy('created_at', 'DESC')
+                ->where('type', 0)
                 ->pluck('followables.created_at', 'slug')
                 ->toArray();
 
