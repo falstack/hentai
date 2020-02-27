@@ -15,21 +15,22 @@ class UpdatePinToFlow
 
     public function handle(\App\Events\Pin\Update $event)
     {
-        if ($event->oldBangumiSlug === $event->newBangumiSlug)
-        {
-            return;
-        }
-
         $bangumiRepository = new BangumiRepository();
 
-        if ($event->oldBangumiSlug)
+        if (!$event->doPublish)
         {
-            $bangumiRepository->del_pin($event->oldBangumiSlug, $event->pin->slug);
+            if ($event->oldBangumiSlug)
+            {
+                $bangumiRepository->del_pin($event->oldBangumiSlug, $event->pin->slug);
+            }
         }
 
-        if ($event->newBangumiSlug)
+        if ($event->published)
         {
-            $bangumiRepository->add_pin($event->newBangumiSlug, $event->pin->slug);
+            if ($event->newBangumiSlug)
+            {
+                $bangumiRepository->add_pin($event->newBangumiSlug, $event->pin->slug);
+            }
         }
     }
 }
