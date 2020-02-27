@@ -27,7 +27,7 @@ class RemovePinFlow
      */
     public function handle(\App\Events\Pin\Delete $event)
     {
-        if (!$event->published || $event->pin->content_type != 1)
+        if (!$event->published)
         {
             return;
         }

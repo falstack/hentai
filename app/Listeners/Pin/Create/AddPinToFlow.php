@@ -16,7 +16,7 @@ class AddPinToFlow
 
     public function handle(\App\Events\Pin\Create $event)
     {
-        if (!$event->pin->bangumi_slug)
+        if (!$event->pin->bangumi_slug || !$event->doPublish)
         {
             return;
         }

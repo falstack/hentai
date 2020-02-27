@@ -27,7 +27,7 @@ class UpdateAuthorTimeline
      */
     public function handle(\App\Events\Pin\Create $event)
     {
-        if (!$event->doPublish || $event->pin->content_type !== 1)
+        if (!$event->doPublish)
         {
             return;
         }
