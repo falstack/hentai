@@ -246,7 +246,6 @@ class PinController extends Controller
 
     public function movePin(Request $request)
     {
-        return $this->resErrServiceUnavailable();
         $slug = $request->get('slug');
         if (!$slug)
         {
@@ -267,14 +266,12 @@ class PinController extends Controller
             return $this->resErrNotFound();
         }
 
-        $tags = $request->get('tags');
-        $topic = $request->get('topic') ?: '';
-        $area = $request->get('area') ?: '';
+        $oldBangumiSlug = $pin->bangumi->slug;
+        $newBangumiSlug = $request->get('bangumi');
         $pin->update([
-            'main_topic_slug' => $topic,
-            'main_area_slug' => $area
+            'bangumi_slug' => $newBangumiSlug
         ]);
-        event(new \App\Events\Pin\Move($pin, $user, $tags));
+        event(new \App\Events\Pin\Move($pin, $user, $oldBangumiSlug, $newBangumiSlug));
 
         return $this->resOK();
     }
