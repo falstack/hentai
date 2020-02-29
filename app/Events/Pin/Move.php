@@ -14,12 +14,14 @@ class Move
 
     public $pin;
     public $user;
-    public $tags;
+    public $oldBangumiSlug;
+    public $newBangumiSlug;
 
-    public function __construct(Pin $pin, User $user, array $tags)
+    public function __construct(Pin $pin, User $user, string $oldBangumiSlug, string $newBangumiSlug)
     {
         $this->pin = $pin;
         $this->user = $user;
-        $this->tags = $tags;
+        $this->oldBangumiSlug = $oldBangumiSlug;
+        $this->newBangumiSlug = $newBangumiSlug;
     }
 }

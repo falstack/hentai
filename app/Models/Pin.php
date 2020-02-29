@@ -223,7 +223,6 @@ class Pin extends Model
         $this->content()->create([
             'text' => $richContentService->saveRichContent($content)
         ]);
-        $tags = [];
 
         event(new \App\Events\Pin\Update($this, $user, $doPublish, $oldBangumiSlug, $bangumi_slug));
 

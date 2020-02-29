@@ -41,6 +41,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\Pin\Move' => [
             'App\Listeners\Pin\Move\UpdatePinTimeline',
+            'App\Listeners\Pin\Move\UpdatePinFlow',
             'App\Listeners\Pin\Move\RefreshCache'
         ],
         'App\Events\Pin\Recommend' => [
