@@ -6,7 +6,7 @@ namespace App\Listeners\Pin\Update;
 
 use App\Http\Repositories\BangumiRepository;
 
-class UpdatePinToFlow
+class UpdatePinFlow
 {
     public function __construct()
     {
