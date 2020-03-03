@@ -10,11 +10,16 @@ use QL\QueryList;
 
 class Query
 {
+    private static $opts = [
+        'timeout' => 30,
+        'headers' => [
+            'Cookie' => 'chii_auth=hpeQnWCapWnuwGXqHgzXOD17WEKf%2F8BK7nWYLMuHoDy1jjY1uxQQ6GbP9fX3y%2BdC6LLJwpkoAP%2F7OzsAgfJeq5h6jwp7OdTUDNFN'
+        ]
+    ];
+
     public function fetchMeta($url)
     {
-        $ql = QueryList::get($url, [], [
-            'timeout' => 30
-        ]);
+        $ql = QueryList::get($url, [], $this::$opts);
         $title = $ql->find('title')->text();
         $description = $ql->find('meta[name=description]')->content;
         $image = $ql->find('img')->src;
@@ -34,9 +39,7 @@ class Query
         {
             $query = urlencode($name);
             $url = "http://bgm.tv/subject_search/{$query}?cat=2";
-            $ql = QueryList::get($url, [], [
-                'timeout' => 30
-            ]);
+            $ql = QueryList::get($url, [], $this::$opts);
             $result = $ql
                 ->find('#browserItemList')
                 ->eq(0)
@@ -101,9 +104,7 @@ class Query
         try
         {
             $url = "http://bgm.tv/subject/{$id}/characters";
-            $ql = QueryList::get($url, [], [
-                'timeout' => 30
-            ]);
+            $ql = QueryList::get($url, [], $this::$opts);
             $result = $ql
                 ->find('.light_odd')
                 ->filter(':has(h2 .tip)')
@@ -151,9 +152,7 @@ class Query
         try
         {
             $url = "http://bgm.tv/subject/{$id}";
-            $ql = QueryList::get($url, [], [
-                'timeout' => 30
-            ]);
+            $ql = QueryList::get($url, [], $this::$opts);
 
             return $ql
                 ->find('.subject_tag_section')
@@ -176,9 +175,7 @@ class Query
         try
         {
             $url = "http://bgm.tv/anime/browser?sort=rank&page={$page}";
-            $ql = QueryList::get($url, [], [
-                'timeout' => 30
-            ]);
+            $ql = QueryList::get($url, [], $this::$opts);
 
             $ids = $ql
                 ->find('#browserItemList')
@@ -215,9 +212,7 @@ class Query
         try
         {
             $url = "http://bgm.tv/character/{$id}";
-            $ql = QueryList::get($url, [], [
-                'timeout' => 30
-            ]);
+            $ql = QueryList::get($url, [], $this::$opts);
 
             $avatar = $ql->find('.infobox')->eq(0)->find('img')->eq(0)->src;
             $meta = explode(PHP_EOL, $ql->find('#infobox')->text());
@@ -269,9 +264,7 @@ class Query
         try
         {
             $url = "http://bgm.tv/subject/{$id}";
-            $ql = QueryList::get($url, [], [
-                'timeout' => 30
-            ]);
+            $ql = QueryList::get($url, [], $this::$opts);
 
             $avatar = $ql
                 ->find('.infobox')
@@ -347,9 +340,7 @@ class Query
         try
         {
             $url = 'http://bgm.tv/calendar';
-            $ql = QueryList::get($url, [], [
-                'timeout' => 30
-            ]);
+            $ql = QueryList::get($url, [], $this::$opts);
             $data = $ql
                 ->find('.coverList')
                 ->map(function ($item)
