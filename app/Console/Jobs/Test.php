@@ -7,9 +7,11 @@ use App\Models\Bangumi;
 use App\Models\BangumiQuestion;
 use App\Models\Pin;
 use App\Models\Tag;
+use App\Services\Spider\Query;
 use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Test extends Command
 {
@@ -32,27 +34,27 @@ class Test extends Command
      */
     public function handle()
     {
-        $list = User
-            ::where('migration_state', '<>', 8)
-            ->take(5000)
-            ->pluck('id')
-            ->toArray();
+        $list = Bangumi
+            ::whereNull('published_at')
+            ->whereNotNull('source_id')
+            ->inRandomOrder()
+            ->take(1000)
+            ->get();
 
-        foreach ($list as $userId)
+        $query = new Query();
+        foreach ($list as $bangumi)
         {
-            $count = DB
-                ::table('followables')
-                ->where('user_id', $userId)
-                ->where('followable_type', 'App\Models\Bangumi')
-                ->where('relation', 'like')
-                ->count();
-
-            User
-                ::where('id', $userId)
-                ->update([
-                    'level' => $count + 1,
-                    'migration_state' => 8
+            $info = $query->getBangumiDetail($bangumi->source_id);
+            if ($info['published_at'])
+            {
+                $bangumi->update([
+                    'published_at' => $info['published_at']
                 ]);
+            }
+            else
+            {
+                Log::info('update publish error：' . $bangumi->source_id);
+            }
         }
 
         return true;

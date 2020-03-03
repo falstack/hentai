@@ -4,6 +4,7 @@
 namespace App\Services\Spider;
 
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use QL\QueryList;
 
@@ -300,6 +301,10 @@ class Query
                 {
                     $publish = $arr[1];
                 }
+                else if ($arr[0] === '上映年度')
+                {
+                    $publish = $arr[1];
+                }
                 else if ($arr[0] === '别名')
                 {
                     $alias[] = $arr[1];
@@ -322,7 +327,7 @@ class Query
                 'name' => $name,
                 'avatar' => "http:{$avatar}",
                 'ep_total' => $count,
-                'published_at' => $publish,
+                'published_at' => $this->formatPublish($publish),
                 'alias' => array_values($alias),
                 'intro' => $intro,
                 'tags' => $tags
@@ -371,6 +376,36 @@ class Query
         {
             Log::info("[--spider--]：get news bangumi failed");
             return [];
+        }
+    }
+
+    private function formatPublish($publish)
+    {
+        if (!$publish)
+        {
+            return null;
+        }
+        try
+        {
+            if ($publish[0] === '0')
+            {
+                $publish = '20' . $publish;
+            }
+            if ($publish[0] === '1')
+            {
+                $publish = '19' . $publish;
+            }
+            $publish = str_replace('年', '-', $publish);
+            $publish = str_replace('月', '-', $publish);
+            $publish = str_replace('日', '-', $publish);
+
+            $ts = strtotime($publish);
+
+            return Carbon::createFromTimestamp($ts);
+        }
+        catch (\Exception $e)
+        {
+            return null;
         }
     }
 }
