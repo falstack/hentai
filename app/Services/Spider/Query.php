@@ -399,7 +399,7 @@ class Query
             }
             $publish = str_replace('年', '-', $publish);
             $publish = str_replace('月', '-', $publish);
-            $publish = str_replace('日', '-', $publish);
+            $publish = str_replace('日', '', $publish);
 
             $ts = strtotime($publish);
 
