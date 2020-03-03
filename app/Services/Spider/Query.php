@@ -297,11 +297,12 @@ class Query
                 {
                     $count = $arr[1];
                 }
-                else if ($arr[0] === '放送开始')
-                {
-                    $publish = $arr[1];
-                }
-                else if ($arr[0] === '上映年度')
+                else if (
+                    $arr[0] === '放送开始' ||
+                    $arr[0] === '发售日' ||
+                    $arr[0] === '上映年度' ||
+                    $arr[0] === '开始'
+                )
                 {
                     $publish = $arr[1];
                 }
