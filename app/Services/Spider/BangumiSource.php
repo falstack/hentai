@@ -149,6 +149,7 @@ class BangumiSource
                 'intro' => $source['intro'],
                 'alias' => $alias,
                 'type' => $type,
+                'published_at' => $source['published_at'] ?? null,
                 'source_id' => $source['id']
             ]);
 

@@ -28,7 +28,8 @@ class Bangumi extends Model
         'score',
         'like_user_count',
         'subscribe_user_count',
-        'type'  // 0：番剧，1；游戏，9：其它
+        'type',  // 0：番剧，1；游戏，9：其它
+        'published_at'
     ];
 
     protected $casts = [
