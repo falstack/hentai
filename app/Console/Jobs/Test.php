@@ -34,6 +34,7 @@ class Test extends Command
      */
     public function handle()
     {
+        return true;
         $list = Bangumi
             ::whereNull('published_at')
             ->whereNotNull('source_id')
