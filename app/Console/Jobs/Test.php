@@ -37,6 +37,7 @@ class Test extends Command
         $list = Bangumi
             ::whereNull('published_at')
             ->whereNotNull('source_id')
+            ->where('type', 0)
             ->inRandomOrder()
             ->take(1000)
             ->get();
