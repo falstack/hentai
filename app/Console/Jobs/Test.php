@@ -39,7 +39,7 @@ class Test extends Command
             ->whereNotNull('source_id')
             ->where('type', 0)
             ->inRandomOrder()
-            ->take(1000)
+            ->take(100)
             ->get();
 
         $query = new Query();
