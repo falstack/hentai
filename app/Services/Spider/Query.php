@@ -384,7 +384,7 @@ class Query
             {
                 $publish = '20' . $publish;
             }
-            if ($publish[0] === '1')
+            if ($publish[0] === '1' && $publish[3] === '-')
             {
                 $publish = '19' . $publish;
             }
