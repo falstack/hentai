@@ -11,10 +11,7 @@ use QL\QueryList;
 class Query
 {
     private static $opts = [
-        'timeout' => 30,
-        'headers' => [
-            'Cookie' => 'chii_auth=hpeQnWCapWnuwGXqHgzXOD17WEKf%2F8BK7nWYLMuHoDy1jjY1uxQQ6GbP9fX3y%2BdC6LLJwpkoAP%2F7OzsAgfJeq5h6jwp7OdTUDNFN'
-        ]
+        'timeout' => 30
     ];
 
     public function fetchMeta($url)
@@ -384,7 +381,7 @@ class Query
             {
                 $publish = '20' . $publish;
             }
-            if ($publish[0] === '1' && $publish[3] === '-')
+            if ($publish[0] === '1' && ($publish[3] === '-' || $publish[3] === '年'))
             {
                 $publish = '19' . $publish;
             }
