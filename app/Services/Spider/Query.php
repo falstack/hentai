@@ -342,7 +342,7 @@ class Query
                 ->find('.coverList')
                 ->map(function ($item)
                 {
-                    return $item
+                    $list = $item
                         ->find('li')
                         ->map(function ($li)
                         {
@@ -350,6 +350,8 @@ class Query
                             return last(explode('/', $info->href));
                         })
                         ->all();
+
+                    return [$list];
                 })
                 ->all();
 

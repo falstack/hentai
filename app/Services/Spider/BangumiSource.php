@@ -19,32 +19,47 @@ class BangumiSource
         $query = new Query();
         $newIds = $query->getNewsBangumi();
         $bangumiSlugs = [];
-        foreach ($newIds as $id)
+        foreach ($newIds as $list)
         {
-            $bangumi = Bangumi
-                ::where('source_id', $id)
-                ->first();
-
-            if ($bangumi)
+            foreach ($list as $i => $id)
             {
-                $bangumiSlugs[] = $bangumi->slug;
-                $this->getBangumiIdols($id, $bangumi->slug);
-                continue;
-            }
+                $bangumi = Bangumi
+                    ::where('source_id', $id)
+                    ->first();
 
-            $info = $query->getBangumiDetail($id);
-            if (!$info)
-            {
-                Redis::SADD('load-bangumi-failed-ids', $id);
-                continue;
-            }
+                if ($bangumi)
+                {
+                    $bangumiSlugs[] = $bangumi->slug;
+                    $bangumi->update([
+                        'update_week' => $i + 1
+                    ]);
+                    $this->getBangumiIdols($id, $bangumi->slug);
+                    continue;
+                }
 
-            $bangumi = $this->importBangumi($info);
-            if ($bangumi)
-            {
-                $bangumiSlugs[] = $bangumi->slug;
+                $info = $query->getBangumiDetail($id);
+                if (!$info)
+                {
+                    Redis::SADD('load-bangumi-failed-ids', $id);
+                    continue;
+                }
+
+                $bangumi = $this->importBangumi($info);
+                if ($bangumi)
+                {
+                    $bangumi->update([
+                        'update_week' => $i + 1
+                    ]);
+                    $bangumiSlugs[] = $bangumi->slug;
+                }
             }
         }
+
+        Bangumi
+            ::whereNotIn('slug', $bangumiSlugs)
+            ->update([
+                'update_week' => 0
+            ]);
 
         DB
             ::table('idols')

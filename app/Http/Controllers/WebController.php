@@ -21,6 +21,7 @@ use App\Services\Spider\BangumiSource;
 use App\Services\Spider\Query;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class WebController extends Controller
