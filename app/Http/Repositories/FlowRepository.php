@@ -43,7 +43,6 @@ class FlowRepository extends Repository
             return Pin
                 ::where('trial_type', 0)
                 ->where('can_up', 1)
-                ->where('content_type', 1)
                 ->whereNull('last_top_at')
                 ->whereNotNull('published_at')
                 ->select('slug', 'updated_at')
@@ -87,7 +86,6 @@ class FlowRepository extends Repository
                         })
                         ->where('trial_type', 0)
                         ->where('can_up', 1)
-                        ->whereNotIn('content_type', [2])
                         ->whereNotNull('published_at')
                         ->whereNull('last_top_at')
                         ->select('slug', 'visit_count', 'comment_count', 'like_count', 'mark_count', 'reward_count', 'created_at');
@@ -141,7 +139,6 @@ class FlowRepository extends Repository
                     $query
                         ->where('trial_type', 0)
                         ->where('can_up', 1)
-                        ->whereNotIn('content_type', [2])
                         ->whereNull('last_top_at')
                         ->whereNotNull('published_at')
                         ->select('slug', 'published_at')
@@ -174,7 +171,6 @@ class FlowRepository extends Repository
                     $query
                         ->where('trial_type', 0)
                         ->where('can_up', 1)
-                        ->whereNotIn('content_type', [2])
                         ->whereNull('last_top_at')
                         ->whereNotNull('published_at')
                         ->select('slug', 'updated_at')

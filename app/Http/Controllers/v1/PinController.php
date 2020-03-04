@@ -33,7 +33,7 @@ class PinController extends Controller
         $pinRepository = new PinRepository();
         $pin = $pinRepository->item($request->get('slug'));
 
-        if (is_null($pin) || $pin->content_type != 1)
+        if (is_null($pin))
         {
             return $this->resErrNotFound();
         }
@@ -155,11 +155,9 @@ class PinController extends Controller
 
         $user = $request->user();
         $bangumiSlug = $request->get('bangumi_slug') ?: config('app.tag.default_daily');
-        $contentType = 1;
 
         $pin = Pin::createPin(
             $request->get('content'),
-            $contentType,
             $request->get('publish'),
             $user,
             $bangumiSlug

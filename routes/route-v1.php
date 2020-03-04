@@ -265,41 +265,9 @@ $route->group(['prefix' => 'pin'], function () use ($route)
     });
 });
 
-$route->group(['prefix' => 'atfield', 'middleware' => 'auth'], function () use ($route)
-{
-    $route->post('create', 'ATFieldController@create');
-
-    $route->post('recommend', 'ATFieldController@recommend');
-
-    $route->post('delete', 'ATFieldController@delete');
-
-    $route->post('begin', 'ATFieldController@begin');
-
-    $route->post('invite', 'ATFieldController@invite');
-
-    $route->post('change_master', 'ATFieldController@changeMaster');
-
-    $route->get('list', 'ATFieldController@list');
-
-    $route->post('submit', 'ATFieldController@submit');
-
-    $route->get('result', 'ATFieldController@result');
-
-    $route->get('flow', 'ATFieldController@flow');
-
-    $route->group(['prefix' => 'rule'], function () use ($route)
-    {
-        $route->get('show', 'ATFieldController@getJoinRule');
-
-        $route->post('update', 'ATFieldController@updateJoinRule');
-    });
-});
-
 $route->group(['prefix' => 'tag'], function () use ($route)
 {
     $route->get('show', 'TagController@show');
-
-    $route->get('atfield', 'TagController@atfield');
 
     $route->get('hottest', 'TagController@hottest');
 

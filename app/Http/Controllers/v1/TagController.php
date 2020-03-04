@@ -280,38 +280,6 @@ class TagController extends Controller
         return $this->resNoContent();
     }
 
-    public function atfield(Request $request)
-    {
-        $slug = $request->get('slug');
-        if (!$slug)
-        {
-            return $this->resErrBad();
-        }
-
-        $trialCount = Pin
-            ::where('content_type', 2)
-            ->whereHas('tags', function ($query) use ($slug)
-            {
-                $query->where('slug', $slug);
-            })
-            ->whereNull('recommended_at')
-            ->count();
-
-        $passCount = Pin
-            ::where('content_type', 2)
-            ->whereHas('tags', function ($query) use ($slug)
-            {
-                $query->where('slug', $slug);
-            })
-            ->whereNotNull('recommended_at')
-            ->count();
-
-        return $this->resOK([
-            'trial' => $trialCount,
-            'pass' => $passCount
-        ]);
-    }
-
     public function search()
     {
         $tagRepository = new TagRepository();
