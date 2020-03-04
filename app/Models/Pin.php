@@ -30,7 +30,6 @@ class Pin extends Model
         'bangumi_slug',     // 番剧 slug
         'trial_type',       // 进入审核池的类型，默认 0 不在审核池，1 创建触发敏感词过滤进入审核池
         'comment_type',     // 评论权限的类型，默认 0 允许所有人评论
-        'content_type',     // 内容类型：1 是 calibur 公开帖子，2 是 calibur 分区答题
         'last_top_at',      // 最后置顶时间
         'last_edit_at',     // 最后编辑时间
         'published_at',     // 发布时间
@@ -119,7 +118,7 @@ class Pin extends Model
         return $this->morphMany('App\Models\Report', 'reportable');
     }
 
-    public static function createPin($content, $content_type, $publish, $user, $bangumi_slug)
+    public static function createPin($content, $publish, $user, $bangumi_slug)
     {
         $richContentService = new RichContentService();
         $content = $richContentService->preFormatContent($content);
@@ -135,7 +134,6 @@ class Pin extends Model
         $now = Carbon::now();
         $data = [
             'user_slug' => $user->slug,
-            'content_type' => $content_type,
             'bangumi_slug' => $bangumi_slug,
             'last_edit_at' => $now
         ];

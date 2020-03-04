@@ -69,7 +69,6 @@ class PinResource extends JsonResource
             'bangumi' => new BangumiItemResource($this->bangumi),
             'author' => new UserItemResource($this->author),
             'trial_type' => $this->trial_type,
-            'content_type' => $this->content_type,
             'comment_type' => $this->comment_type,
             'last_top_at' => $this->last_top_at,
             'recommended_at' => $this->recommended_at,
