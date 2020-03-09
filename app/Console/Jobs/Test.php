@@ -55,6 +55,7 @@ class Test extends Command
             ::table('contents')
             ->select(DB::raw('MIN(id) AS id'))
             ->groupBy(['contentable_type', 'contentable_id'])
+            ->whereNull('deleted_at')
             ->havingRaw('COUNT(id) > 1')
             ->pluck('id')
             ->take(1000)
