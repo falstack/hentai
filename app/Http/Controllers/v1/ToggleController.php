@@ -96,10 +96,7 @@ class ToggleController extends Controller
         $pinSlug = $request->get('pin_slug');
         $pin = Pin
             ::where('slug', $pinSlug)
-            ->with(['content' => function ($query)
-            {
-                $query->orderBy('created_at', 'desc');
-            }])
+            ->with(['content'])
             ->first();
 
         if (is_null($pin))

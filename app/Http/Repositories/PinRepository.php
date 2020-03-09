@@ -17,6 +17,20 @@ class PinRepository extends Repository
 {
     public function item($slug, $refresh = false)
     {
+        $result = $this->itemWithContent($slug, $refresh);
+
+        if (!$result)
+        {
+            return $result;
+        }
+
+        unset($result->content);
+
+        return $result;
+    }
+
+    public function itemWithContent($slug, $refresh = false)
+    {
         if (!$slug)
         {
             return null;
@@ -26,10 +40,7 @@ class PinRepository extends Repository
         {
             $pin = Pin
                 ::withTrashed()
-                ->with(['author', 'bangumi' ,'content' => function ($query)
-                {
-                    $query->orderBy('created_at', 'desc');
-                }])
+                ->with(['author', 'bangumi', 'content'])
                 ->where('slug', $slug)
                 ->first();
 
@@ -47,6 +58,18 @@ class PinRepository extends Repository
         }
 
         return $result;
+    }
+
+    public function itemOnlyContent($slug, $refresh = false)
+    {
+        $result = $this->itemWithContent($slug, $refresh);
+
+        if (!$result)
+        {
+            return [];
+        }
+
+        return $result->content;
     }
 
     public function drafts($slug, $page, $take, $refresh = false)

@@ -31,7 +31,7 @@ class PinController extends Controller
         }
 
         $pinRepository = new PinRepository();
-        $pin = $pinRepository->item($request->get('slug'));
+        $pin = $pinRepository->itemWithContent($request->get('slug'));
 
         if (is_null($pin))
         {
@@ -280,7 +280,7 @@ class PinController extends Controller
         $user = $request->user();
 
         $pinRepository = new PinRepository();
-        $pin = $pinRepository->item($slug);
+        $pin = $pinRepository->itemWithContent($slug);
         if (is_null($pin))
         {
             return $this->resErrNotFound();
