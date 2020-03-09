@@ -43,12 +43,10 @@ class UserHomeResource extends JsonResource
                 'total_sign_count' => $this->total_sign_count,
                 'latest_signed_at' => $this->latest_signed_at,
             ],
-            'stat' => [
-                'activity' => $this->activity_stat,
-                'exposure' => $this->exposure_stat,
-            ],
-            'stat_activity' => $this->activity_stat,
-            'stat_exposure' => $this->exposure_stat,
+            'wallet_coin' => (float)$this->virtual_coin,
+            'wallet_money' => (float)$this->money_coin,
+            'stat_activity' => (float)$this->activity_stat,
+            'stat_exposure' => (float)$this->exposure_stat,
         ];
     }
 }
