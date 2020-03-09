@@ -62,7 +62,7 @@ class PinResource extends JsonResource
             {
                 return $image['url'];
             }, $richContentService->parseRichBanner($content)),
-            'intro' => mb_substr($richContentService->paresPureContent($content), 0, 120, 'utf-8'),
+            'intro' => mb_substr($richContentService->paresPureContent($content), 0, 60, 'utf-8'),
             'bangumi' => new BangumiItemResource($this->bangumi),
             'author' => new UserItemResource($this->author),
             'trial_type' => $this->trial_type,
