@@ -2,7 +2,9 @@
 
 namespace App\Console\Jobs;
 
+use App\Models\Content;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class Test extends Command
 {
@@ -18,6 +20,8 @@ class Test extends Command
      * @var string
      */
     protected $description = 'test job';
+
+    protected $ids;
     /**
      * Execute the console command.
      *
@@ -25,6 +29,37 @@ class Test extends Command
      */
     public function handle()
     {
+        $ids = $this->getDeleteIds();
+
+        if (empty($ids))
+        {
+            return true;
+        }
+
+        $this->ids = $ids;
+
+        while (!empty($this->ids))
+        {
+            Content::whereIn('id', $this->ids)->delete();
+
+            $this->ids = $this->getDeleteIds();
+        }
+
         return true;
+    }
+
+    protected function getDeleteIds()
+    {
+        // select MIN(id) AS id from `contents` group by `contentable_type`, `contentable_id` having COUNT(id) > 1
+        $ids = DB
+            ::table('contents')
+            ->select(DB::raw('MIN(id) AS id'))
+            ->groupBy(['contentable_type', 'contentable_id'])
+            ->havingRaw('COUNT(id) > 1')
+            ->pluck('id')
+            ->take(1000)
+            ->toArray();
+
+        return $ids;
     }
 }

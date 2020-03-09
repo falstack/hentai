@@ -218,6 +218,7 @@ class Pin extends Model
 
         $this->update($data);
 
+        $this->content()->delete();
         $this->content()->create([
             'text' => $richContentService->saveRichContent($content)
         ]);
