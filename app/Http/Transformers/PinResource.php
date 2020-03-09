@@ -52,9 +52,6 @@ class PinResource extends JsonResource
             $badge = '图集';
         }
 
-        $intro = $richContentService->paresPureContent($content);
-        substr($richContentService->paresPureContent($content), 0, 120);
-
         return [
             'slug' => $this->slug,
             'title' => $title,
@@ -65,7 +62,7 @@ class PinResource extends JsonResource
             {
                 return $image['url'];
             }, $richContentService->parseRichBanner($content)),
-            'intro' => $intro,
+            'intro' => mb_substr($richContentService->paresPureContent($content), 0, 120, 'utf-8'),
             'bangumi' => new BangumiItemResource($this->bangumi),
             'author' => new UserItemResource($this->author),
             'trial_type' => $this->trial_type,
