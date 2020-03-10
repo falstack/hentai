@@ -345,64 +345,6 @@ class RichContentService
         return $result;
     }
 
-    public function parseRichPoster($title, array $data)
-    {
-        $imageCount = 0;
-        $videoCount = 0;
-        $musicCount = 0;
-        $firstImage = null;
-        $firstVideo = null;
-        $firstMusic = null;
-        $images = [];
-
-        foreach ($data as $row)
-        {
-            $type = $row['type'];
-            if ($type === 'image')
-            {
-                $imageCount++;
-                if (!$firstImage)
-                {
-                    $firstImage = $row;
-                }
-                $images[] = $row['data']['file'];
-            }
-        }
-
-        if (
-            !$firstImage &&
-            !$firstVideo &&
-            !$firstMusic &&
-            !isset($title['banner'])
-        )
-        {
-            return null;
-        }
-
-        $banner = null;
-        if (isset($title['banner']))
-        {
-            $banner = $title['banner'];
-            $imageCount++;
-            array_unshift($images, $banner);
-        }
-        else if ($firstImage)
-        {
-            $banner = $firstImage['data']['file'];
-        }
-
-        return [
-            'image_count' => $imageCount,
-            'video_count' => $videoCount,
-            'music_count' => $musicCount,
-            'first_image' => $firstImage,
-            'first_video' => $firstVideo,
-            'first_music' => $firstMusic,
-            'banner' => $banner,
-            'images' => array_slice($images, 0, 3)
-        ];
-    }
-
     public function parseRichBanner($data)
     {
         $images = [];

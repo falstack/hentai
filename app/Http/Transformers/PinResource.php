@@ -29,7 +29,7 @@ class PinResource extends JsonResource
         {
             $title = array_shift($content)['data'];
         }
-        $media = $richContentService->parseRichPoster($title, $content);
+
         $badge = '帖子';
         if ($richContentService->getFirstType($content, 'baidu'))
         {
@@ -39,25 +39,12 @@ class PinResource extends JsonResource
         {
             $badge = '投票';
         }
-        else if ($richContentService->getFirstType($content, 'music'))
-        {
-            $badge = '音乐';
-        }
-        else if ($richContentService->getFirstType($content, 'video'))
-        {
-            $badge = '视频';
-        }
-        else if ($media['image_count'] >= 9)
-        {
-            $badge = '图集';
-        }
 
         return [
             'slug' => $this->slug,
             'title' => $title,
             'badge' => $badge,
             'content' => $content,
-            'media' => $media,
             'banner' => array_map(function ($image)
             {
                 return patchImage($image['url']);
