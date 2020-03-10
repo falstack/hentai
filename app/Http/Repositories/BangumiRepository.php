@@ -100,7 +100,7 @@ class BangumiRepository extends Repository
             return json_encode($result);
         });
 
-        return json_decode($result);
+        return gettype($result) === 'string' ? json_decode($result) : $result;
     }
 
     public function rule($slug, $refresh = false)
