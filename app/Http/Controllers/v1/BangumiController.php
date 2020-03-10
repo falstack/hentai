@@ -108,6 +108,24 @@ class BangumiController extends Controller
         return $this->resOK($idsObj);
     }
 
+    public function hot100(Request $request)
+    {
+        $page = $request->get('page') ?: 1;
+        $take = $request->get('take') ?: 10;
+
+        $bangumiRepository = new BangumiRepository();
+        $idsObj = $bangumiRepository->hot($page - 1, $take);
+
+        if (empty($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $idsObj['result'] = $bangumiRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
+    }
+
     public function release()
     {
         $bangumiRepository = new BangumiRepository();

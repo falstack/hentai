@@ -25,6 +25,7 @@ class BangumiItemResource extends JsonResource
             'is_parent' => $this->is_parent,
             'parent_slug' => $this->parent_slug,
             'tags' => BangumiTagResource::collection($this->tags),
+            'type' => $this->type,
             'is_liked' => false,
             'like_user_count' => $this->like_user_count,
             'subscribe_user_count' => $this->subscribe_user_count,
