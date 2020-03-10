@@ -62,7 +62,7 @@ class PinResource extends JsonResource
             'deleted_at' => $this->deleted_at,
             'visit_count' => $this->visit_count,
             'comment_count' => $this->comment_count,
-            'like_count' => $this->upvoters()->count(),
+            'like_count' => $this->like_count,
             'mark_count' => $this->mark_count,
             'reward_count' => $this->reward_count,
             'can_up' => $this->can_up
