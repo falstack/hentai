@@ -108,6 +108,15 @@ class BangumiController extends Controller
         return $this->resOK($idsObj);
     }
 
+    public function release()
+    {
+        $bangumiRepository = new BangumiRepository();
+
+        $result = $bangumiRepository->release();
+
+        return $this->resOK($result);
+    }
+
     public function score(Request $request)
     {
 

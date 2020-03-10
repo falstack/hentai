@@ -82,6 +82,27 @@ class BangumiRepository extends Repository
         return $this->filterIdsByPage($list, $page, $take);
     }
 
+    public function release()
+    {
+        $result = $this->RedisItem('bangumi-release', function ()
+        {
+            $list = Bangumi
+                ::where('update_week', '<>', 0)
+                ->pluck('update_week', 'slug')
+                ->toArray();
+
+            $result = [[], [], [], [], [], [], []];
+            foreach ($list as $slug => $i)
+            {
+                $result[intval($i - 1)][] = $this->item($slug);
+            }
+
+            return json_encode($result);
+        });
+
+        return json_decode($result);
+    }
+
     public function rule($slug, $refresh = false)
     {
         return $this->RedisItem("bangumi-join-rule:{$slug}", function () use ($slug)
