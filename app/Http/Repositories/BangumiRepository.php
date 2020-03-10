@@ -103,6 +103,23 @@ class BangumiRepository extends Repository
         return gettype($result) === 'string' ? json_decode($result) : $result;
     }
 
+    public function hot($page, $take, $refresh = false)
+    {
+        $result = $this->RedisList('bangumi-hots', function ()
+        {
+            return Bangumi
+                ::where('type', '<>', 9)
+                ->orderBy('publish_pin_count', 'DESC')
+                ->orderBy('like_user_count', 'DESC')
+                ->orderBy('subscribe_user_count', 'DESC')
+                ->pluck('slug')
+                ->take(100)
+                ->toArray();
+        }, $refresh);
+
+        return $this->filterIdsByPage($result, $page, $take);
+    }
+
     public function rule($slug, $refresh = false)
     {
         return $this->RedisItem("bangumi-join-rule:{$slug}", function () use ($slug)

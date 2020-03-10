@@ -28,6 +28,7 @@ class Bangumi extends Model
         'score',
         'like_user_count',
         'subscribe_user_count',
+        'publish_pin_count',
         'type',                 // 0：番剧，1；游戏，9：其它
         'update_week',          // 0：不更新，1 ~ 7：星期一 ~ 星期日
         'published_at'
