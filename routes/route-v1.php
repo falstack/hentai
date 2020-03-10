@@ -91,6 +91,8 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
 
     $route->get('atfield', 'BangumiController@atfield');
 
+    $route->get('release', 'BangumiController@release');
+
     $route->get('idols', 'BangumiController@idols');
 
     $route->get('liker', 'BangumiController@liker');
