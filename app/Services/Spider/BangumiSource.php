@@ -19,9 +19,9 @@ class BangumiSource
         $query = new Query();
         $newIds = $query->getNewsBangumi();
         $bangumiSlugs = [];
-        foreach ($newIds as $list)
+        foreach ($newIds as $i => $list)
         {
-            foreach ($list as $i => $id)
+            foreach ($list as $id)
             {
                 $bangumi = Bangumi
                     ::where('source_id', $id)
