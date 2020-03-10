@@ -58,7 +58,6 @@ class Test extends Command
             ->whereNull('deleted_at')
             ->havingRaw('COUNT(id) > 1')
             ->pluck('id')
-            ->take(1000)
             ->toArray();
 
         return $ids;
