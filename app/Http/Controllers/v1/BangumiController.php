@@ -114,7 +114,11 @@ class BangumiController extends Controller
 
         $result = $bangumiRepository->release();
 
-        return $this->resOK($result);
+        return $this->resOK([
+            'no_more' => true,
+            'result' => $result,
+            'total' => 0
+        ]);
     }
 
     public function score(Request $request)
