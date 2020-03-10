@@ -345,7 +345,7 @@ class RichContentService
         return $result;
     }
 
-    public function parseRichBanner($data)
+    public function parseRichBanner($data, $banner)
     {
         $images = [];
         foreach ($data as $row)
@@ -386,7 +386,7 @@ class RichContentService
             return array_slice($filterImage, 0, 1);
         }
 
-        $default = [
+        $default = $banner ?: [
             'url' => 'https://m1.calibur.tv/wen.png',
             'mime' => 'image/png',
             'width' => 4000,
