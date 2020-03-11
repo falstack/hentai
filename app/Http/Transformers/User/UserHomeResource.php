@@ -27,11 +27,6 @@ class UserHomeResource extends JsonResource
             'level' => $this->level,
             'sex' => $this->sex_secret ? -1 : $this->sex,
             'birthday' => $this->birth_secret ? -1 : $this->birthday,
-            // 数据
-            'followers_count' => $this->followers_count,
-            'following_count' => $this->following_count,
-            'friends_count' => $this->friends_count,
-            'visit_count' => $this->visit_count,
             // 签到
             'daily_signed' => $userDailySign->check($this->slug),
             'continuous_sign_count' => $this->continuous_sign_count,
