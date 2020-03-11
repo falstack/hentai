@@ -73,6 +73,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     protected $casts = [
         'sex' => 'integer',
+        'is_admin' => 'boolean',
         'sex_secret' => 'boolean',
         'birth_secret' => 'boolean',
     ];
