@@ -342,7 +342,7 @@ class RichContentService
             }
         }
 
-        return $result;
+        return trim($result);
     }
 
     public function parseRichBanner($data, $banner)
