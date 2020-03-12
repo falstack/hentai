@@ -400,6 +400,7 @@ class JoinController extends Controller
         $bangumi = Bangumi
             ::where('slug', $slug)
             ->first();
+
         if (is_null($bangumi))
         {
             return $this->resErrNotFound('没有找到对应的番剧');
@@ -445,6 +446,36 @@ class JoinController extends Controller
         }
 
         return $this->resOK('挑战成功！');
+    }
+
+    public function pass(Request $request)
+    {
+        $user = $request->user();
+        $slug = $request->get('slug');
+
+        $bangumiRepository = new BangumiRepository();
+        $rule = $bangumiRepository->rule($slug);
+
+        if ($rule && $rule['rule_type'] !== 0)
+        {
+            return $this->resErrRole();
+        }
+
+        $bangumi = Bangumi
+            ::where('slug', $slug)
+            ->first();
+
+        if (is_null($bangumi))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if (!$bangumi->isLikedBy($user))
+        {
+            event(new \App\Events\Bangumi\Pass($user, $bangumi));
+        }
+
+        return $this->resOK();
     }
 
     public function vote(Request $request)

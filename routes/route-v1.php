@@ -131,6 +131,12 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
 
 $route->group(['prefix' => 'join', 'middleware' => 'auth'], function () use ($route)
 {
+    $route->get('result', 'JoinController@result');
+
+    $route->get('flow', 'JoinController@flow');
+
+    $route->get('list', 'JoinController@list');
+
     $route->post('create', 'JoinController@create');
 
     $route->post('recommend', 'JoinController@recommend');
@@ -139,15 +145,11 @@ $route->group(['prefix' => 'join', 'middleware' => 'auth'], function () use ($ro
 
     $route->post('begin', 'JoinController@begin');
 
-    $route->get('list', 'JoinController@list');
-
     $route->post('submit', 'JoinController@submit');
 
+    $route->post('pass', 'JoinController@pass');
+
     $route->post('vote', 'JoinController@vote');
-
-    $route->get('result', 'JoinController@result');
-
-    $route->get('flow', 'JoinController@flow');
 
     $route->group(['prefix' => 'rule'], function () use ($route)
     {
