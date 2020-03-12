@@ -21,7 +21,6 @@ class Test extends Command
      */
     protected $description = 'test job';
 
-    protected $ids;
     /**
      * Execute the console command.
      *
@@ -29,37 +28,6 @@ class Test extends Command
      */
     public function handle()
     {
-        $ids = $this->getDeleteIds();
-
-        if (empty($ids))
-        {
-            return true;
-        }
-
-        $this->ids = $ids;
-
-        while (!empty($this->ids))
-        {
-            Content::whereIn('id', $this->ids)->delete();
-
-            $this->ids = $this->getDeleteIds();
-        }
-
         return true;
-    }
-
-    protected function getDeleteIds()
-    {
-        // select MIN(id) AS id from `contents` group by `contentable_type`, `contentable_id` having COUNT(id) > 1
-        $ids = DB
-            ::table('contents')
-            ->select(DB::raw('MIN(id) AS id'))
-            ->groupBy(['contentable_type', 'contentable_id'])
-            ->whereNull('deleted_at')
-            ->havingRaw('COUNT(id) > 1')
-            ->pluck('id')
-            ->toArray();
-
-        return $ids;
     }
 }
