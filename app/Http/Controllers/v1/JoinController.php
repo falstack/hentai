@@ -296,7 +296,7 @@ class JoinController extends Controller
         if ($rule)
         {
             $count = $rule->question_count;
-            if ($rule->rule_type == 1)
+            if ($rule->rule_type == 2)
             {
                 return $this->resErrRole('该分区只能邀请加入');
             }
