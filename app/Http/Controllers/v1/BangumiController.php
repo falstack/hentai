@@ -51,6 +51,7 @@ class BangumiController extends Controller
 
         $bangumiPatchCounter = new BangumiPatchCounter();
         $patch = $bangumiPatchCounter->all($slug);
+        $patch['rule'] = $bangumiRepository->rule($slug);
         $user = $request->user();
 
         if (!$user)
