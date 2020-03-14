@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners\Pin\Vote;
+namespace App\Listeners\Pin\UpVote;
 
 use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\FlowRepository;
@@ -23,10 +23,10 @@ class UpdateFlowListCache
     /**
      * Handle the event.
      *
-     * @param  \App\Events\Pin\Vote  $event
+     * @param  \App\Events\Pin\UpVote  $event
      * @return void
      */
-    public function handle(\App\Events\Pin\Vote $event)
+    public function handle(\App\Events\Pin\UpVote $event)
     {
         $pin = $event->pin;
         if (!$pin->published_at || !$pin->can_up)

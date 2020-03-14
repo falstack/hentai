@@ -39,9 +39,6 @@ class Pin extends Model
         'like_count',       // 点赞数
         'mark_count',       // 收藏数
         'reward_count',     // 打赏数
-        'main_area_slug',
-        'main_topic_slug',
-        'main_notebook_slug',
         'can_up',           // 是否能被顶起来
     ];
 

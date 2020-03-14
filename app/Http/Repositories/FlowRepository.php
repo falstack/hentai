@@ -11,229 +11,156 @@ use Illuminate\Support\Facades\DB;
 
 class FlowRepository extends Repository
 {
-    public $times = [
-        'all', '3-day', '7-day', '30-day'
-    ];
+    public static $pinHottestVisitKey = 'pin-hottest-visit';
 
-    public function pins($slug, $sort, $isUp, $specId, $time, $take)
+    public static $from = ['index', 'bangumi', 'user'];
+
+    public static $order = ['newest', 'activity', 'hottest'];
+
+    public static $indexSlug = '';
+
+    public function pinNewest($from, $slug, $take, $lastId, $isUp)
     {
-        if ($sort === 'hottest')
-        {
-            $ids = $this->hottest_ids($slug, $time);
-            $idsObj = $this->filterIdsBySeenIds($ids, $specId, $take);
-        }
-        else if ($sort === 'active')
-        {
-            $ids = $this->active_ids($slug);
-            $idsObj = $this->filterIdsBySeenIds($ids, $specId, $take);
-        }
-        else
-        {
-            $ids = $this->newest_ids($slug);
-            $idsObj = $this->filterIdsByMaxId($ids, $specId, $take, false, $isUp);
-        }
-
-        return $idsObj;
-    }
-
-    public function index($seenIds, $take, $refresh = false)
-    {
-        $ids =  $this->RedisSort($this->index_cache_key(), function ()
+        $ids = $this->RedisSort($this->flow_pin_cache_key($from, self::$order[0], $slug), function () use ($from, $slug)
         {
             return Pin
-                ::where('trial_type', 0)
-                ->where('can_up', 1)
-                ->whereNull('last_top_at')
-                ->whereNotNull('published_at')
-                ->select('slug', 'updated_at')
-                ->orderBy('updated_at', 'DESC')
-                ->pluck('updated_at', 'slug')
-                ->toArray();
+                ::whereNotNull('published_at')
+                ->where('trial_type', 0)
+                ->when($from === 'bangumi', function ($query) use ($slug)
+                {
+                    return $query->where('bangumi_slug', 'slug');
+                })
+                ->when($from === 'user', function ($query) use ($slug)
+                {
+                    return $query->where('user_slug', 'slug');
+                })
+                ->orderBy('published_at', 'DESC')
+                ->pluck('published_at', 'slug');
 
-        }, ['force' => $refresh, 'is_time' => true]);
+        }, ['is_time' => true]);
+
+        return $this->filterIdsByMaxId($ids, $lastId, $take, false, $isUp);
+    }
+
+    public function pinActivity($from, $slug, $take, $seenIds)
+    {
+        $ids = $this->RedisSort($this->flow_pin_cache_key($from, self::$order[1], $slug), function () use ($from, $slug)
+        {
+            return Pin
+                ::whereNotNull('published_at')
+                ->where('trial_type', 0)
+                ->where('can_up', 1)
+                ->when($from === 'bangumi', function ($query) use ($slug)
+                {
+                    return $query->where('bangumi_slug', 'slug');
+                })
+                ->when($from === 'user', function ($query) use ($slug)
+                {
+                    return $query->where('user_slug', 'slug');
+                })
+                ->orderBy('updated_at', 'DESC')
+                ->pluck('updated_at', 'slug');
+
+        }, ['is_time' => true]);
 
         return $this->filterIdsBySeenIds($ids, $seenIds, $take);
     }
 
-    public function hottest_ids($slug, $time, $refresh = false)
+    public function pinHottest($from, $slug, $take, $seenIds, $randId)
     {
-        return $this->RedisSort($this->hottest_cache_key($slug, $time), function () use ($slug, $time)
+        $this->SortAdd(
+            self::$pinHottestVisitKey,
+            $this->flow_pin_cache_key($from, self::$order[2], $slug, $randId)
+        );
+
+        $ids = $this->pinHottestIds($from, $slug, $randId);
+
+        return $this->filterIdsBySeenIds($ids, $seenIds, $take);
+    }
+
+    public function pinHottestIds($from, $slug, $randId, $refresh = false)
+    {
+        return $this->RedisSort($this->flow_pin_cache_key($from, self::$order[2], $slug, $randId), function () use ($from, $slug, $randId)
         {
-            $relations = Tag
-                ::where('slug', $slug)
-                ->with(['pins' => function($query) use ($time)
+            $pins = Pin
+                ::whereNotNull('published_at')
+                ->where('trial_type', 0)
+                ->where('can_up', 1)
+                ->where(DB::raw('id % 10'), $randId)
+                ->when($from === 'bangumi', function ($query) use ($slug)
                 {
-                    $query
-                        ->when($time !== 'all', function ($q) use ($time)
-                        {
-                            if ($time === '3-day')
-                            {
-                                $date = Carbon::now()->addDays(-3);
-                            }
-                            else if ($time === '7-day')
-                            {
-                                $date = Carbon::now()->addDays(-7);
-                            }
-                            else if ($time === '30-day')
-                            {
-                                $date = Carbon::now()->addDays(-30);
-                            }
-                            else
-                            {
-                                $date = Carbon::now()->addDays(-1);
-                            }
-                            return $q->where('created_at', '>=', $date);
-                        })
-                        ->where('trial_type', 0)
-                        ->where('can_up', 1)
-                        ->whereNotNull('published_at')
-                        ->whereNull('last_top_at')
-                        ->select('slug', 'visit_count', 'comment_count', 'like_count', 'mark_count', 'reward_count', 'created_at');
-                }])
-                ->select('id')
+                    return $query->where('bangumi_slug', 'slug');
+                })
+                ->when($from === 'user', function ($query) use ($slug)
+                {
+                    return $query->where('user_slug', 'slug');
+                })
+                ->select('slug', 'visit_count', 'comment_count', 'like_count', 'mark_count', 'reward_count', 'published_at')
+                ->take(500)
                 ->get()
                 ->toArray();
 
-            $result = [];
-            if ($time === '3-day')
-            {
-                $i = 0.8;
-            }
-            else if ($time === '7-day')
-            {
-                $i = 0.5;
-            }
-            else if ($time === '30-day')
-            {
-                $i = 0.3;
-            }
-            else
-            {
-                $i = 0.1;
-            }
             // https://segmentfault.com/a/1190000004253816
-            foreach ($relations as $list)
+            $result = [];
+            $i = 0.1;
+
+            foreach ($pins as $pin)
             {
-                foreach ($list['pins'] as $pin)
-                {
-                    $result[$pin['slug']] = (
+                $result[$pin['slug']] = (
                         log(($pin['visit_count'] + 1), 10) * 4 +
                         log(($pin['comment_count'] * 4 + 1), M_E) +
                         log(($pin['like_count'] * 2 + $pin['mark_count'] * 3 + $pin['reward_count'] * 10 + 1), 10)
-                    ) / pow(((time() - strtotime($pin['created_at'])) + 1), $i);
-                }
+                    ) / pow(((time() - strtotime($pin['published_at'])) + 1), $i);
             }
 
             return $result;
-        }, ['force' => $refresh]);
+        }, ['refresh' => $refresh]);
     }
 
-    public function newest_ids($slug, $refresh = false)
+    public function createPin($pinSlug, $bangumiSlug, $userSlug, $onlyBangumi = false)
     {
-        return $this->RedisSort($this->newest_cache_key($slug), function () use ($slug)
+        $slugs = $onlyBangumi ? [$bangumiSlug] : [self::$indexSlug, $bangumiSlug, $userSlug];
+        foreach ($slugs as $i => $slug)
         {
-            $relations = Tag
-                ::where('slug', $slug)
-                ->with(['pins' => function($query)
-                {
-                    $query
-                        ->where('trial_type', 0)
-                        ->where('can_up', 1)
-                        ->whereNull('last_top_at')
-                        ->whereNotNull('published_at')
-                        ->select('slug', 'published_at')
-                        ->orderBy('published_at', 'DESC');
-                }])
-                ->select('id')
-                ->get()
-                ->toArray();
+            $this->SortAdd($this->flow_pin_cache_key(self::$from[$i], self::$order[0], $slug), $pinSlug);
+        }
 
-            $result = [];
-            foreach ($relations as $list)
-            {
-                foreach ($list['pins'] as $pin)
-                {
-                    $result[$pin['slug']] = $pin['published_at'];
-                }
-            }
-            return $result;
-        }, ['force' => $refresh, 'is_time' => true]);
+        $this->update_pin($pinSlug, $bangumiSlug, $userSlug);
     }
 
-    public function active_ids($slug, $refresh = false)
+    public function updatePin($pinSlug, $bangumiSlug, $userSlug, $onlyBangumi = false)
     {
-        return $this->RedisSort($this->newest_cache_key($slug), function () use ($slug)
+        $slugs = $onlyBangumi ? [$bangumiSlug] : [self::$indexSlug, $bangumiSlug, $userSlug];
+        foreach ($slugs as $i => $slug)
         {
-            $relations = Tag
-                ::where('slug', $slug)
-                ->with(['pins' => function($query)
-                {
-                    $query
-                        ->where('trial_type', 0)
-                        ->where('can_up', 1)
-                        ->whereNull('last_top_at')
-                        ->whereNotNull('published_at')
-                        ->select('slug', 'updated_at')
-                        ->orderBy('updated_at', 'DESC');
-                }])
-                ->select('id')
-                ->get()
-                ->toArray();
-
-            $result = [];
-            foreach ($relations as $list)
-            {
-                foreach ($list['pins'] as $pin)
-                {
-                    $result[$pin['slug']] = $pin['updated_at'];
-                }
-            }
-            return $result;
-        }, ['force' => $refresh, 'is_time' => true]);
-    }
-
-    public function add_pin($tagSlug, $pinSlug)
-    {
-        $this->SortAdd($this->newest_cache_key($tagSlug), $pinSlug);
-        $this->SortAdd($this->active_cache_key($tagSlug), $pinSlug);
-        $this->SortAdd($this->index_cache_key(), $pinSlug);
-    }
-
-    public function update_pin($tagSlug, $pinSlug)
-    {
-        $this->SortAdd($this->newest_cache_key($tagSlug), $pinSlug);
-        $this->SortAdd($this->active_cache_key($tagSlug), $pinSlug);
-        $this->SortAdd($this->index_cache_key(), $pinSlug);
-    }
-
-    public function del_pin($tagSlug, $pinSlug)
-    {
-        $this->SortRemove($this->newest_cache_key($tagSlug), $pinSlug);
-        $this->SortRemove($this->active_cache_key($tagSlug), $pinSlug);
-        $this->SortRemove($this->index_cache_key(), $pinSlug);
-        foreach ($this->times as $time)
-        {
-            $this->SortRemove($this->hottest_cache_key($tagSlug, $time), $pinSlug);
+            $this->SortAdd($this->flow_pin_cache_key(self::$from[$i], self::$order[1], $slug), $pinSlug);
         }
     }
 
-    protected function hottest_cache_key(string $slug, $time)
+    public function deletePin($pinSlug, $bangumiSlug, $userSlug, $onlyBangumi = false)
     {
-        return "tag-hottest-{$slug}-{$time}";
+        $slugs = $onlyBangumi ? [$bangumiSlug] : [self::$indexSlug, $bangumiSlug, $userSlug];
+        $randId = substr((string)slug2id($pinSlug), -1);
+        foreach (self::$order[0] as $order)
+        {
+            foreach ($slugs as $i => $slug)
+            {
+                $id = $order === 'hottest' ? $randId : 0;
+                $this->SortRemove(
+                    $this->flow_pin_cache_key(
+                        self::$from[$i],
+                        $order,
+                        $slug,
+                        $id
+                    ),
+                    $pinSlug
+                );
+            }
+        }
     }
 
-    protected function newest_cache_key(string $slug)
+    private function flow_pin_cache_key(string $from, string $order, string $slug, $id = 0)
     {
-        return "tag-newest-{$slug}-all";
-    }
-
-    protected function active_cache_key(string $slug)
-    {
-        return "tag-active-{$slug}-all";
-    }
-
-    protected function index_cache_key()
-    {
-        return 'flow-index-ids';
+        return "flow-pin-{$order}:{$from}-{$slug}-{$id}";
     }
 }

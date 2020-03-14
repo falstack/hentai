@@ -3,6 +3,7 @@
 namespace App\Listeners\Comment\Create;
 
 use App\Http\Repositories\BangumiRepository;
+use App\Http\Repositories\FlowRepository;
 use App\Models\Pin;
 use Carbon\Carbon;
 use Illuminate\Queue\InteractsWithQueue;
@@ -50,6 +51,13 @@ class UpdateFlowListCache
         {
             $bangumiRepository->recommend_pin($pin->slug);
         }
+
+        $flowRepository = new FlowRepository();
+        $flowRepository->updatePin(
+            $pin->slug,
+            $pin->bangumi_slug,
+            $pin->user_slug
+        );
 
         $pin->update([
             'updated_at' => Carbon::now()
