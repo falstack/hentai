@@ -28,11 +28,11 @@ class FlowRepository extends Repository
                 ->where('trial_type', 0)
                 ->when($from === 'bangumi', function ($query) use ($slug)
                 {
-                    return $query->where('bangumi_slug', 'slug');
+                    return $query->where('bangumi_slug', $slug);
                 })
                 ->when($from === 'user', function ($query) use ($slug)
                 {
-                    return $query->where('user_slug', 'slug');
+                    return $query->where('user_slug', $slug);
                 })
                 ->orderBy('published_at', 'DESC')
                 ->pluck('published_at', 'slug');
@@ -52,11 +52,11 @@ class FlowRepository extends Repository
                 ->where('can_up', 1)
                 ->when($from === 'bangumi', function ($query) use ($slug)
                 {
-                    return $query->where('bangumi_slug', 'slug');
+                    return $query->where('bangumi_slug', $slug);
                 })
                 ->when($from === 'user', function ($query) use ($slug)
                 {
-                    return $query->where('user_slug', 'slug');
+                    return $query->where('user_slug', $slug);
                 })
                 ->orderBy('updated_at', 'DESC')
                 ->pluck('updated_at', 'slug');
@@ -89,11 +89,11 @@ class FlowRepository extends Repository
                 ->where(DB::raw('id % 10'), $randId)
                 ->when($from === 'bangumi', function ($query) use ($slug)
                 {
-                    return $query->where('bangumi_slug', 'slug');
+                    return $query->where('bangumi_slug', $slug);
                 })
                 ->when($from === 'user', function ($query) use ($slug)
                 {
-                    return $query->where('user_slug', 'slug');
+                    return $query->where('user_slug', $slug);
                 })
                 ->select('slug', 'visit_count', 'comment_count', 'like_count', 'mark_count', 'reward_count', 'published_at')
                 ->take(500)
