@@ -334,9 +334,14 @@ $route->group(['prefix' => 'comment'], function () use ($route)
 
 $route->group(['prefix' => 'flow'], function () use ($route)
 {
-    $route->get('pins', 'FlowController@pins');
+    $route->group(['prefix' => 'pin'], function () use ($route)
+    {
+        $route->get('newest', 'FlowController@pinNewest');
 
-    $route->get('index', 'FlowController@index');
+        $route->get('hottest', 'FlowController@pinHottest');
+
+        $route->get('activity', 'FlowController@pinActivity');
+    });
 });
 
 $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route)

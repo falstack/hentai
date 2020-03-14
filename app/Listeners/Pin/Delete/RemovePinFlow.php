@@ -3,6 +3,7 @@
 namespace App\Listeners\Pin\Delete;
 
 use App\Http\Repositories\BangumiRepository;
+use App\Http\Repositories\FlowRepository;
 use App\Http\Repositories\UserRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -37,5 +38,12 @@ class RemovePinFlow
 
         $userRepository = new UserRepository();
         $userRepository->toggle_pin($event->pin->user_slug, $event->pin->slug, true);
+
+        $flowRepository = new FlowRepository();
+        $flowRepository->deletePin(
+            $event->pin->slug,
+            $event->pin->bangumi_slug,
+            $event->pin->user_slug
+        );
     }
 }

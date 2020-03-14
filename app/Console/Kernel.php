@@ -23,6 +23,7 @@ class Kernel extends ConsoleKernel
         Jobs\UpdateIdolMarketPrice::class,
         Jobs\SaveBangumiScore::class,
         Jobs\UpdateBangumiRank::class,
+        Jobs\AutoRefreshPinHottest::class,
     ];
 
     /**
@@ -42,6 +43,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('UpdateIdolMarketPrice')->hourly()->withoutOverlapping();
 //        $schedule->command('SaveBangumiScore')->everyMinute()->withoutOverlapping();
         $schedule->command('Test')->everyMinute()->withoutOverlapping();
+        $schedule->command('AutoRefreshPinHottest')->everyFiveMinutes()->withoutOverlapping();
         $schedule->command('UpdateBangumiRank')->daily();
     }
 }

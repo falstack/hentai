@@ -12,54 +12,22 @@ use Illuminate\Validation\Rule;
 
 class FlowController extends Controller
 {
-    public function pins(Request $request)
+    public function pinNewest(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'slug' => 'required|string',
-            'sort' => [
-                'required',
-                Rule::in(['newest', 'hottest', 'active']),
-            ],
-            'time' => 'required',
-                Rule::in(['3-day', '7-day', '30-day', 'all']),
-            'take' => 'required|integer',
-            'is_up' => 'required|integer',
-            'spec_id' => 'present|string'
-        ]);
-
-        if ($validator->fails())
-        {
-            return $this->resErrParams($validator);
-        }
-
-        $slug = $request->get('slug');
-        $sort = $request->get('sort');
-        $time = $request->get('time');
-        $take = $request->get('take');
-        $isUp = $request->get('is_up');
-        if ($sort === 'newest')
-        {
-            $specId = $request->get('spec_id');
-        }
-        else
-        {
-            $specId = $request->get('spec_id') ? explode(',', $request->get('spec_id')) : [];
-        }
-
-        $tagRepository = new TagRepository();
-        $tag = $tagRepository->item($slug);
-        if (is_null($tag))
-        {
-            return $this->resOK([
-                'result' => [],
-                'total' => 0,
-                'no_more' => true
-            ]);
-        }
-
         $flowRepository = new FlowRepository();
-        $idsObj = $flowRepository->pins($slug, $sort, $isUp, $specId, $time, $take);
 
+        $take = $request->get('take') ?: 10;
+        $slug = $request->get('slug') ?: $flowRepository::$indexSlug;
+        $from = $request->get('from') ?: 'index';
+        $isUp = $request->get('is_up') ?: 0;
+        $lastId = $request->get('last_id') ?: '';
+
+        if (!in_array($from, $flowRepository::$from))
+        {
+            return $this->resErrBad();
+        }
+
+        $idsObj = $flowRepository->pinNewest($from, $slug, $take, $lastId, (bool)$isUp);
         if (empty($idsObj['result']))
         {
             return $this->resOK($idsObj);
@@ -71,14 +39,48 @@ class FlowController extends Controller
         return $this->resOK($idsObj);
     }
 
-    public function index(Request $request)
+    public function pinActivity(Request $request)
     {
-        $seenIds = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
-        $take = $request->get('take') ?: 10;
-
         $flowRepository = new FlowRepository();
-        $idsObj = $flowRepository->index($seenIds, $take);
 
+        $take = $request->get('take') ?: 10;
+        $slug = $request->get('slug') ?: $flowRepository::$indexSlug;
+        $from = $request->get('from') ?: 'index';
+        $seenIds = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
+
+        if (!in_array($from, $flowRepository::$from))
+        {
+            return $this->resErrBad();
+        }
+
+        $idsObj = $flowRepository->pinActivity($from, $slug, $take, $seenIds);
+        if (empty($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $pinRepository = new PinRepository();
+        $idsObj['result'] = $pinRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
+    }
+
+    public function pinHottest(Request $request)
+    {
+        $flowRepository = new FlowRepository();
+
+        $take = $request->get('take') ?: 10;
+        $slug = $request->get('slug') ?: $flowRepository::$indexSlug;
+        $from = $request->get('from') ?: 'index';
+        $randId = $request->get('rand_id') ?: 1;
+        $seenIds = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
+
+        if (!in_array($from, $flowRepository::$from))
+        {
+            return $this->resErrBad();
+        }
+
+        $idsObj = $flowRepository->pinHottest($from, $slug, $take, $seenIds, $randId);
         if (empty($idsObj['result']))
         {
             return $this->resOK($idsObj);
