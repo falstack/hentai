@@ -5,8 +5,6 @@ namespace App\Http\Repositories;
 
 
 use App\Models\Pin;
-use App\Models\Tag;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class FlowRepository extends Repository
@@ -63,12 +61,13 @@ class FlowRepository extends Repository
 
     public function pinActivityIds($from, $slug, $randId, $refresh = false)
     {
-        return $this->RedisSort($this->flow_pin_cache_key($from, self::$order[1], $slug, $randId), function () use ($from, $slug)
+        return $this->RedisSort($this->flow_pin_cache_key($from, self::$order[1], $slug, $randId), function () use ($from, $slug, $randId)
         {
             return Pin
                 ::whereNotNull('published_at')
                 ->where('trial_type', 0)
                 ->where('can_up', 1)
+                ->where(DB::raw('id % 10'), $randId)
                 ->when($from === 'bangumi', function ($query) use ($slug)
                 {
                     return $query->where('bangumi_slug', $slug);
