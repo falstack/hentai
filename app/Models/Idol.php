@@ -33,6 +33,16 @@ class Idol extends Model
         'is_newbie' => 'boolean'
     ];
 
+    public function setAvatarAttribute($url)
+    {
+        $this->attributes['avatar'] = trimImage($url);
+    }
+
+    public function getAvatarAttribute($avatar)
+    {
+        return patchImage($avatar, 'default-avatar');
+    }
+
     public function bangumi()
     {
         return $this->belongsTo('App\Models\Bangumi', 'bangumi_slug', 'slug');
