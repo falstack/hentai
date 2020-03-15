@@ -119,17 +119,18 @@ class Pin extends Model
     {
         $richContentService = new RichContentService();
         $content = $richContentService->preFormatContent($content);
-
+        $trial_type = 0;
         if ($publish)
         {
             $risk = $richContentService->detectContentRisk($content, false);
             if ($risk['risk_score'] > 0) {
-                return null;
+                $trial_type = 1;
             }
         }
 
         $now = Carbon::now();
         $data = [
+            'trial_type' => $trial_type,
             'user_slug' => $user->slug,
             'bangumi_slug' => $bangumi_slug,
             'last_edit_at' => $now
@@ -171,7 +172,6 @@ class Pin extends Model
             {
                 $lastContent = $this
                     ->content()
-                    ->orderBy('created_at', 'desc')
                     ->pluck('text')
                     ->first();
                 $oldVote = $richContentService->getFirstType($lastContent, 'vote');
@@ -192,17 +192,19 @@ class Pin extends Model
             }
         }
 
+        $trial_type = 0;
         if ($publish || $this->published_at)
         {
             $risk = $richContentService->detectContentRisk($content, false);
             if ($risk['risk_score'] > 0)
             {
-                return false;
+                $trial_type = 1;
             }
         }
 
         $now = Carbon::now();
         $data = [
+            'trial_type' => $trial_type,
             'last_edit_at' => $now,
             'bangumi_slug' => $bangumi_slug
         ];
