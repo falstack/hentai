@@ -33,96 +33,40 @@ class UpdateIdolMarketPrice extends Command
      */
     public function handle()
     {
-        $this->updateStockPrice();
-        $this->updateMarketPrice();
-        $this->updateRank();
-        $this->updateCache();
-
-        return true;
-    }
-
-    protected function updateStockPrice()
-    {
         $total = Idol
             ::sum('coin_count');
 
         $list = Idol
             ::where('fans_count', '>', 0)
-            ->select('slug', 'coin_count')
+            ->orderBy('market_price', 'DESC')
+            ->orderBy('stock_price', 'DESC')
             ->get();
 
         $virtualCoinService = new VirtualCoinService();
+        $idolRepository = new IdolRepository();
+        $idolPatchCounter = new IdolPatchCounter();
 
-        foreach ($list as $item)
+        foreach ($list as $index => $item)
         {
             $score = $item->coin_count;
             $calc = new WilsonScoreInterval($score, $total - $score);
             $rate = $calc->score();
+            $price = $virtualCoinService->calculate($rate * $total / $score + 1);
 
             DB
                 ::table('idols')
                 ->where('slug', $item->slug)
                 ->update([
-                    'lover' => IdolFans::where('idol_slug',  $item->slug)->orderBy('stock_count', 'DESC')->pluck('user_slug')->first(),
-                    'stock_price' => $virtualCoinService->calculate($rate * $total / $score + 1)
-                ]);
-        }
-    }
-
-    protected function updateMarketPrice()
-    {
-        $list = Idol
-            ::where('updated_at', '>=', Carbon::now()->addHours(-1))
-            ->select('slug', 'stock_price', 'stock_count')
-            ->get();
-
-        foreach ($list as $item)
-        {
-            DB
-                ::table('idols')
-                ->where('slug', $item->slug)
-                ->update([
-                    'market_price' => $item->stock_price * $item->stock_count
-                ]);
-        }
-    }
-
-    protected function updateRank()
-    {
-        $list = Idol
-            ::orderBy('market_price', 'DESC')
-            ->orderBy('stock_price', 'DESC')
-            ->where('fans_count', '>', 0)
-            ->select('slug')
-            ->get();
-
-        foreach ($list as $index => $item)
-        {
-            DB
-                ::table('idols')
-                ->where('slug', $item->slug)
-                ->update([
+                    'lover_slug' => IdolFans::where('idol_slug',  $item->slug)->orderBy('stock_count', 'DESC')->pluck('user_slug')->first(),
+                    'stock_price' => $price,
+                    'market_price' => $price * $item->stock_count,
                     'rank' => $index + 1
                 ]);
+
+            $idolRepository->item($item->slug, true);
+            $idolPatchCounter->all($item->slug, true);
         }
-    }
 
-    protected function updateCache()
-    {
-        $list = Idol
-            ::orderBy('market_price', 'DESC')
-            ->orderBy('stock_price', 'DESC')
-            ->where('fans_count', '>', 0)
-            ->pluck('slug')
-            ->toArray();
-
-        $idolRepository = new IdolRepository();
-        $idolPatchCounter = new IdolPatchCounter();
-
-        foreach ($list as $slug)
-        {
-            $idolRepository->item($slug, true);
-            $idolPatchCounter->all($slug, true);
-        }
+        return true;
     }
 }
