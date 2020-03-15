@@ -4,6 +4,7 @@
 namespace App\Http\Repositories;
 
 
+use App\Models\Idol;
 use App\Models\Pin;
 use Illuminate\Support\Facades\DB;
 
@@ -161,6 +162,70 @@ class FlowRepository extends Repository
                 );
             }
         }
+    }
+
+    public function idolNewest($lastId, $take, $refresh = false)
+    {
+        $list = $this->RedisSort($this->flow_idol_cache_key(self::$order[0], self::$indexSlug), function ()
+        {
+            return Idol
+                ::where('is_newbie', 1)
+                ->orderBy('market_price', 'DESC')
+                ->orderBy('stock_price', 'DESC')
+                ->pluck('market_price', 'slug')
+                ->toArray();
+
+        }, ['force' => $refresh]);
+
+        return $this->filterIdsByMaxId($list, $lastId, $take);
+    }
+
+    public function idolActivity($from, $slug, $take, $seenIds)
+    {
+        $ids = $this->RedisSort($this->flow_idol_cache_key(self::$order[1], $slug), function () use ($from, $slug)
+        {
+            return Idol
+                ::when($from === 'bangumi', function ($query) use ($slug)
+                {
+                    return $query->where('bangumi_slug', $slug);
+                })
+                ->when($from === 'user', function ($query) use ($slug)
+                {
+                    return $query->where('user_slug', $slug);
+                })
+                ->orderBy('updated_at', 'DESC')
+                ->pluck('updated_at', 'slug')
+                ->toArray();
+        }, ['is_time' => true]);
+
+        return $this->filterIdsBySeenIds($ids, $seenIds, $take);
+    }
+
+    public function idolHottest($from, $slug, $take, $seenIds)
+    {
+        $ids = $this->RedisSort($this->flow_idol_cache_key(self::$order[2], $slug), function () use ($from, $slug)
+        {
+            return Idol
+                ::when($from === 'bangumi', function ($query) use ($slug)
+                {
+                    return $query->where('bangumi_slug', $slug);
+                })
+                ->when($from === 'user', function ($query) use ($slug)
+                {
+                    return $query->where('user_slug', $slug);
+                })
+                ->orderBy('market_price', 'DESC')
+                ->orderBy('stock_price', 'DESC')
+                ->pluck('market_price', 'slug')
+                ->toArray();
+        });
+
+        return $this->filterIdsBySeenIds($ids, $seenIds, $take);
+    }
+
+    private function flow_idol_cache_key(string $order, string $slug)
+    {
+        return "flow-idol:{$order}-{$slug}}";
     }
 
     private function flow_pin_cache_key(string $from, string $order, string $slug, $id = 0)
