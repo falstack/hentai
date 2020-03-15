@@ -6,6 +6,7 @@ use App\Http\Modules\Counter\IdolPatchCounter;
 use App\Http\Modules\VirtualCoinService;
 use App\Http\Repositories\IdolRepository;
 use App\Models\Idol;
+use App\Models\IdolFans;
 use App\Services\WilsonScoreInterval;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -62,6 +63,7 @@ class UpdateIdolMarketPrice extends Command
                 ::table('idols')
                 ->where('slug', $item->slug)
                 ->update([
+                    'lover' => IdolFans::where('idol_slug',  $item->slug)->orderBy('stock_count', 'DESC')->pluck('user_slug')->first(),
                     'stock_price' => $virtualCoinService->calculate($rate * $total / $score + 1)
                 ]);
         }
