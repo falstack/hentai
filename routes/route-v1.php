@@ -342,6 +342,15 @@ $route->group(['prefix' => 'flow'], function () use ($route)
 
         $route->get('activity', 'FlowController@pinActivity');
     });
+
+    $route->group(['prefix' => 'idol'], function () use ($route)
+    {
+        $route->get('newest', 'FlowController@idolNewest');
+
+        $route->get('hottest', 'FlowController@idolHottest');
+
+        $route->get('activity', 'FlowController@idolActivity');
+    });
 });
 
 $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route)
