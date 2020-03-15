@@ -42,9 +42,28 @@ class FlowRepository extends Repository
         return $this->filterIdsByMaxId($ids, $lastId, $take, false, $isUp);
     }
 
-    public function pinActivity($from, $slug, $take, $seenIds)
+    public function pinActivity($from, $slug, $take, $seenIds, $randId)
     {
-        $ids = $this->RedisSort($this->flow_pin_cache_key($from, self::$order[1], $slug), function () use ($from, $slug)
+        $ids = $this->pinActivityIds($from, $slug, $randId);
+
+        return $this->filterIdsBySeenIds($ids, $seenIds, $take);
+    }
+
+    public function pinHottest($from, $slug, $take, $seenIds, $randId)
+    {
+        $this->SortAdd(
+            self::$pinHottestVisitKey,
+            $this->flow_pin_cache_key($from, self::$order[2], $slug, $randId)
+        );
+
+        $ids = $this->pinHottestIds($from, $slug, $randId);
+
+        return $this->filterIdsBySeenIds($ids, $seenIds, $take);
+    }
+
+    public function pinActivityIds($from, $slug, $randId, $refresh = false)
+    {
+        return $this->RedisSort($this->flow_pin_cache_key($from, self::$order[1], $slug, $randId), function () use ($from, $slug)
         {
             return Pin
                 ::whereNotNull('published_at')
@@ -61,21 +80,7 @@ class FlowRepository extends Repository
                 ->orderBy('updated_at', 'DESC')
                 ->pluck('updated_at', 'slug');
 
-        }, ['is_time' => true]);
-
-        return $this->filterIdsBySeenIds($ids, $seenIds, $take);
-    }
-
-    public function pinHottest($from, $slug, $take, $seenIds, $randId)
-    {
-        $this->SortAdd(
-            self::$pinHottestVisitKey,
-            $this->flow_pin_cache_key($from, self::$order[2], $slug, $randId)
-        );
-
-        $ids = $this->pinHottestIds($from, $slug, $randId);
-
-        return $this->filterIdsBySeenIds($ids, $seenIds, $take);
+        }, ['refresh' => $refresh, 'is_time' => true]);
     }
 
     public function pinHottestIds($from, $slug, $randId, $refresh = false)
