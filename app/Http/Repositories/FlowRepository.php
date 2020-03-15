@@ -5,6 +5,7 @@ namespace App\Http\Repositories;
 
 
 use App\Models\Idol;
+use App\Models\IdolFans;
 use App\Models\Pin;
 use Illuminate\Support\Facades\DB;
 
@@ -184,18 +185,24 @@ class FlowRepository extends Repository
     {
         $ids = $this->RedisSort($this->flow_idol_cache_key(self::$order[1], $slug), function () use ($from, $slug)
         {
+            if ($from === 'user')
+            {
+                return IdolFans
+                    ::where('user_slug', $slug)
+                    ->orderBy('updated_at', 'DESC')
+                    ->pluck('updated_at', 'idol_slug')
+                    ->toArray();
+            }
+
             return Idol
                 ::when($from === 'bangumi', function ($query) use ($slug)
                 {
                     return $query->where('bangumi_slug', $slug);
                 })
-                ->when($from === 'user', function ($query) use ($slug)
-                {
-                    return $query->where('user_slug', $slug);
-                })
                 ->orderBy('updated_at', 'DESC')
                 ->pluck('updated_at', 'slug')
                 ->toArray();
+
         }, ['is_time' => true]);
 
         return $this->filterIdsBySeenIds($ids, $seenIds, $take);
@@ -205,14 +212,19 @@ class FlowRepository extends Repository
     {
         $ids = $this->RedisSort($this->flow_idol_cache_key(self::$order[2], $slug), function () use ($from, $slug)
         {
+            if ($from === 'user')
+            {
+                return IdolFans
+                    ::where('user_slug', $slug)
+                    ->orderBy('coin_count', 'DESC')
+                    ->pluck('coin_count', 'idol_slug')
+                    ->toArray();
+            }
+
             return Idol
                 ::when($from === 'bangumi', function ($query) use ($slug)
                 {
                     return $query->where('bangumi_slug', $slug);
-                })
-                ->when($from === 'user', function ($query) use ($slug)
-                {
-                    return $query->where('user_slug', $slug);
                 })
                 ->orderBy('market_price', 'DESC')
                 ->orderBy('stock_price', 'DESC')
