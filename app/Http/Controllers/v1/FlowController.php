@@ -46,6 +46,7 @@ class FlowController extends Controller
         $take = $request->get('take') ?: 10;
         $slug = $request->get('slug') ?: $flowRepository::$indexSlug;
         $from = $request->get('from') ?: 'index';
+        $randId = $request->get('rand_id') ?: 1;
         $seenIds = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
 
         if (!in_array($from, $flowRepository::$from))
@@ -53,7 +54,7 @@ class FlowController extends Controller
             return $this->resErrBad();
         }
 
-        $idsObj = $flowRepository->pinActivity($from, $slug, $take, $seenIds);
+        $idsObj = $flowRepository->pinActivity($from, $slug, $take, $seenIds, $randId);
         if (empty($idsObj['result']))
         {
             return $this->resOK($idsObj);
