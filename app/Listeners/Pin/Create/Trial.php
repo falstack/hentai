@@ -5,11 +5,9 @@ namespace App\Listeners\Pin\Create;
 
 
 use App\Http\Modules\RichContentService;
-use App\Http\Repositories\BangumiRepository;
-use App\Http\Repositories\FlowRepository;
-use App\Http\Repositories\UserRepository;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class Trial
+class Trial implements ShouldQueue
 {
     public function __construct()
     {

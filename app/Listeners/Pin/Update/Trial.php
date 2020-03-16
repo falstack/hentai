@@ -3,9 +3,9 @@
 namespace App\Listeners\Pin\Update;
 
 use App\Http\Modules\RichContentService;
-use App\Http\Repositories\PinRepository;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class Trial
+class Trial implements ShouldQueue
 {
     /**
      * Create the event listener.
