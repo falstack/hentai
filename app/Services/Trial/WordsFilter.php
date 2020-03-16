@@ -8,7 +8,7 @@ class WordsFilter
     protected static $BAD_WORDS_LEVEL_2;
     protected $delete_line = 1;
     protected $review_line = 3;
-    protected $replace = ['！', '!', '#', '@', '~', ' ', '.', '。'];
+    protected $replace = ['~','！', '!', '@', '#', '$', '^', '&', '*', '(', ')', '（', '）' ,' ', '.', '。'];
 
     public function count($text, $level = 0)
     {

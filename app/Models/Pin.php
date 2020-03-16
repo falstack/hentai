@@ -135,7 +135,6 @@ class Pin extends Model
 
         $now = Carbon::now();
         $data = [
-            'trial_type' => $trial_type,
             'user_slug' => $user->slug,
             'bangumi_slug' => $bangumi_slug,
             'last_edit_at' => $now
@@ -155,7 +154,7 @@ class Pin extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
 
-        event(new \App\Events\Pin\Create($pin, $user, $bangumi_slug, $publish));
+        event(new \App\Events\Pin\Create($pin, $user, $bangumi_slug, $publish, $content));
 
         return $pin;
     }
@@ -163,12 +162,8 @@ class Pin extends Model
     public function updatePin($content, $publish, $user, $bangumi_slug)
     {
         $richContentService = new RichContentService();
-        if (!$this->published_at)
-        {
-            // 还未公开发布的文章
-            $content = $richContentService->preFormatContent($content);
-        }
-        else
+        $content = $richContentService->preFormatContent($content);
+        if ($this->published_at)
         {
             // 已发布的文章
             // 不能编辑投票
@@ -197,23 +192,8 @@ class Pin extends Model
             }
         }
 
-        $trial_type = 0;
-        if ($publish || $this->published_at)
-        {
-            $risk = $richContentService->detectContentRisk($content, false);
-            if ($risk['delete'])
-            {
-                return false;
-            }
-            if ($risk['review'])
-            {
-                $trial_type = 1;
-            }
-        }
-
         $now = Carbon::now();
         $data = [
-            'trial_type' => $trial_type,
             'last_edit_at' => $now,
             'bangumi_slug' => $bangumi_slug
         ];
@@ -231,13 +211,17 @@ class Pin extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
 
-        event(new \App\Events\Pin\Update($this, $user, $doPublish, $oldBangumiSlug, $bangumi_slug));
+        event(new \App\Events\Pin\Update($this, $user, $doPublish, $oldBangumiSlug, $bangumi_slug, $content));
 
         return true;
     }
 
     public function deletePin($user)
     {
+        $this->update([
+            'trial_type' => 0
+        ]);
+
         $this->delete();
 
         event(new \App\Events\Pin\Delete($this, $user));

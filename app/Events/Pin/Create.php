@@ -14,17 +14,19 @@ class Create
     public $user;
     public $bangumiSlug;
     public $doPublish;
+    public $arrContent;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Pin $pin, User $user, string $bangumiSlug, bool $publish)
+    public function __construct(Pin $pin, User $user, string $bangumiSlug, bool $publish, array $content)
     {
         $this->pin = $pin;
         $this->user = $user;
         $this->bangumiSlug = $bangumiSlug;
         $this->doPublish = $publish;
+        $this->arrContent = $content;
     }
 }

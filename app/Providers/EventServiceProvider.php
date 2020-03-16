@@ -30,14 +30,16 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\Create\RefreshUserDrafts',
             'App\Listeners\Pin\Create\UpdateAuthorTimeline',
             'App\Listeners\Pin\Create\AddPinToFlow',
-            'App\Listeners\Pin\Create\AddPinToSearch'
+            'App\Listeners\Pin\Create\AddPinToSearch',
+            'App\Listeners\Pin\Create\Trial'
         ],
         'App\Events\Pin\Update' => [
             'App\Listeners\Pin\Update\UpdatePinTimeline',
             'App\Listeners\Pin\Update\UpdateAuthorTimeline',
             'App\Listeners\Pin\Update\RefreshCache',
             'App\Listeners\Pin\Update\UpdatePinFlow',
-            'App\Listeners\Pin\Update\UpdatePinSearch'
+            'App\Listeners\Pin\Update\UpdatePinSearch',
+            'App\Listeners\Pin\Update\Trial'
         ],
         'App\Events\Pin\Move' => [
             'App\Listeners\Pin\Move\UpdatePinTimeline',
