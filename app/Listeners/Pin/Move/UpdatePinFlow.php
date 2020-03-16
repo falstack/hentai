@@ -25,13 +25,13 @@ class UpdatePinFlow
             $event->pin->slug,
             $event->oldBangumiSlug,
             $event->pin->user_slug,
-            true
+            ['bangumi' => true]
         );
         $flowRepository->updatePin(
             $event->pin->slug,
             $event->newBangumiSlug,
             $event->pin->user_slug,
-            true
+            ['bangumi' => true]
         );
     }
 }

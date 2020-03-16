@@ -123,35 +123,91 @@ class FlowRepository extends Repository
         }, ['refresh' => $refresh]);
     }
 
-    public function createPin($pinSlug, $bangumiSlug, $userSlug, $onlyBangumi = false)
+    public function createPin($pinSlug, $bangumiSlug, $userSlug, $type = null)
     {
-        $slugs = $onlyBangumi ? [$bangumiSlug] : [self::$indexSlug, $bangumiSlug, $userSlug];
+        $slugs = [];
+        if (is_array($type))
+        {
+            if (isset($type['index']) && $type['index'])
+            {
+                $slugs[] = self::$indexSlug;
+            }
+            if (isset($type['bangumi']) && $type['bangumi'])
+            {
+                $slugs[] = $bangumiSlug;
+            }
+            if (isset($type['user']) && $type['user'])
+            {
+                $slugs[] = $userSlug;
+            }
+        }
+        else
+        {
+            $slugs = [self::$indexSlug, $bangumiSlug, $userSlug];
+        }
         foreach ($slugs as $i => $slug)
         {
             $this->SortAdd($this->flow_pin_cache_key(self::$from[$i], self::$order[0], $slug), $pinSlug);
+            $this->SortAdd($this->flow_pin_cache_key(self::$from[$i], self::$order[1], $slug), $pinSlug);
         }
-
-        $this->update_pin($pinSlug, $bangumiSlug, $userSlug);
     }
 
-    public function updatePin($pinSlug, $bangumiSlug, $userSlug, $onlyBangumi = false)
+    public function updatePin($pinSlug, $bangumiSlug, $userSlug, $type = null)
     {
-        $slugs = $onlyBangumi ? [$bangumiSlug] : [self::$indexSlug, $bangumiSlug, $userSlug];
+        $slugs = [];
+        if (is_array($type))
+        {
+            if (isset($type['index']) && $type['index'])
+            {
+                $slugs[] = self::$indexSlug;
+            }
+            if (isset($type['bangumi']) && $type['bangumi'])
+            {
+                $slugs[] = $bangumiSlug;
+            }
+            if (isset($type['user']) && $type['user'])
+            {
+                $slugs[] = $userSlug;
+            }
+        }
+        else
+        {
+            $slugs = [self::$indexSlug, $bangumiSlug, $userSlug];
+        }
         foreach ($slugs as $i => $slug)
         {
             $this->SortAdd($this->flow_pin_cache_key(self::$from[$i], self::$order[1], $slug), $pinSlug);
         }
     }
 
-    public function deletePin($pinSlug, $bangumiSlug, $userSlug, $onlyBangumi = false)
+    public function deletePin($pinSlug, $bangumiSlug, $userSlug, $type = null)
     {
-        $slugs = $onlyBangumi ? [$bangumiSlug] : [self::$indexSlug, $bangumiSlug, $userSlug];
+        $slugs = [];
+        if (is_array($type))
+        {
+            if (isset($type['index']) && $type['index'])
+            {
+                $slugs[] = self::$indexSlug;
+            }
+            if (isset($type['bangumi']) && $type['bangumi'])
+            {
+                $slugs[] = $bangumiSlug;
+            }
+            if (isset($type['user']) && $type['user'])
+            {
+                $slugs[] = $userSlug;
+            }
+        }
+        else
+        {
+            $slugs = [self::$indexSlug, $bangumiSlug, $userSlug];
+        }
         $randId = substr((string)slug2id($pinSlug), -1);
         foreach (self::$order[0] as $order)
         {
             foreach ($slugs as $i => $slug)
             {
-                $id = $order === 'hottest' ? $randId : 0;
+                $id = $order === 'newest' ? 0 : $randId;
                 $this->SortRemove(
                     $this->flow_pin_cache_key(
                         self::$from[$i],
