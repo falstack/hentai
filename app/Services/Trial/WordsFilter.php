@@ -10,7 +10,7 @@ class WordsFilter
     protected $review_line = 3;
     protected $replace = ['！', '!', '#', '@', '~', ' ', '.', '。'];
 
-    public function count($text)
+    public function count($text, $level = 0)
     {
         if ( ! $text)
         {
@@ -27,15 +27,22 @@ class WordsFilter
         $this->loadWords();
         $words = [];
 
-        $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_1, $text);
-        for ($k = 0; $k < count($arrRet); $k++)
+        if ($level === 0 || $level === 1)
         {
-            $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
+            $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_1, $text);
+            for ($k = 0; $k < count($arrRet); $k++)
+            {
+                $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
+            }
         }
-        $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_2, $text);
-        for ($k = 0; $k < count($arrRet); $k++)
+
+        if ($level === 0 || $level === 2)
         {
-            $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
+            $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_2, $text);
+            for ($k = 0; $k < count($arrRet); $k++)
+            {
+                $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
+            }
         }
 
         return count(array_unique($words));

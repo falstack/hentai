@@ -40,11 +40,6 @@ class PinController extends Controller
 
         if ($pin->deleted_at != null)
         {
-            if ($pin->trial_type != 0)
-            {
-                return $this->resErrLocked();
-            }
-
             return $this->resErrNotFound();
         }
 
@@ -440,14 +435,6 @@ class PinController extends Controller
     }
 
     public function down(Request $request)
-    {
-
-    }
-
-    /**
-     * 审核列表
-     */
-    public function trials(Request $request)
     {
 
     }

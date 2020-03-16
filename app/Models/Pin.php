@@ -123,7 +123,12 @@ class Pin extends Model
         if ($publish)
         {
             $risk = $richContentService->detectContentRisk($content, false);
-            if ($risk['risk_score'] > 0) {
+            if ($risk['delete'])
+            {
+                return false;
+            }
+            if ($risk['review'])
+            {
                 $trial_type = 1;
             }
         }
@@ -196,7 +201,11 @@ class Pin extends Model
         if ($publish || $this->published_at)
         {
             $risk = $richContentService->detectContentRisk($content, false);
-            if ($risk['risk_score'] > 0)
+            if ($risk['delete'])
+            {
+                return false;
+            }
+            if ($risk['review'])
             {
                 $trial_type = 1;
             }
