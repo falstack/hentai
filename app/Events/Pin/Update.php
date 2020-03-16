@@ -16,13 +16,14 @@ class Update
     public $published;
     public $oldBangumiSlug;
     public $newBangumiSlug;
+    public $arrContent;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Pin $pin, User $user, bool $publish, string $oldBangumiSlug, string $newBangumiSlug)
+    public function __construct(Pin $pin, User $user, bool $publish, string $oldBangumiSlug, string $newBangumiSlug, array $content)
     {
         $this->pin = $pin;
         $this->user = $user;
@@ -30,5 +31,6 @@ class Update
         $this->published = !!$pin->published_at;
         $this->oldBangumiSlug = $oldBangumiSlug;
         $this->newBangumiSlug = $newBangumiSlug;
+        $this->arrContent = $content;
     }
 }
