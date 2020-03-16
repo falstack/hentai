@@ -35,7 +35,12 @@ class UpdateFlowListCache
             ::where('slug', $slug)
             ->first();
 
-        if (is_null($pin) || !$pin->published_at || !$pin->can_up)
+        if (!$pin)
+        {
+            return;
+        }
+
+        if (!$pin->published_at || !$pin->can_up || $pin->trial_type != 0)
         {
             return;
         }

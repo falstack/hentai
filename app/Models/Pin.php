@@ -119,19 +119,6 @@ class Pin extends Model
     {
         $richContentService = new RichContentService();
         $content = $richContentService->preFormatContent($content);
-        $trial_type = 0;
-        if ($publish)
-        {
-            $risk = $richContentService->detectContentRisk($content, false);
-            if ($risk['delete'])
-            {
-                return false;
-            }
-            if ($risk['review'])
-            {
-                $trial_type = 1;
-            }
-        }
 
         $now = Carbon::now();
         $data = [

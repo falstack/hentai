@@ -3,6 +3,7 @@
 namespace App\Listeners\Pin\Update;
 
 use App\Http\Modules\RichContentService;
+use App\Http\Repositories\FlowRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 class Trial implements ShouldQueue
@@ -32,13 +33,24 @@ class Trial implements ShouldQueue
 
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($event->arrContent);
+        $pin = $event->pin;
         if ($risk['delete'])
         {
-            $event->pin->deletePin($event->user);
+            $pin->update([
+                'trial_type' => 2
+            ]);
+
+            $flowRepository = new FlowRepository();
+            $flowRepository->deletePin(
+                $pin->slug,
+                $pin->bangumi_slug,
+                $pin->user_slug,
+                ['index' => true, 'bangumi' => true]
+            );
         }
         if ($risk['review'])
         {
-            $event->pin->update([
+            $pin->update([
                 'trial_type' => 1
             ]);
         }
