@@ -404,15 +404,6 @@ class RichContentService
             $data = $this->parseRichContent($data);
         }
 
-        $wordsFilter = new WordsFilter();
-        $imageFilter = new ImageFilter();
-
-        $content = [];
-        $riskWords = [];
-        $riskImage = [];
-        $riskScore = 0;
-        $useReview = 0;
-
         $image = [];
         $words = '';
 
@@ -470,56 +461,52 @@ class RichContentService
                     $words .= $item['text'];
                 }
             }
+        }
 
-            if ($words)
+        $delete = false;
+        $review = false;
+
+        if ($words)
+        {
+            $wordsFilter = new WordsFilter();
+            $count = $wordsFilter->count($words, 2);
+            if ($count > 0)
             {
-                $filter = $wordsFilter->filter($words);
-                $riskWords = $filter['words'];
-                if ($filter['delete'])
-                {
-                    $riskScore++;
-                }
-                if ($filter['review'])
-                {
-                    $useReview++;
-                }
+                return [
+                    'review' => false,
+                    'delete' => true
+                ];
             }
 
-            if ($withImage && config('app.env') !== 'local')
+            $count = $wordsFilter->count($words, 1);
+            if ($count > 0)
             {
-                foreach ($image as $url)
-                {
-                    $detect = $imageFilter->check($url);
-                    if ($detect['review'] || $detect['delete'])
-                    {
-                        $riskImage[] = $url;
-                    }
-                    if ($detect['delete'])
-                    {
-                        $riskScore++;
-                    }
-                    if ($detect['review'])
-                    {
-                        $useReview++;
-                    }
-                }
+                $review = true;
             }
         }
 
-        if ($riskScore > 0)
+        if ($withImage && count($image) && config('app.env') !== 'local')
         {
-            foreach ($riskWords as $word)
+            $imageFilter = new ImageFilter();
+
+            foreach ($image as $url)
             {
-                Redis::ZINCRBY('blocked-risk-words-v2', 1, $word);
+                $detect = $imageFilter->check($url);
+                if ($detect['delete'])
+                {
+                    $delete = true;
+                    break;
+                }
+                if ($detect['review'])
+                {
+                    $review = true;
+                }
             }
         }
 
         return [
-            'content' => $content,
-            'risk_words' => array_unique($riskWords),
-            'risk_image' => array_unique($riskImage),
-            'risk_score' => $riskScore,
-            'use_review' => $useReview
+            'review' => $review,
+            'delete' => $delete
         ];
     }
 }

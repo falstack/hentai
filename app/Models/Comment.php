@@ -57,7 +57,7 @@ class Comment extends Model
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($content, false);
 
-        if ($risk['risk_score'] > 0)
+        if ($risk['delete'])
         {
             return null;
         }

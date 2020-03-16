@@ -29,8 +29,8 @@ class Message extends Model
         $richContentService = new RichContentService();
 
         $content = $data['content'];
-        $risk = $richContentService->detectContentRisk($content);
-        if ($risk['risk_score'] > 0)
+        $risk = $richContentService->detectContentRisk($content, false);
+        if ($risk['delete'])
         {
             return null;
         }
