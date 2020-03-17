@@ -91,8 +91,6 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
 
     $route->get('hot', 'BangumiController@hot100');
 
-    $route->get('atfield', 'BangumiController@atfield');
-
     $route->get('release', 'BangumiController@release');
 
     $route->get('idols', 'BangumiController@idols');
@@ -390,5 +388,7 @@ $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use (
         });
 
         $route->post('image/test', 'TrialController@imageTest');
+
+        $route->get('stat', 'TrialController@trialStat');
     });
 });

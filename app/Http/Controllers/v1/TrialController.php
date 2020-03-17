@@ -10,6 +10,8 @@ namespace App\Http\Controllers\v1;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\BangumiQuestion;
+use App\Models\Pin;
 use App\Services\Trial\ImageFilter;
 use App\Services\Trial\WordsFilter;
 use Illuminate\Http\Request;
@@ -147,6 +149,46 @@ class TrialController extends Controller
         $imageFilter = new ImageFilter();
 
         return $this->resOK($imageFilter->test($imageUrl));
+    }
+
+    public function trialStat(Request $request)
+    {
+        $slug = $request->get('slug');
+        $from = $request->get('from') ?: '';
+
+        $qaWaitCount = BangumiQuestion
+            ::where('status', 0)
+            ->when($slug, function ($query) use ($slug)
+            {
+                return $query->where('bangumi_slug', $slug);
+            })
+            ->count();
+
+        $qaPassCount = BangumiQuestion
+            ::where('status', 1)
+            ->when($slug, function ($query) use ($slug)
+            {
+                return $query->where('bangumi_slug', $slug);
+            })
+            ->count();
+
+        $pinWaitCount = Pin
+            ::where('trial_type', '<>', 0)
+            ->when($from === 'bangumi', function ($query) use ($slug)
+            {
+                return $query->where('bangumi_slug', $slug);
+            })
+            ->when($from === 'user', function ($query) use ($slug)
+            {
+                return $query->where('user_slug', $slug);
+            })
+            ->count();
+
+        return $this->resOK([
+            'qa_wait' => $qaWaitCount,
+            'qa_pass' => $qaPassCount,
+            'pin_wait' => $pinWaitCount
+        ]);
     }
 
     protected function changeBlackWordsFile($filename)
