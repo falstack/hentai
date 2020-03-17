@@ -109,7 +109,7 @@ class FlowController extends Controller
         $idsObj = $flowRepository->pinTrial($from, $slug, $take);
         if (empty($idsObj['result']))
         {
-            return $idsObj;
+            return $this->resOK($idsObj);
         }
 
         $pinRepository = new PinRepository();
@@ -135,7 +135,7 @@ class FlowController extends Controller
 
         $idsObj['extra'] = $extra;
 
-        return $idsObj;
+        return $this->resOK($idsObj);
     }
 
     public function idolNewest(Request $request)
