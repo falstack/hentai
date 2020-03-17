@@ -20,7 +20,7 @@ class BangumiItemResource extends JsonResource
             'alias' => explode('|', $this->alias),
             'rank' => $this->rank,
             'score' => $this->score,
-            'intro' => $this->intro,
+            'intro' => mb_substr(trim($this->intro), 0, 30, 'utf-8'),
             'source_id' => $this->source_id,
             'is_parent' => $this->is_parent,
             'parent_slug' => $this->parent_slug,
