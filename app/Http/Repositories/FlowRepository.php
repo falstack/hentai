@@ -242,7 +242,7 @@ class FlowRepository extends Repository
             $slugs = [self::$indexSlug, $bangumiSlug, $userSlug];
         }
         $randId = substr((string)slug2id($pinSlug), -1);
-        foreach (self::$order[0] as $order)
+        foreach (self::$order as $order)
         {
             foreach ($slugs as $i => $slug)
             {
