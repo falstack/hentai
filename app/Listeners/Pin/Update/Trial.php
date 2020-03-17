@@ -47,11 +47,21 @@ class Trial implements ShouldQueue
                 $pin->user_slug,
                 ['index' => true, 'bangumi' => true]
             );
+
+            $pin->timeline()->create([
+                'event_type' => 8,
+                'event_slug' => 'update-2'
+            ]);
         }
         if ($risk['review'])
         {
             $pin->update([
                 'trial_type' => 1
+            ]);
+
+            $pin->timeline()->create([
+                'event_type' => 8,
+                'event_slug' => 'update-1'
             ]);
         }
     }

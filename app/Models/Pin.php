@@ -78,6 +78,7 @@ class Pin extends Model
          * 5 => 移动帖子
          * 6 => 推荐
          * 7 => 取消推荐
+         * 8 => 进入审核
          */
         return $this->morphMany('App\Models\Timeline', 'timelineable');
     }
@@ -205,10 +206,6 @@ class Pin extends Model
 
     public function deletePin($user)
     {
-        $this->update([
-            'trial_type' => 0
-        ]);
-
         $this->delete();
 
         event(new \App\Events\Pin\Delete($this, $user));
