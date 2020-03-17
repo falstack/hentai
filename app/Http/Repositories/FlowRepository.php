@@ -143,8 +143,6 @@ class FlowRepository extends Repository
 
         $total = Pin
             ::where('trial_type', '<>', 0)
-            ->orderBy('trial_type', 'DESC')
-            ->orderBy('id', 'ASC')
             ->when($from === 'bangumi', function ($query) use ($slug)
             {
                 return $query->where('bangumi_slug', $slug);

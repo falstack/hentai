@@ -9,7 +9,6 @@ use App\Http\Repositories\IdolRepository;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\UserRepository;
 use App\Models\Bangumi;
-use App\Models\BangumiQuestion;
 use App\Models\Search;
 use App\Services\Spider\BangumiSource;
 use App\Services\Spider\Query;
@@ -63,32 +62,6 @@ class BangumiController extends Controller
         $patch['is_liked'] = $user->hasLiked($bangumiId, Bangumi::class);
 
         return $this->resOK($patch);
-    }
-
-    public function atfield(Request $request)
-    {
-        $slug = $request->get('slug');
-
-        $trialCount = BangumiQuestion
-            ::where('status', 0)
-            ->when($slug, function ($query) use ($slug)
-            {
-                return $query->where('bangumi_slug', $slug);
-            })
-            ->count();
-
-        $passCount = BangumiQuestion
-            ::where('status', 1)
-            ->when($slug, function ($query) use ($slug)
-            {
-                return $query->where('bangumi_slug', $slug);
-            })
-            ->count();
-
-        return $this->resOK([
-            'trial' => $trialCount,
-            'pass' => $passCount
-        ]);
     }
 
     public function rank250(Request $request)
