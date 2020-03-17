@@ -123,6 +123,45 @@ class FlowRepository extends Repository
         }, ['refresh' => $refresh]);
     }
 
+    public function pinTrial($from, $slug, $take)
+    {
+        $result = Pin
+            ::where('trial_type', '<>', 0)
+            ->orderBy('trial_type', 'DESC')
+            ->orderBy('id', 'ASC')
+            ->when($from === 'bangumi', function ($query) use ($slug)
+            {
+                return $query->where('bangumi_slug', $slug);
+            })
+            ->when($from === 'user', function ($query) use ($slug)
+            {
+                return $query->where('user_slug', $slug);
+            })
+            ->take($take)
+            ->pluck('slug')
+            ->toArray();
+
+        $total = Pin
+            ::where('trial_type', '<>', 0)
+            ->orderBy('trial_type', 'DESC')
+            ->orderBy('id', 'ASC')
+            ->when($from === 'bangumi', function ($query) use ($slug)
+            {
+                return $query->where('bangumi_slug', $slug);
+            })
+            ->when($from === 'user', function ($query) use ($slug)
+            {
+                return $query->where('user_slug', $slug);
+            })
+            ->count();
+
+        return [
+            'result' => $result,
+            'total' => $total,
+            'no_more' => true
+        ];
+    }
+
     public function createPin($pinSlug, $bangumiSlug, $userSlug, $type = null)
     {
         $slugs = [];

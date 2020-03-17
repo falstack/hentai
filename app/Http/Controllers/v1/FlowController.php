@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\RichContentService;
 use App\Http\Repositories\FlowRepository;
 use App\Http\Repositories\IdolRepository;
 use App\Http\Repositories\PinRepository;
+use App\Models\Content;
 use Illuminate\Http\Request;
 
 class FlowController extends Controller
@@ -89,6 +91,51 @@ class FlowController extends Controller
         $idsObj['result'] = $pinRepository->list($idsObj['result']);
 
         return $this->resOK($idsObj);
+    }
+
+    public function pinTrial(Request $request)
+    {
+        $flowRepository = new FlowRepository();
+
+        $take = $request->get('take') ?: 10;
+        $slug = $request->get('slug') ?: $flowRepository::$indexSlug;
+        $from = $request->get('from') ?: 'index';
+
+        if (!in_array($from, $flowRepository::$from))
+        {
+            return $this->resErrBad();
+        }
+
+        $idsObj = $flowRepository->pinTrial($from, $slug, $take);
+        if (empty($idsObj['result']))
+        {
+            return $idsObj;
+        }
+
+        $pinRepository = new PinRepository();
+        $slugs = $idsObj['result'];
+        $idsObj['result'] = $pinRepository->list($slugs);
+        $ids = array_map(function ($slug)
+        {
+            return slug2id($slug);
+        }, $slugs);
+
+        $content = Content
+            ::where('contentable_type', 'App\\Models\\Pin')
+            ->whereIn('contentable_id', $ids)
+            ->pluck('text', 'contentable_id')
+            ->toArray();
+
+        $richContentService = new RichContentService();
+        $extra = [];
+        foreach ($content as $id => $text)
+        {
+            $extra[id2slug($id)] = $richContentService->detectContentRisk($text, false);
+        }
+
+        $idsObj['extra'] = $extra;
+
+        return $idsObj;
     }
 
     public function idolNewest(Request $request)
