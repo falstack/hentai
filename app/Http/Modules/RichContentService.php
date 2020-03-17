@@ -404,7 +404,7 @@ class RichContentService
             $data = $this->parseRichContent($data);
         }
 
-        $image = [];
+        $images = [];
         $words = '';
 
         foreach($data as $row)
@@ -421,14 +421,14 @@ class RichContentService
             else if ($type === 'image')
             {
                 $words .= $row['data']['caption'];
-                $image[] = $row['data']['file']['url'];
+                $images[] = $row['data']['file']['url'];
             }
             else if ($type === 'title')
             {
                 $words .= $row['data']['text'];
                 if (isset($row['data']['banner']))
                 {
-                    $image[] = $row['data']['banner']['url'];
+                    $images[] = $row['data']['banner']['url'];
                 }
             }
             else if ($type === 'link')
@@ -463,8 +463,12 @@ class RichContentService
             }
         }
 
-        $delete = false;
-        $review = false;
+        $result = [
+          'review' => false,
+          'delete' => false,
+          'images' => $images,
+          'filter' => $words
+        ];
 
         if ($words)
         {
@@ -472,41 +476,37 @@ class RichContentService
             $count = $wordsFilter->count($words, 2);
             if ($count > 0)
             {
-                return [
-                    'review' => false,
-                    'delete' => true
-                ];
+                $result['delete'] = true;
             }
 
             $count = $wordsFilter->count($words, 1);
             if ($count > 0)
             {
-                $review = true;
+                $result['review'] = true;
             }
+
+            $result['filter'] = $wordsFilter->filter($words);
         }
 
-        if ($withImage && count($image) && config('app.env') !== 'local')
+        if ($withImage && count($images) && config('app.env') !== 'local')
         {
             $imageFilter = new ImageFilter();
 
-            foreach ($image as $url)
+            foreach ($images as $url)
             {
                 $detect = $imageFilter->check($url);
                 if ($detect['delete'])
                 {
-                    $delete = true;
+                    $result['delete'] = true;
                     break;
                 }
                 if ($detect['review'])
                 {
-                    $review = true;
+                    $result['review'] = true;
                 }
             }
         }
 
-        return [
-            'review' => $review,
-            'delete' => $delete
-        ];
+        return $result;
     }
 }

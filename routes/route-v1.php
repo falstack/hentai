@@ -341,6 +341,8 @@ $route->group(['prefix' => 'flow'], function () use ($route)
         $route->get('hottest', 'FlowController@pinHottest');
 
         $route->get('activity', 'FlowController@pinActivity');
+
+        $route->get('trial', 'FlowController@pinTrial');
     });
 
     $route->group(['prefix' => 'idol'], function () use ($route)
