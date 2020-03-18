@@ -130,7 +130,7 @@ class FlowController extends Controller
         $extra = [];
         foreach ($content as $id => $text)
         {
-            $extra[id2slug($id)] = $richContentService->detectContentRisk($text, false);
+            $extra[$slugs[array_search($id, $ids)]] = $richContentService->detectContentRisk($text, false);
         }
 
         $idsObj['extra'] = $extra;
