@@ -34,5 +34,6 @@ jobs:
           script: |
             cd ${{ secrets.SERVER_PATH }}
             git pull origin deploy
+            composer dump-autoload
             service supervisord restart
 

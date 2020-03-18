@@ -247,6 +247,8 @@ $route->group(['prefix' => 'pin'], function () use ($route)
 
         $route->post('delete', 'PinController@deletePin');
 
+        $route->post('pass', 'PinController@passPin');
+
         $route->post('move', 'PinController@movePin');
 
         $route->post('recommend', 'PinController@recommendPin');
