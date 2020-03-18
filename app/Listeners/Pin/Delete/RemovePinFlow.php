@@ -5,8 +5,6 @@ namespace App\Listeners\Pin\Delete;
 use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\FlowRepository;
 use App\Http\Repositories\UserRepository;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class RemovePinFlow
 {

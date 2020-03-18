@@ -227,12 +227,44 @@ class PinController extends Controller
             return $this->resErrNotFound();
         }
 
-        if ($pin->user_slug != $user->slug && !$user->is_admin)
+        if (
+            !$user->is_admin &&
+            $user->slug != $pin->user_slug &&
+            $user->cant('trial_pin')
+        )
         {
             return $this->resErrRole();
         }
 
         $pin->deletePin($user);
+
+        return $this->resNoContent();
+    }
+
+    public function passPin(Request $request)
+    {
+        $user = $request->user();
+        $slug = $request->get('slug');
+
+        $pin = Pin
+            ::withTrashed()
+            ->where('slug', $slug)
+            ->first();
+
+        if (is_null($pin))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if (
+            !$user->is_admin &&
+            $user->cant('trial_pin')
+        )
+        {
+            return $this->resErrRole();
+        }
+
+        $pin->recoverPin($user);
 
         return $this->resNoContent();
     }

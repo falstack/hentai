@@ -58,6 +58,13 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\Delete\RemovePinFlow',
             'App\Listeners\Pin\Delete\RemovePinSearch',
         ],
+        'App\Events\Pin\Recover' => [
+            'App\Listeners\Pin\Recover\RefreshCache',
+            'App\Listeners\Pin\Recover\UpdatePinTimeline',
+            'App\Listeners\Pin\Recover\UpdateUserTimeline',
+            'App\Listeners\Pin\Recover\UpdatePinFlow',
+            'App\Listeners\Pin\Recover\UpdatePinSearch',
+        ],
         'App\Events\Tag\Create' => [
             'App\Listeners\Tag\Create\InitTagMaster',
             'App\Listeners\Tag\Create\InitTagTimeline',
