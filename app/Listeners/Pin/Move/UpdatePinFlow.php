@@ -16,6 +16,11 @@ class UpdatePinFlow
 
     public function handle(\App\Events\Pin\Move $event)
     {
+        if ($event->pin->trial_type != 0)
+        {
+            return;
+        }
+
         $bangumiRepository = new BangumiRepository();
         $bangumiRepository->del_pin($event->oldBangumiSlug, $event->pin->slug);
         $bangumiRepository->add_pin($event->newBangumiSlug, $event->pin->slug);
