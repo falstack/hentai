@@ -86,16 +86,27 @@ class RichContentService
             else if ($type === 'title')
             {
                 $text = trim($row['data']['text']);
-                if (!$text && (!isset($row['data']['banner']) || !$row['data']['banner']))
+                $banner = $row['data']['banner'] ?? null;
+                if (!$text && !$banner)
                 {
                     continue;
                 }
+                $titleData = [
+                    'text' => $text ? Purifier::clean($text) : ''
+                ];
+                if ($banner)
+                {
+                    $titleData['banner'] = [
+                        'url' => $banner['url'],
+                        'width' => $banner['width'],
+                        'height' => $banner['height'],
+                        'size' => $banner['size'],
+                        'mime' => $banner['mime']
+                    ];
+                }
                 $result[] = [
                     'type' => $type,
-                    'data' => array_merge(
-                        $row['data'],
-                        ['text' => $text ? Purifier::clean($text) : '']
-                    )
+                    'data' => $titleData
                 ];
             }
             else if ($type === 'link')
@@ -208,15 +219,6 @@ class RichContentService
         $result = [];
         foreach ($data as $row)
         {
-//            if ($row['type'] === 'vote')
-//            {
-//                // 过滤掉答案
-//                unset($row['data']['right_ids']);
-//                $result[] = [
-//                    'type' => 'vote',
-//                    'data' => $row['data']
-//                ];
-//            }
             if ($row['type'] === 'video')
             {
                 continue;
