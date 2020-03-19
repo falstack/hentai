@@ -27,7 +27,7 @@ class UpdatePinTimeline
     {
         $pin = $event->pin;
         $pin->timeline()->create([
-            'event_type' => 9,
+            'event_type' => 8,
             'event_slug' => $pin->user_slug
         ]);
     }
