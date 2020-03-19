@@ -428,7 +428,7 @@ class RichContentService
             else if ($type === 'title')
             {
                 $words .= $row['data']['text'];
-                if (isset($row['data']['banner']))
+                if (isset($row['data']['banner']) && $row['data']['banner'])
                 {
                     $images[] = $row['data']['banner']['url'];
                 }

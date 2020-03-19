@@ -49,8 +49,8 @@ class Trial implements ShouldQueue
             );
 
             $pin->timeline()->create([
-                'event_type' => 8,
-                'event_slug' => 'update-2'
+                'event_type' => 10,
+                'event_slug' => $event->user->slug
             ]);
         }
         if ($risk['review'])
@@ -60,8 +60,8 @@ class Trial implements ShouldQueue
             ]);
 
             $pin->timeline()->create([
-                'event_type' => 8,
-                'event_slug' => 'update-1'
+                'event_type' => 9,
+                'event_slug' => $event->user->slug
             ]);
         }
     }
