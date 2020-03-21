@@ -27,7 +27,7 @@ class UpdatePinFlow
                 $pin->slug,
                 $pin->bangumi_slug,
                 $pin->user_slug,
-                ['index' => true, 'bangumi' => true]
+                strtotime($pin->published_at)
             );
         }
     }

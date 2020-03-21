@@ -160,7 +160,7 @@ class FlowRepository extends Repository
         ];
     }
 
-    public function createPin($pinSlug, $bangumiSlug, $userSlug, $type = null)
+    public function createPin($pinSlug, $bangumiSlug, $userSlug, $type = null, $time = 0)
     {
         $slugs = [];
         if (is_array($type))
@@ -184,7 +184,7 @@ class FlowRepository extends Repository
         }
         foreach ($slugs as $i => $slug)
         {
-            $this->SortAdd($this->flow_pin_cache_key(self::$from[$i], self::$order[0], $slug), $pinSlug);
+            $this->SortAdd($this->flow_pin_cache_key(self::$from[$i], self::$order[0], $slug), $pinSlug, $time);
             $this->SortAdd($this->flow_pin_cache_key(self::$from[$i], self::$order[1], $slug), $pinSlug);
         }
     }
