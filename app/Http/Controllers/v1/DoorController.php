@@ -259,15 +259,20 @@ class DoorController extends Controller
         if ($method === 'pwd')
         {
             $matched = $user->verifyPassword($secret);
+
+            if (!$matched)
+            {
+                return $this->resErrBad('密码错误');
+            }
         }
         else if ($matched === 'msg')
         {
             $matched = $this->checkMessageAuthCode($access, 'sign_in', $secret);
-        }
 
-        if (!$matched)
-        {
-            return $this->resErrBad('密码错误');
+            if (!$matched)
+            {
+                return $this->resErrBad('验证码错误');
+            }
         }
 
         $role = $request->get('role');
