@@ -51,7 +51,7 @@ class DoorController extends Controller
         $validator = Validator::make($request->all(), [
             'type' => [
                 'required',
-                Rule::in(['sign_up', 'forgot_password', 'bind_phone']),
+                Rule::in(['sign_up', 'forgot_password', 'bind_phone', 'sign_in']),
             ],
             'phone_number' => 'required|digits:11'
         ]);
@@ -71,28 +71,31 @@ class DoorController extends Controller
 
         if ($type === 'sign_up')
         {
-            $museNew = true;
+            $mustNew = true;
             $mustOld = false;
-
-            return $this->resErrServiceUnavailable('暂时关闭手机号注册');
+        }
+        else if ($type === 'sign_in')
+        {
+            $mustNew = false;
+            $mustOld = true;
         }
         else if ($type === 'forgot_password')
         {
-            $museNew = false;
+            $mustNew = false;
             $mustOld = true;
         }
         else if ($type === 'bind_phone')
         {
-            $museNew = true;
+            $mustNew = true;
             $mustOld = false;
         }
         else
         {
-            $museNew = false;
+            $mustNew = false;
             $mustOld = false;
         }
 
-        if ($museNew && !$this->accessIsNew('phone', $phone))
+        if ($mustNew && !$this->accessIsNew('phone', $phone))
         {
             return $this->resErrBad('手机号已注册');
         }
@@ -108,6 +111,10 @@ class DoorController extends Controller
         if ($type === 'sign_up')
         {
             $result = $sms->register($phone, $authCode);
+        }
+        else if ($type === 'sign_in')
+        {
+            $result = $sms->login($phone, $authCode);
         }
         else if ($type === 'forgot_password')
         {
@@ -151,7 +158,6 @@ class DoorController extends Controller
      *
      * @Parameters({
      *      @Parameter("access", description="手机号", type="number", required=true),
-     *      @Parameter("secret", description="`6至16位`的密码", type="string", required=true),
      *      @Parameter("authCode", description="6位数字的短信验证码", type="number", required=true),
      *      @Parameter("inviteCode", description="邀请码", type="string", required=false),
      * })
@@ -165,7 +171,6 @@ class DoorController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'access' => 'required|digits:11',
-            'secret' => 'required|min:6|max:16',
             'authCode' => 'required|digits:6'
         ]);
 
@@ -175,8 +180,9 @@ class DoorController extends Controller
         }
 
         $access = $request->get('access');
+        $authCode = $request->get('authCode');
 
-        if (!$this->checkMessageAuthCode($access, 'sign_up', $request->get('authCode')))
+        if (!$this->checkMessageAuthCode($access, 'sign_up', $authCode))
         {
             return $this->resErrBad('短信验证码已过期，请重新获取');
         }
@@ -187,7 +193,7 @@ class DoorController extends Controller
         }
 
         $data = [
-            'password' => $request->get('secret'),
+            'password' => $authCode,
             'phone' => $access
         ];
 
