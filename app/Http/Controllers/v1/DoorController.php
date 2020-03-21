@@ -245,16 +245,25 @@ class DoorController extends Controller
             return $this->resErrParams($validator);
         }
 
-        $user = User
-            ::where('phone', $request->get('access'))
-            ->first();
+        $method = $request->get('method') ?: 'pwd';
+        $access = $request->get('access');
+        $secret = $request->get('secret');
+        $user = User::where('phone', $access)->first();
 
         if (is_null($user))
         {
             return $this->resErrBad('未注册的账号');
         }
 
-        $matched = $user->verifyPassword($request->get('secret'));
+        $matched = false;
+        if ($method === 'pwd')
+        {
+            $matched = $user->verifyPassword($secret);
+        }
+        else if ($matched === 'msg')
+        {
+            $matched = $this->checkMessageAuthCode($access, 'sign_in', $secret);
+        }
 
         if (!$matched)
         {
