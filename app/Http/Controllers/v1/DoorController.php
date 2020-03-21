@@ -130,6 +130,18 @@ class DoorController extends Controller
         return $this->resCreated('短信已发送');
     }
 
+    public function detectAccess(Request $request)
+    {
+        $method = $request->get('method') ?: 'phone';
+        $access = $request->get('access');
+
+        $isNew = $this->accessIsNew($method, $access);
+
+        return $this->resOK([
+            'is_new' => $isNew
+        ]);
+    }
+
     /**
      * 用户注册
      *

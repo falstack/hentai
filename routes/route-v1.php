@@ -2,6 +2,8 @@
 
 $route->group(['prefix' => 'door'], function () use ($route)
 {
+    $route->post('/detect', 'DoorController@detectAccess');
+
     $route->post('/message', 'DoorController@sendMessage');
 
     $route->post('/register', 'DoorController@register');
