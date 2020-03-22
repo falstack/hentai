@@ -182,10 +182,15 @@ class DoorController extends Controller
 
         $access = $request->get('access');
         $authCode = $request->get('authCode');
+        $detect = $this->checkMessageAuthCode($access, 'sign_up', $authCode);
 
-        if (!$this->checkMessageAuthCode($access, 'sign_up', $authCode))
+        if ($detect === null)
         {
-            return $this->resErrBad('短信验证码已过期，请重新获取');
+            return $this->resErrBad('短信验证码过期');
+        }
+        if ($detect === false)
+        {
+            return $this->resErrBad('短信验证码错误');
         }
 
         if (!$this->accessIsNew('phone', $access))
@@ -256,23 +261,24 @@ class DoorController extends Controller
             return $this->resErrBad('未注册的账号');
         }
 
-        $matched = false;
         if ($method === 'pwd')
         {
-            $matched = $user->verifyPassword($secret);
-
-            if (!$matched)
+            if (!$user->verifyPassword($secret))
             {
                 return $this->resErrBad('密码错误');
             }
         }
-        else if ($matched === 'msg')
+        else if ($method === 'msg')
         {
-            $matched = $this->checkMessageAuthCode($access, 'sign_in', $secret);
+            $detect = $this->checkMessageAuthCode($access, 'sign_in', $secret);
 
-            if (!$matched)
+            if ($detect === null)
             {
-                return $this->resErrBad('验证码错误');
+                return $this->resErrBad('短信验证码过期');
+            }
+            if ($detect === false)
+            {
+                return $this->resErrBad('短信验证码错误');
             }
         }
 
@@ -561,10 +567,15 @@ class DoorController extends Controller
         }
 
         $phone = $request->get('phone');
+        $detect = $this->checkMessageAuthCode($phone, 'bind_phone', $request->get('authCode'));
 
-        if (!$this->checkMessageAuthCode($phone, 'bind_phone', $request->get('authCode')))
+        if ($detect === null)
         {
-            return $this->resErrBad('短信验证码已过期，请重新获取');
+            return $this->resErrBad('短信验证码过期');
+        }
+        if ($detect === false)
+        {
+            return $this->resErrBad('短信验证码错误');
         }
 
         if (!$this->accessIsNew('phone', $phone))
@@ -839,10 +850,15 @@ class DoorController extends Controller
         }
 
         $access = $request->get('access');
+        $detect = $this->checkMessageAuthCode($access, 'forgot_password', $request->get('authCode'));
 
-        if (!$this->checkMessageAuthCode($access, 'forgot_password', $request->get('authCode')))
+        if ($detect === null)
         {
-            return $this->resErrBad('短信验证码过期，请重新获取');
+            return $this->resErrBad('短信验证码过期');
+        }
+        if ($detect === false)
+        {
+            return $this->resErrBad('短信验证码错误');
         }
 
         $user = User
@@ -897,7 +913,7 @@ class DoorController extends Controller
         $value = Redis::GET($key);
         if (is_null($value))
         {
-            return false;
+            return null;
         }
 
         Redis::DEL($key);
