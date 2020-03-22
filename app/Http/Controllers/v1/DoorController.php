@@ -132,6 +132,7 @@ class DoorController extends Controller
         if (!$result)
         {
             $this->checkMessageAuthCode($phone, $type, $authCode);
+            $this->checkMessageThrottle($phone, true);
             return $this->resErrServiceUnavailable();
         }
 
@@ -920,9 +921,14 @@ class DoorController extends Controller
         return intval($value) === intval($token);
     }
 
-    private function checkMessageThrottle($phone)
+    private function checkMessageThrottle($phone, $isDelete = false)
     {
         $cacheKey = 'phone_message_throttle:' . $phone;
+        if ($isDelete)
+        {
+            Redis::DEL($cacheKey);
+            return true;
+        }
         if (Redis::EXISTS($cacheKey))
         {
             return true;
