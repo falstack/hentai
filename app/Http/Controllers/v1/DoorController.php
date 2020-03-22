@@ -929,7 +929,7 @@ class DoorController extends Controller
         }
 
         Redis::SET($cacheKey, 1);
-        Redis::EXPIRE($cacheKey, 60);
+        Redis::EXPIRE($cacheKey, 55);
 
         return false;
     }
