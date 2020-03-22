@@ -131,6 +131,7 @@ class DoorController extends Controller
 
         if (!$result)
         {
+            $this->checkMessageAuthCode($phone, $type, $authCode);
             return $this->resErrServiceUnavailable();
         }
 
