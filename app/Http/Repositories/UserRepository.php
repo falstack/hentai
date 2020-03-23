@@ -9,7 +9,7 @@
 namespace App\Http\Repositories;
 
 
-use App\Http\Transformers\User\UserHomeResource;
+use App\Http\Transformers\User\UserItemResource;
 use App\Models\Bangumi;
 use App\Models\IdolFans;
 use App\Models\Pin;
@@ -37,7 +37,7 @@ class UserRepository extends Repository
                 return 'nil';
             }
 
-            return new UserHomeResource($user);
+            return new UserItemResource($user);
         }, $refresh);
 
         if ($result === 'nil')
