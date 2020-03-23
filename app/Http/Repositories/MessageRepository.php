@@ -9,9 +9,11 @@
 namespace App\Http\Repositories;
 
 
+use App\Http\Modules\RichContentService;
 use App\Http\Transformers\Message\MessageItemResource;
 use App\Models\Message;
 use App\Models\MessageMenu;
+use Illuminate\Support\Facades\Redis;
 
 class MessageRepository extends Repository
 {
@@ -24,7 +26,6 @@ class MessageRepository extends Repository
                 ::where('type', $type)
                 ->whereRaw('getter_slug = ? and sender_slug = ?', [$senderSlug, $getterSlug])
                 ->orWhereRaw('getter_slug = ? and sender_slug = ?', [$getterSlug, $senderSlug])
-                ->orderBy('created_at', 'ASC')
                 ->with(['content', 'sender'])
                 ->get();
 
@@ -62,6 +63,22 @@ class MessageRepository extends Repository
         $format['result'] = $result;
 
         return $format;
+    }
+
+    public function newest($type, $getterSlug, $senderSlug)
+    {
+        $cacheKey = Message::roomCacheKey($type, $getterSlug, $senderSlug);
+        if (!Redis::EXISTS($cacheKey))
+        {
+            return '';
+        }
+
+        $richContentService = new RichContentService();
+
+        $value = Redis::ZREVRANGE($cacheKey, 0, 1);
+        $text = $richContentService->paresPureContent(json_decode($value, true));
+
+        return mb_substr($text, 0, 30, 'utf-8');
     }
 
     public function menu($slug)

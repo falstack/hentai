@@ -147,10 +147,12 @@ class Repository
         {
             if ($opts['desc'])
             {
+                // 从大到小
                 $cache = $opts['with_score'] ? Redis::ZREVRANGE($key, 0, -1, 'WITHSCORES') : Redis::ZREVRANGE($key, 0, -1);
             }
             else
             {
+                // 从小到大
                 $cache = $opts['with_score'] ? Redis::ZRANGE($key, 0, -1, 'WITHSCORES') : Redis::ZRANGE($key, 0, -1);
             }
         }
