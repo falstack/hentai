@@ -13,7 +13,6 @@ use App\Http\Modules\RichContentService;
 use App\Http\Transformers\Message\MessageItemResource;
 use App\Models\Message;
 use App\Models\MessageMenu;
-use Illuminate\Support\Facades\Redis;
 
 class MessageRepository extends Repository
 {
@@ -67,16 +66,15 @@ class MessageRepository extends Repository
 
     public function newest($type, $getterSlug, $senderSlug)
     {
-        $cacheKey = Message::roomCacheKey($type, $getterSlug, $senderSlug);
-        if (!Redis::EXISTS($cacheKey))
+        $arr = $this->history($type, $getterSlug, $senderSlug, '', true, 1);
+        if (empty($arr['result']))
         {
             return '';
         }
 
         $richContentService = new RichContentService();
-
-        $value = Redis::ZREVRANGE($cacheKey, 0, 1);
-        $text = $richContentService->paresPureContent(json_decode($value, true));
+        $item = $arr['result'][0];
+        $text = $richContentService->paresPureContent($item['content']);
 
         return mb_substr($text, 0, 30, 'utf-8');
     }
