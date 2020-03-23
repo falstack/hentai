@@ -105,6 +105,7 @@ class MessageController extends Controller
             if ($type == '1')
             {
                 $cache[$i]['about_user'] = $userRepository->item($channel[2] == $slug ? $channel[3] : $channel[2]);
+                $cache[$i]['desc'] = $messageRepository->newest($type, $channel[2], $channel[3]);
             }
         }
 
