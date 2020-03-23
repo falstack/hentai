@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\UnreadMessageCounter;
 use App\Http\Modules\WebSocketPusher;
 use App\Http\Repositories\MessageRepository;
+use App\Http\Repositories\UserRepository;
 use App\Models\Message;
 use App\Models\MessageMenu;
 use Illuminate\Http\Request;
@@ -82,11 +83,36 @@ class MessageController extends Controller
     public function getMessageMenu(Request $request)
     {
         $user = $request->user();
+        $slug = $user->slug;
+
         $messageRepository = new MessageRepository();
+        $cache = $messageRepository->menu($slug);
+        if (empty($cache))
+        {
+            return $this->resOK([
+                'result' => [],
+                'no_more' => true,
+                'total' => 0
+            ]);
+        }
 
-        $cache = $messageRepository->menu($user->slug);
+        $userRepository = new UserRepository();
+        foreach ($cache as $i => $item)
+        {
+            $channel = explode('@', $item['channel']);
+            $type = $channel[0];
+            $cache[$i]['type'] = $type;
+            if ($type == '1')
+            {
+                $cache[$i]['about_user'] = $userRepository->item($channel[1] == $slug ? $channel[2] : $channel[1]);
+            }
+        }
 
-        return $this->resOK($cache);
+        return $this->resOK([
+            'total' => 0,
+            'result' => $cache,
+            'no_more' => true
+        ]);
     }
 
     public function getChatHistory(Request $request)
