@@ -100,11 +100,11 @@ class MessageController extends Controller
         foreach ($cache as $i => $item)
         {
             $channel = explode('@', $item['channel']);
-            $type = $channel[0];
+            $type = $channel[1];
             $cache[$i]['type'] = $type;
             if ($type == '1')
             {
-                $cache[$i]['about_user'] = $userRepository->item($channel[1] == $slug ? $channel[2] : $channel[1]);
+                $cache[$i]['about_user'] = $userRepository->item($channel[2] == $slug ? $channel[3] : $channel[2]);
             }
         }
 
