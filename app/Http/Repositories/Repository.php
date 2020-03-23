@@ -287,11 +287,11 @@ class Repository
         {
             if ($offset < $take + 1)
             {
-                $result = array_slice($ids, 0, $offset - 1, $withScore);
+                $result = array_slice($ids, 0, $take, $withScore);
             }
             else
             {
-                $result = array_slice($ids, $offset - 1 - $take, $take, $withScore);
+                $result = array_slice($ids, $offset - ($take + 1), $take, $withScore);
             }
         }
         else
