@@ -336,7 +336,7 @@ class RichContentService
             }
             else if ($type === 'image')
             {
-                $result .= $row['data']['caption'];
+                $result .= $row['data']['caption'] ?: '[图片]';
             }
             else if ($type === 'baidu')
             {
