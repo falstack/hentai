@@ -66,7 +66,7 @@ class MessageRepository extends Repository
 
     public function newest($type, $getterSlug, $senderSlug)
     {
-        $arr = $this->history($type, $getterSlug, $senderSlug, '', true, 1);
+        $arr = $this->history($type, $getterSlug, $senderSlug, '', false, 1);
         if (empty($arr['result']))
         {
             return '';
