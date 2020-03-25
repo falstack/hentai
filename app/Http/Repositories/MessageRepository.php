@@ -16,7 +16,7 @@ use App\Models\MessageMenu;
 
 class MessageRepository extends Repository
 {
-    public function history($type, $getterSlug, $senderSlug, $sinceId, $isUp, $count)
+    public function history($type, $getterSlug, $senderSlug, $maxId, $isUp, $count)
     {
         $cacheKey = Message::roomCacheKey($type, $getterSlug, $senderSlug);
         $cache = $this->RedisSort($cacheKey, function () use ($type, $getterSlug, $senderSlug)
@@ -52,7 +52,7 @@ class MessageRepository extends Repository
             ];
         }
 
-        $format = $this->filterIdsByMaxId(array_flip($cache), $sinceId, $count, true, $isUp);
+        $format = $this->filterIdsByMaxId(array_flip($cache), $maxId, $count, true, $isUp);
         $userRepository = new UserRepository();
         $result = [];
         foreach ($format['result'] as $id => $item)
