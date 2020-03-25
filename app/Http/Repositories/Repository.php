@@ -264,45 +264,33 @@ class Repository
             ];
         }
 
-        $list = $withScore ? array_keys($ids) : $ids;
+        $idList = $withScore ? array_keys($ids) : $ids;
+        $total = count($ids);
         if ($maxId)
         {
-            $offset = array_search($maxId, $list);
+            $offset = array_search($maxId, $idList);
             if ($offset === false)
             {
-                $offset = count($list) + 1;
+                // 如果 maxId 这个元素被删除了，那么返回的就是 false
+                // 这个时候...就返回空数组吧
+                $offset = $isUp ? -$total : $total;
             }
             else
             {
-                $offset += 1;
+                $offset = $isUp ? ($offset - 1 - $total) : $offset + 1;
             }
         }
         else
         {
-            $offset = 0;
+            $offset = $isUp ? -1 : 0;
         }
 
-        $total = count($ids);
-        if ($isUp)
-        {
-            if ($offset < $take + 1)
-            {
-                $result = array_slice($ids, 0, $take, $withScore);
-            }
-            else
-            {
-                $result = array_slice($ids, $offset - ($take + 1), $take, $withScore);
-            }
-        }
-        else
-        {
-            $result = array_slice($ids, $offset, $take, $withScore);
-        }
+        $result = array_slice($ids, $offset, $take, $withScore);
 
         return [
             'result' => $result,
             'total' => $total,
-            'no_more' => $isUp ? ($offset <= $take + 1) : ($result > 0 ? ($total - ($offset + $take) <= 0) : true)
+            'no_more' => $take + ($isUp ? -$offset : ($offset + 1)) >= $total
         ];
     }
 

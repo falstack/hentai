@@ -5,7 +5,6 @@ namespace App\Http\Transformers\Message;
 
 
 use App\Http\Modules\RichContentService;
-use App\Http\Transformers\User\UserItemResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MessageItemResource extends JsonResource
@@ -16,7 +15,8 @@ class MessageItemResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'user' => new UserItemResource($this->sender),
+            'sender_slug' => $this->sender_slug,
+            'getter_slug' => $this->getter_slug,
             'content' => $richContentService->parseRichContent($this->content->text),
             'channel' => $this->when(isset($this->channel), $this->channel),
             'created_at' => $this->created_at

@@ -25,7 +25,7 @@ class MessageRepository extends Repository
                 ::where('type', $type)
                 ->whereRaw('getter_slug = ? and sender_slug = ?', [$senderSlug, $getterSlug])
                 ->orWhereRaw('getter_slug = ? and sender_slug = ?', [$getterSlug, $senderSlug])
-                ->with(['content', 'sender'])
+                ->with(['content'])
                 ->get();
 
             if (empty($messages))
@@ -53,10 +53,13 @@ class MessageRepository extends Repository
         }
 
         $format = $this->filterIdsByMaxId(array_flip($cache), $sinceId, $count, true, $isUp);
+        $userRepository = new UserRepository();
         $result = [];
         foreach ($format['result'] as $id => $item)
         {
-            $result[] = array_merge(json_decode($item, true), ['id' => $id]);
+            $message = json_decode($item, true);
+            $message['sender'] = $userRepository->item($message['sender_slug']);
+            $result[] = $message;
         }
 
         $format['result'] = $result;
@@ -66,7 +69,7 @@ class MessageRepository extends Repository
 
     public function newest($type, $getterSlug, $senderSlug)
     {
-        $arr = $this->history($type, $getterSlug, $senderSlug, '', false, 1);
+        $arr = $this->history($type, $getterSlug, $senderSlug, '', true, 1);
         if (empty($arr['result']))
         {
             return '';
