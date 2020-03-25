@@ -132,12 +132,12 @@ class MessageController extends Controller
         {
             $getterSlug = $channel[3];
         }
-        $sinceId = intval($request->get('since_id'));
+        $lastId = intval($request->get('last_id'));
         $isUp = (boolean)$request->get('is_up') ?: false;
         $count = $request->get('count') ?: 15;
 
         $messageRepository = new MessageRepository();
-        $result = $messageRepository->history($messageType, $getterSlug, $senderSlug, $sinceId, $isUp, $count);
+        $result = $messageRepository->history($messageType, $getterSlug, $senderSlug, $lastId, $isUp, $count);
 
         return $this->resOK($result);
     }
