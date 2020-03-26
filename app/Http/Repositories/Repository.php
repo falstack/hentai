@@ -264,10 +264,6 @@ class Repository
             ];
         }
 
-        if ($isUp)
-        {
-            $ids = array_reverse($ids);
-        }
         $idList = $withScore ? array_keys($ids) : $ids;
         $total = count($ids);
         if ($maxId)
@@ -275,16 +271,23 @@ class Repository
             $offset = array_search($maxId, $idList);
             if ($offset === false)
             {
-                // 如果 maxId 这个元素被删除了，那么返回的就是 false
-                // 这个时候...就返回空数组吧
-                $offset = $total;
+                return [
+                    'result' => [],
+                    'total' => $total,
+                    'no_more' => false
+                ];
             }
             else
             {
-                $offset = $offset + 1;
+                $offset = $isUp ? ($offset - $take) : ($offset + 1);
             }
         }
         else
+        {
+            $offset = $isUp ? ($total - $take) : 0;
+        }
+
+        if ($offset < 0)
         {
             $offset = 0;
         }
