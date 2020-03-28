@@ -297,7 +297,7 @@ class Repository
         return [
             'result' => $result,
             'total' => $total,
-            'no_more' => $offset + $take >= $total
+            'no_more' => $isUp ? ($offset <= $take) : ($offset + $take >= $total)
         ];
     }
 
