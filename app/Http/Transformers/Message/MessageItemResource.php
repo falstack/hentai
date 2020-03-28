@@ -19,6 +19,7 @@ class MessageItemResource extends JsonResource
             'getter_slug' => $this->getter_slug,
             'content' => $richContentService->parseRichContent($this->content->text),
             'channel' => $this->when(isset($this->channel), $this->channel),
+            'sender' => $this->when(isset($this->sender), $this->sender),
             'created_at' => $this->created_at
         ];
     }
