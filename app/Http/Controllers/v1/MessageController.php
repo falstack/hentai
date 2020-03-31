@@ -150,6 +150,10 @@ class MessageController extends Controller
         $type = $request->get('type');
         $senderSlug = $request->get('slug');
         $getterSlug = $user->slug;
+        if ($senderSlug === $getterSlug)
+        {
+            return $this->resErrBad('不能给自己发私信');
+        }
 
         $menu = MessageMenu
             ::firstOrCreate([
