@@ -77,7 +77,6 @@ class MessageController extends Controller
         {
             return $this->resErrBad();
         }
-        $message['sender'] = new UserItemResource($sender);
 
         return $this->resCreated($message);
     }
