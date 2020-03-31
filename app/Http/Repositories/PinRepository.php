@@ -52,7 +52,7 @@ class PinRepository extends Repository
             return new PinResource($pin);
         }, $refresh);
 
-        if ($result === 'nil')
+        if ($result === null || $result === 'nil')
         {
             return null;
         }
