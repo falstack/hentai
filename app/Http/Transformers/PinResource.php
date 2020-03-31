@@ -17,6 +17,10 @@ class PinResource extends JsonResource
 {
     public function toArray($request)
     {
+        if (!$this->content)
+        {
+            return null;
+        }
         $richContentService = new RichContentService();
 
         $title = [
