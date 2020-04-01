@@ -82,6 +82,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'is_admin' => 'boolean',
         'sex_secret' => 'boolean',
         'birth_secret' => 'boolean',
+        'unread_agree_count' => 'integer',
+        'unread_reward_count' => 'integer',
+        'unread_mark_count' => 'integer',
+        'unread_comment_count' => 'integer',
+        'unread_share_count' => 'integer',
+        'unread_message_count' => 'integer',
     ];
 
     public function setNicknameAttribute($name)
