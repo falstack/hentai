@@ -43,6 +43,10 @@ class PinResource extends JsonResource
         {
             $badge = '投票';
         }
+        if ($title && isset($title['banner']) && isset($title['banner']['url']))
+        {
+            $title['banner']['url'] = patchImage($title['banner']['url']);
+        }
 
         return [
             'slug' => $this->slug,
