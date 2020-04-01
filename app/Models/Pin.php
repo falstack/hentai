@@ -42,16 +42,6 @@ class Pin extends Model
         'can_up',           // 是否能被顶起来
     ];
 
-    public function author()
-    {
-        return $this->belongsTo('App\User', 'user_slug', 'slug');
-    }
-
-    public function bangumi()
-    {
-        return $this->belongsTo('App\Models\Bangumi', 'bangumi_slug', 'slug');
-    }
-
     public function tags()
     {
         return $this->morphToMany('App\Models\Tag', 'taggable');

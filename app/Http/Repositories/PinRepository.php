@@ -40,7 +40,7 @@ class PinRepository extends Repository
         {
             $pin = Pin
                 ::withTrashed()
-                ->with(['author', 'bangumi', 'content'])
+                ->with('content')
                 ->where('slug', $slug)
                 ->first();
 
@@ -56,6 +56,11 @@ class PinRepository extends Repository
         {
             return null;
         }
+
+        $userRepository = new UserRepository();
+        $bangumiRepository = new BangumiRepository();
+        $result->author = $userRepository->item($result->user_slug);
+        $result->bangumi = $bangumiRepository->item($result->bangumi_slug);
 
         return $result;
     }
