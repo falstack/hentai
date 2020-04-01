@@ -26,8 +26,8 @@ class AddDefaultTagRelation
      */
     public function handle(\App\Events\User\Register $event)
     {
-        $this->joinNewbieTopic($event->user);
-        $this->createDefaultNotebook($event->user);
+        // $this->joinNewbieTopic($event->user);
+        // $this->createDefaultNotebook($event->user);
     }
 
     protected function joinNewbieTopic($user)
