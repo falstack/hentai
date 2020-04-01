@@ -50,6 +50,8 @@ class PinResource extends JsonResource
 
         return [
             'slug' => $this->slug,
+            'user_slug' => $this->user_slug,
+            'bangumi_slug' => $this->bangumi_slug,
             'title' => $title,
             'badge' => $badge,
             'content' => $content,
@@ -58,8 +60,8 @@ class PinResource extends JsonResource
                 return patchImage($image['url']);
             }, $richContentService->parseRichBanner($content, $title['banner'] ?? null)),
             'intro' => mb_substr($richContentService->paresPureContent($content), 0, 60, 'utf-8'),
-            'bangumi' => new BangumiItemResource($this->bangumi),
-            'author' => new UserItemResource($this->author),
+            'bangumi' => $this->when(isset($this->bangumi), $this->bangumi),
+            'author' => $this->when(isset($this->author), $this->author),
             'trial_type' => $this->trial_type,
             'comment_type' => $this->comment_type,
             'last_top_at' => $this->last_top_at,
