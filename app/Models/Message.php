@@ -55,7 +55,7 @@ class Message extends Model
         $message->sender = $sender;
         $message->channel = $roomId;
 
-        event(new \App\Events\Message\Create($message, $sender, $roomId));
+        event(new \App\Events\Message\Create($message, $sender, $roomId, $messageType));
 
         return new MessageItemResource($message);
     }

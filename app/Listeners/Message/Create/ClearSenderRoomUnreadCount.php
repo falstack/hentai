@@ -4,10 +4,10 @@
 namespace App\Listeners\Message\Create;
 
 
+use App\Http\Repositories\Repository;
 use App\Models\MessageMenu;
-use Illuminate\Support\Facades\Redis;
 
-class ClearSenderRoomCounter
+class ClearSenderRoomUnreadCount
 {
     public function __construct()
     {
@@ -36,13 +36,7 @@ class ClearSenderRoomCounter
          * 这个地方的 menuList 仍然是读取 sender 的 slug（主要还是要把当前 sender 看做读数据时的 getter）
          */
         $menuListCacheKey = MessageMenu::messageListCacheKey($message->sender_slug);
-        if (Redis::EXISTS($menuListCacheKey))
-        {
-            Redis::ZADD(
-                $menuListCacheKey,
-                $senderMenuItem->generateCacheScore(),
-                $event->roomId
-            );
-        }
+        $repository = new Repository();
+        $repository->SortAdd($menuListCacheKey, $event->roomId, $senderMenuItem->generateCacheScore());
     }
 }

@@ -4,8 +4,8 @@
 namespace App\Http\Modules;
 
 
-use App\Http\Modules\Counter\UnreadMessageCounter;
 use App\Http\Repositories\MessageRepository;
+use App\User;
 
 class WebSocketPusher
 {
@@ -31,12 +31,16 @@ class WebSocketPusher
             }
 
             $pusher = $server ?: app('swoole');
-            $UnreadMessageCounter = new UnreadMessageCounter();
+            $user = User::where('slug', $slug)->first();
 
             $pusher->push($targetFd, json_encode([
                 'channel' => 'unread_total',
-                'unread_message_total' => $UnreadMessageCounter->get($slug),
-                'unread_notice_total' => 0
+                'unread_agree_count' => $user->unread_agree_count,
+                'unread_reward_count' => $user->unread_reward_count,
+                'unread_mark_count' => $user->unread_mark_count,
+                'unread_comment_count' => $user->unread_comment_count,
+                'unread_share_count' => $user->unread_share_count,
+                'unread_message_count' => $user->unread_message_count
             ]));
         }
         catch (\Exception $e) {}
