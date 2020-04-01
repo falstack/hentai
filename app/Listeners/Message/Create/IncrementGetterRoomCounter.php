@@ -4,8 +4,8 @@
 namespace App\Listeners\Message\Create;
 
 
+use App\Http\Repositories\Repository;
 use App\Models\MessageMenu;
-use Illuminate\Support\Facades\Redis;
 
 class IncrementGetterRoomCounter
 {
@@ -27,13 +27,7 @@ class IncrementGetterRoomCounter
         $getterMenuItem->increment('count');
 
         $menuListCacheKey = MessageMenu::messageListCacheKey($message->getter_slug);
-        if (Redis::EXISTS($menuListCacheKey))
-        {
-            Redis::ZADD(
-                $menuListCacheKey,
-                $getterMenuItem->generateCacheScore(),
-                $event->roomId
-            );
-        }
+        $repository = new Repository();
+        $repository->SortAdd($menuListCacheKey, $event->roomId, $getterMenuItem->generateCacheScore());
     }
 }

@@ -4,7 +4,7 @@
 namespace App\Listeners\Message\Create;
 
 
-use App\Http\Modules\Counter\UnreadMessageCounter;
+use App\User;
 
 class IncrementGetterUnreadMessageCount
 {
@@ -15,7 +15,8 @@ class IncrementGetterUnreadMessageCount
 
     public function handle(\App\Events\Message\Create $event)
     {
-        $UnreadMessageCounter = new UnreadMessageCounter();
-        $UnreadMessageCounter->add($event->message->getter_slug);
+        User
+            ::where('slug', $event->message->getter_slug)
+            ->increment('unread_message_count');
     }
 }

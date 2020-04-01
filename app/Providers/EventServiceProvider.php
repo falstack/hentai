@@ -126,7 +126,7 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Tag\AddPin\UpdatePinCache',
         ],
         'App\Events\Message\Create' => [
-            'App\Listeners\Message\Create\ClearSenderRoomCounter',
+            'App\Listeners\Message\Create\ClearSenderRoomUnreadCount',
             'App\Listeners\Message\Create\UpdateMessageListCache',
             'App\Listeners\Message\Create\IncrementGetterRoomCounter',
             'App\Listeners\Message\Create\IncrementGetterUnreadMessageCount',

@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Modules\Counter\UnreadMessageCounter;
-use App\Http\Modules\WebSocketPusher;
 use App\Http\Repositories\MessageRepository;
+use App\Http\Repositories\Repository;
 use App\Http\Repositories\UserRepository;
 use App\Models\Message;
 use App\Models\MessageMenu;
@@ -17,18 +16,16 @@ class MessageController extends Controller
 {
     public function getMessageTotal(Request $request)
     {
-        $slug = $request->get('slug');
-        if (!$slug)
-        {
-            return $this->resErrBad();
-        }
-
-        $unreadMessageCounter = new UnreadMessageCounter();
+        $user = $request->user();
 
         return $this->resOK([
             'channel' => 'unread_total',
-            'unread_message_total' => $unreadMessageCounter->get($slug),
-            'unread_notice_total' => 0
+            'unread_agree_count' => $user->unread_agree_count,
+            'unread_reward_count' => $user->unread_reward_count,
+            'unread_mark_count' => $user->unread_mark_count,
+            'unread_comment_count' => $user->unread_comment_count,
+            'unread_share_count' => $user->unread_share_count,
+            'unread_message_count' => $user->unread_message_count
         ]);
     }
 
@@ -246,28 +243,19 @@ class MessageController extends Controller
             return $this->resNoContent();
         }
 
+        $user->increment('unread_message_count', -$menu->count);
         $menu->update([
             'count' => 0,
             'updated_at' => $menu->updated_at
         ]);
 
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
-        if (Redis::EXISTS($cacheKey))
-        {
-            Redis::ZADD(
-                $cacheKey,
-                $menu->generateCacheScore(),
-                Message::roomCacheKey($messageType, $getterSlug, $senderSlug)
-            );
-        }
-
-        $unreadMessageCounter = new UnreadMessageCounter();
-        $count = $unreadMessageCounter->get($getterSlug);
-        $unreadMessageCounter->add($getterSlug, -$count);
-
-        $webSocketPusher = new WebSocketPusher();
-        $webSocketPusher->pushUnreadMessage($getterSlug);
-        $webSocketPusher->pushUserMessageList($getterSlug);
+        $repository = new Repository();
+        $repository->SortAdd(
+            $cacheKey,
+            Message::roomCacheKey($messageType, $getterSlug, $senderSlug),
+            $menu->generateCacheScore()
+        );
 
         return $this->resNoContent();
     }

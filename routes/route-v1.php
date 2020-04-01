@@ -190,10 +190,10 @@ $route->group(['prefix' => 'idol'], function () use ($route)
 
 $route->group(['prefix' => 'message'], function () use ($route)
 {
-    $route->get('total', 'MessageController@getMessageTotal');
-
     $route->group(['middleware' => 'auth'], function () use ($route)
     {
+        $route->get('total', 'MessageController@getMessageTotal');
+
         $route->post('send', 'MessageController@sendMessage');
 
         $route->get('menu', 'MessageController@getMessageMenu');
