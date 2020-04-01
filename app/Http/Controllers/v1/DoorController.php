@@ -686,6 +686,10 @@ class DoorController extends Controller
         );
         $body = json_decode($resp->body, true);
         $uniqueId = $body['unionid'] ?? '';
+        if (!isset($body['session_key']))
+        {
+            return $this->resErrServiceUnavailable('请尝试使用手机号登录/注册');
+        }
 
         if (!$uniqueId)
         {
@@ -792,6 +796,10 @@ class DoorController extends Controller
         );
         $body = json_decode($resp->body, true);
         $uniqueId = $body['unionid'] ?? '';
+        if (!isset($body['session_key']))
+        {
+            return $this->resErrServiceUnavailable('请尝试使用手机号登录/注册');
+        }
 
         if (!$uniqueId)
         {
