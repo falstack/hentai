@@ -64,6 +64,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'is_admin',                     // 是否是管理员
         'buy_idol_count',               // 购买股票的团子数
         'get_idol_count',               // 从股市获得的收益数
+        'unread_agree_count',           // 未读点赞个数
+        'unread_reward_count',          // 未读投食个数
+        'unread_mark_count',            // 未读收藏个数
+        'unread_comment_count',         // 未读评论个数
+        'unread_share_count',           // 未读分享个数
+        'unread_message_count',         // 未读私信个数
     ];
 
     protected $hidden = [

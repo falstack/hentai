@@ -7,7 +7,6 @@ use App\Http\Modules\Counter\UnreadMessageCounter;
 use App\Http\Modules\WebSocketPusher;
 use App\Http\Repositories\MessageRepository;
 use App\Http\Repositories\UserRepository;
-use App\Http\Transformers\User\UserItemResource;
 use App\Models\Message;
 use App\Models\MessageMenu;
 use Illuminate\Http\Request;

@@ -20,7 +20,7 @@ class InitUserTimeline
     /**
      * Handle the event.
      *
-     * @param  ExampleEvent  $event
+     * @param  \App\Events\User\Register  $event
      * @return void
      */
     public function handle(\App\Events\User\Register $event)
