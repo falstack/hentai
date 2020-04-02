@@ -5,7 +5,6 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\MessageRepository;
 use App\Http\Repositories\Repository;
-use App\Http\Repositories\UserRepository;
 use App\Models\Message;
 use App\Models\MessageMenu;
 use Illuminate\Http\Request;
@@ -90,19 +89,6 @@ class MessageController extends Controller
                 'no_more' => true,
                 'total' => 0
             ]);
-        }
-
-        $userRepository = new UserRepository();
-        foreach ($cache as $i => $item)
-        {
-            $channel = explode('@', $item['channel']);
-            $type = $channel[1];
-            $cache[$i]['type'] = $type;
-            if ($type == '1')
-            {
-                $cache[$i]['about_user'] = $userRepository->item($channel[2] == $slug ? $channel[3] : $channel[2]);
-                $cache[$i]['desc'] = $messageRepository->newest($type, $channel[2], $channel[3]);
-            }
         }
 
         return $this->resOK([

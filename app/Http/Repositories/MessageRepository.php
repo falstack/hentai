@@ -108,13 +108,22 @@ class MessageRepository extends Repository
         }
 
         $result = [];
+        $userRepository = new UserRepository();
         foreach ($cache as $channel => $score)
         {
-            $result[] = [
+            $arr = explode('@', $channel);
+            $item = [
                 'channel' => $channel,
                 'time' => substr($score, 0, -3),
-                'count' => intval(substr($score, -3))
+                'count' => intval(substr($score, -3)),
+                'type' => $arr[1]
             ];
+            if ($arr[1] == 1)
+            {
+                $item['about_user'] = $userRepository->item($channel[2] == $slug ? $channel[3] : $channel[2]);
+                $item['desc'] = $this->newest($arr[1], $channel[2], $channel[3]);
+            }
+            $result[] = $item;
         }
 
         return $result;
