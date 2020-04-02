@@ -248,9 +248,8 @@ class MessageController extends Controller
         ]);
 
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
-        $roomId = Message::roomCacheKey($messageType, $getterSlug, $senderSlug);
         $repository = new Repository();
-        $repository->SortSet($cacheKey, $roomId, $menu->generateCacheScore());
+        $repository->SortSet($cacheKey, $channel, $menu->generateCacheScore());
 
         return $this->resNoContent();
     }

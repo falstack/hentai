@@ -240,10 +240,7 @@ class Repository
 
     public function SortSet($key, $value, $score)
     {
-        if (Redis::EXISTS($key))
-        {
-            Redis::ZADD($key, $score, $value);
-        }
+        Redis::ZADD($key, $score, $value);
     }
 
     public function DeletePage($path)
