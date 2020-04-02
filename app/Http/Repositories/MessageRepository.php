@@ -120,8 +120,8 @@ class MessageRepository extends Repository
             ];
             if ($arr[1] == 1)
             {
-                $item['about_user'] = $userRepository->item($channel[2] == $slug ? $channel[3] : $channel[2]);
-                $item['desc'] = $this->newest($arr[1], $channel[2], $channel[3]);
+                $item['about_user'] = $userRepository->item($arr[2] == $slug ? $arr[3] : $arr[2]);
+                $item['desc'] = $this->newest($arr[1], $arr[2], $arr[3]);
             }
             $result[] = $item;
         }
