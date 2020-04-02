@@ -9,7 +9,6 @@ use App\Http\Repositories\UserRepository;
 use App\Models\Message;
 use App\Models\MessageMenu;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
 class MessageController extends Controller
@@ -163,11 +162,8 @@ class MessageController extends Controller
          * 如果之前没聊过天，那么缓存里就没有这个 roomId，要加上
          */
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
-        Redis::ZADD(
-            $cacheKey,
-            $menu->generateCacheScore(0),
-            $channel
-        );
+        $repository = new Repository();
+        $repository->SortSet($cacheKey, $channel, $menu->generateCacheScore());
 
         return $this->resOK($channel);
     }
@@ -199,13 +195,8 @@ class MessageController extends Controller
          * 删掉自己列表的缓存
          */
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
-        if (Redis::EXISTS($cacheKey))
-        {
-            Redis::ZREM(
-                $cacheKey,
-                Message::roomCacheKey($messageType, $getterSlug, $senderSlug)
-            );
-        }
+        $repository = new Repository();
+        $repository->SortRemove($cacheKey, $channel);
 
         return $this->resNoContent();
     }
@@ -259,7 +250,7 @@ class MessageController extends Controller
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
         $roomId = Message::roomCacheKey($messageType, $getterSlug, $senderSlug);
         $repository = new Repository();
-        $repository->SortAdd($cacheKey, $roomId, $menu->generateCacheScore(0));
+        $repository->SortSet($cacheKey, $roomId, $menu->generateCacheScore());
 
         return $this->resNoContent();
     }
