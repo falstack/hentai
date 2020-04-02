@@ -6,7 +6,6 @@ namespace App\Events\Message;
 use App\Models\Message;
 use App\User;
 use Illuminate\Queue\SerializesModels;
-use phpDocumentor\Reflection\Types\Integer;
 
 class Create
 {
@@ -17,7 +16,7 @@ class Create
     public $roomId;
     public $type;
 
-    public function __construct(Message $message, User $sender, string $roomId, Integer $messageType)
+    public function __construct(Message $message, User $sender, string $roomId, int $messageType)
     {
         $this->message = $message;
         $this->sender = $sender;
