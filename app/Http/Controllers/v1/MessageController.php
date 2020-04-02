@@ -195,8 +195,9 @@ class MessageController extends Controller
          * 删掉自己列表的缓存
          */
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
+        $roomId = Message::roomCacheKey($messageType, $getterSlug, $senderSlug);
         $repository = new Repository();
-        $repository->SortRemove($cacheKey, $channel);
+        $repository->SortRemove($cacheKey, $roomId);
 
         return $this->resNoContent();
     }
@@ -248,8 +249,9 @@ class MessageController extends Controller
         ]);
 
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
+        $roomId = Message::roomCacheKey($messageType, $getterSlug, $senderSlug);
         $repository = new Repository();
-        $repository->SortSet($cacheKey, $channel, $menu->generateCacheScore());
+        $repository->SortSet($cacheKey, $roomId, $menu->generateCacheScore());
 
         return $this->resNoContent();
     }
