@@ -22,12 +22,23 @@ class ClearSenderRoomUnreadCount
          * 在查询 menu 的时候，getter 为当前查询用户
          * 因此这个时候，sender 的 menuItem 的 getter_slug 其实是 message->sender_slug
          */
-        $senderMenuItem = MessageMenu::firstOrCreate([
-            'getter_slug' => $message->sender_slug,
-            'sender_slug' => $message->getter_slug,
-            'type' => $message->type
-        ]);
+        $senderMenuItem = MessageMenu
+            ::where('getter_slug', $message->sender_slug)
+            ->where('sender_slug', $message->getter_slug)
+            ->where('type', $message->type)
+            ->first();
+        if (!$senderMenuItem)
+        {
+            return true;
+        }
 
+        $count = $senderMenuItem->count;
+        $sender = $event->sender;
+        if ($count - $sender->unread_message_count < 0)
+        {
+            $count = $sender->unread_message_count;
+        }
+        $sender->increment('unread_message_count', -$count);
         $senderMenuItem->update([
             'count' => 0
         ]);
