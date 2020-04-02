@@ -28,6 +28,6 @@ class IncrementGetterRoomCounter
 
         $menuListCacheKey = MessageMenu::messageListCacheKey($message->getter_slug);
         $repository = new Repository();
-        $repository->SortAdd($menuListCacheKey, $event->roomId, $getterMenuItem->generateCacheScore());
+        $repository->SortSet($menuListCacheKey, $event->roomId, $getterMenuItem->generateCacheScore());
     }
 }

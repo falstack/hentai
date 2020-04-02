@@ -51,6 +51,6 @@ class ClearSenderRoomUnreadCount
          */
         $menuListCacheKey = MessageMenu::messageListCacheKey($message->sender_slug);
         $repository = new Repository();
-        $repository->SortAdd($menuListCacheKey, $event->roomId, $senderMenuItem->generateCacheScore(0));
+        $repository->SortSet($menuListCacheKey, $event->roomId, $senderMenuItem->generateCacheScore());
     }
 }
