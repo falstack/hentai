@@ -18,17 +18,18 @@ class MessageMenu extends Model
         'count' => 'integer',
     ];
 
-    public function generateCacheScore()
+    public function generateCacheScore($number = null)
     {
-        if (intval($this->count) > 999)
+        $count = $number === null ? $this->count : $number;
+        if (intval($count) > 999)
         {
             $msgCount = '999';
         }
         else
         {
-            $msgCount = str_pad($this->count, 3, '0', STR_PAD_LEFT);
+            $msgCount = str_pad($count, 3, '0', STR_PAD_LEFT);
         }
-        return strtotime($this->updated_at) . $msgCount;
+        return ($number === null ? strtotime($this->updated_at) : time()) . $msgCount;
     }
 
     public static function messageListCacheKey($slug)

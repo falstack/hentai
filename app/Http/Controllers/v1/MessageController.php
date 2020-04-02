@@ -165,7 +165,7 @@ class MessageController extends Controller
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
         Redis::ZADD(
             $cacheKey,
-            $menu->generateCacheScore(),
+            $menu->generateCacheScore(0),
             $channel
         );
 
@@ -259,7 +259,7 @@ class MessageController extends Controller
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
         $roomId = Message::roomCacheKey($messageType, $getterSlug, $senderSlug);
         $repository = new Repository();
-        $repository->SortAdd($cacheKey, $roomId, $menu->generateCacheScore());
+        $repository->SortAdd($cacheKey, $roomId, $menu->generateCacheScore(0));
 
         return $this->resNoContent();
     }
