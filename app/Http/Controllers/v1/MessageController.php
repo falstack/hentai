@@ -244,11 +244,14 @@ class MessageController extends Controller
             return $this->resNoContent();
         }
 
-        if ($count - $user->unread_message_count < 0)
+        if ($user->unread_message_count - $count < 0)
         {
             $count = $user->unread_message_count;
         }
-        $user->increment('unread_message_count', -$count);
+        if ($count)
+        {
+            $user->increment('unread_message_count', -$count);
+        }
         $menu->update([
             'count' => 0
         ]);
