@@ -14,6 +14,10 @@ class MessageMenu extends Model
         'type',             // 消息的类型
     ];
 
+    protected $casts = [
+        'count' => 'integer',
+    ];
+
     public function generateCacheScore()
     {
         if (intval($this->count) > 999)

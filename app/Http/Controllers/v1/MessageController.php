@@ -229,8 +229,8 @@ class MessageController extends Controller
 
         $menu = MessageMenu
             ::where('type', $messageType)
-            ->where('sender_slug', $senderSlug)
             ->where('getter_slug', $getterSlug)
+            ->where('sender_slug', $senderSlug)
             ->first();
 
         if (is_null($menu))
@@ -238,15 +238,19 @@ class MessageController extends Controller
             return $this->resErrNotFound();
         }
 
-        if (!$menu->count)
+        $count = $menu->count;
+        if (!$count)
         {
             return $this->resNoContent();
         }
 
-        $user->increment('unread_message_count', -$menu->count);
+        if ($count - $user->unread_message_count < 0)
+        {
+            $count = $user->unread_message_count;
+        }
+        $user->increment('unread_message_count', -$count);
         $menu->update([
-            'count' => 0,
-            'updated_at' => $menu->updated_at
+            'count' => 0
         ]);
 
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
