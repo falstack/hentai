@@ -4,6 +4,7 @@
 namespace App\Http\Modules\Counter;
 
 
+use App\Http\Modules\Counter\Base\HashCounter;
 use App\Http\Modules\RichContentService;
 use App\Http\Repositories\PinRepository;
 use App\Models\PinAnswer;

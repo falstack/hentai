@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Http\Modules\Counter;
+namespace App\Http\Modules\Counter\Base;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;

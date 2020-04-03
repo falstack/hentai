@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Http\Modules\Counter;
+namespace App\Http\Modules\Counter\Base;
 
 use App\Http\Repositories\Repository;
 use Illuminate\Support\Carbon;

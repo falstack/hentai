@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Http\Modules\DailyRecord;
+namespace App\Http\Modules\DailyRecord\Base;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
