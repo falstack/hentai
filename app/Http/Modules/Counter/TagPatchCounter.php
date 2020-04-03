@@ -4,6 +4,7 @@
 namespace App\Http\Modules\Counter;
 
 
+use App\Http\Modules\Counter\Base\HashCounter;
 use App\Models\Search;
 use App\Models\Tag;
 

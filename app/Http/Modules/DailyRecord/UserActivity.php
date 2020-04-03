@@ -3,6 +3,7 @@
 
 namespace App\Http\Modules\DailyRecord;
 
+use App\Http\Modules\DailyRecord\Base\DailyRecord;
 use Illuminate\Support\Facades\DB;
 
 class UserActivity extends DailyRecord

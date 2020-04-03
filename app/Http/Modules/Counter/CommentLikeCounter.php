@@ -4,6 +4,7 @@
 namespace App\Http\Modules\Counter;
 
 
+use App\Http\Modules\Counter\Base\AsyncCounter;
 use App\Models\Comment;
 
 class CommentLikeCounter extends AsyncCounter
