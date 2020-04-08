@@ -41,7 +41,7 @@ class SocialCounter
         {
             DB
                 ::table($this->table)
-                ->create([
+                ->insert([
                     'user_id' => $userId,
                     'model_id' => $modelId,
                     'author_id' => $authorId,
