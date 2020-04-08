@@ -4,6 +4,7 @@
 namespace App\Http\Modules\Counter\Base;
 
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class SocialCounter
@@ -20,7 +21,7 @@ class SocialCounter
     /**
      * 创建、更新数据
      */
-    public function set($userId, $modelId, $authorId, $value = 1)
+    public function set($userId, $modelId, $authorId, $value = 1, $time = 0)
     {
         $data = null;
 
@@ -34,6 +35,8 @@ class SocialCounter
                 ->first();
         }
 
+        $time = $time ? $time : Carbon::now();
+
         if (is_null($data))
         {
             DB
@@ -42,7 +45,9 @@ class SocialCounter
                     'user_id' => $userId,
                     'model_id' => $modelId,
                     'author_id' => $authorId,
-                    'value' => $value
+                    'value' => $value,
+                    'created_at' => $time,
+                    'updated_at' => $time
                 ]);
 
             return;
@@ -52,7 +57,8 @@ class SocialCounter
             ::table($this->table)
             ->where('id', $data->id)
             ->update([
-                'value' => $value
+                'value' => $value,
+                'updated_at' => $time
             ]);
     }
 
