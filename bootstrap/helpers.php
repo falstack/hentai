@@ -16,6 +16,7 @@ if ( ! function_exists('config_path'))
 
 function slug2id($slug)
 {
+    $slug = str_replace('cc-', '', $slug);
     return floor(base_convert($slug, 36, 10) / 1000);
 }
 
