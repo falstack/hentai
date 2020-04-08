@@ -30,6 +30,7 @@ class SocialCounter
                 ::table($this->table)
                 ->where('user_id', $userId)
                 ->where('model_id', $modelId)
+                ->where('author_id', $authorId)
                 ->first();
         }
 
@@ -58,24 +59,38 @@ class SocialCounter
     /**
      * 删除数据
      */
-    public function del($userId, $modelId)
+    public function del($userId, $modelId, $authorId)
     {
         DB
             ::table($this->table)
             ->where('user_id', $userId)
-            ->where('model_id', $modelId)
+            ->when($modelId, function ($query) use ($modelId)
+            {
+                return $query->where('model_id', $modelId);
+            })
+            ->when($authorId, function ($query) use ($authorId)
+            {
+                return $query->where('author_id', $authorId);
+            })
             ->delete();
     }
 
     /**
      * 获取数据
      */
-    public function get($userId, $modelId)
+    public function get($userId, $modelId, $authorId)
     {
         $value = DB
             ::table($this->table)
             ->where('user_id', $userId)
-            ->where('model_id', $modelId)
+            ->when($modelId, function ($query) use ($modelId)
+            {
+                return $query->where('model_id', $modelId);
+            })
+            ->when($authorId, function ($query) use ($authorId)
+            {
+                return $query->where('author_id', $authorId);
+            })
             ->pluck('value')
             ->first();
 
@@ -85,11 +100,18 @@ class SocialCounter
     /**
      * 获得该模型的所有「正向」用户
      */
-    public function users($modelId, $withScore = false)
+    public function users($modelId, $authorId, $withScore = false)
     {
         $data = DB
             ::table($this->table)
-            ->where('model_id', $modelId)
+            ->when($modelId, function ($query) use ($modelId)
+            {
+                return $query->where('model_id', $modelId);
+            })
+            ->when($authorId, function ($query) use ($authorId)
+            {
+                return $query->where('author_id', $authorId);
+            })
             ->where('value', '>', 0)
             ->pluck('value', 'user_id')
             ->toArray();
@@ -116,11 +138,18 @@ class SocialCounter
     /**
      * 获取该模型「正向」用户的个数
      */
-    public function total($modelId)
+    public function total($modelId, $authorId)
     {
         return DB
             ::table($this->table)
-            ->where('model_id', $modelId)
+            ->when($modelId, function ($query) use ($modelId)
+            {
+                return $query->where('model_id', $modelId);
+            })
+            ->when($authorId, function ($query) use ($authorId)
+            {
+                return $query->where('author_id', $authorId);
+            })
             ->where('value', '>', 0)
             ->count();
     }
@@ -128,11 +157,18 @@ class SocialCounter
     /**
      * 获取该模型的分数
      */
-    public function score($modelId)
+    public function score($modelId, $authorId)
     {
         return (int)DB
             ::table($this->table)
-            ->where('model_id', $modelId)
+            ->when($modelId, function ($query) use ($modelId)
+            {
+                return $query->where('model_id', $modelId);
+            })
+            ->when($authorId, function ($query) use ($authorId)
+            {
+                return $query->where('author_id', $authorId);
+            })
             ->sum('value');
     }
 
@@ -153,17 +189,28 @@ class SocialCounter
     /**
      * 一个用户获取多个关联关系
      */
-    public function batch($userId, $modelIds)
+    public function batch($userId, $modelIds = [], $authorIds = [])
     {
         $data = DB
             ::table($this->table)
             ->where('user_id', $userId)
-            ->whereIn('model_id', $modelIds)
-            ->pluck('value', 'model_id')
+            ->when(count($modelIds), function ($query) use ($modelIds)
+            {
+                return $query
+                    ->whereIn('model_id', $modelIds)
+                    ->pluck('value', 'model_id');
+            })
+            ->when(count($authorIds), function ($query) use ($authorIds)
+            {
+                return $query
+                    ->whereIn('author_id', $authorIds)
+                    ->pluck('value', 'author_id');
+            })
             ->toArray();
 
         $result = [];
-        foreach ($modelIds as $id)
+        $ids = count($modelIds) ? $modelIds : $authorIds;
+        foreach ($ids as $id)
         {
             $result[(int)$id] = 0;
         }
