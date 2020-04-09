@@ -64,6 +64,12 @@ class Test extends Command
             return true;
         }
 
+        $result = $this->migrationBangumiLike();
+        if ($result)
+        {
+            return true;
+        }
+
         return true;
     }
 
@@ -261,6 +267,45 @@ class Test extends Command
             DB::table('followables')
                 ->where('followable_type', 'App\User')
                 ->where('relation', 'follow')
+                ->where('user_id', $row->user_id)
+                ->where('followable_id', $row->followable_id)
+                ->update([
+                    'migration_state' => 1
+                ]);
+        }
+
+        return true;
+    }
+
+    protected function migrationBangumiLike()
+    {
+        $data = DB
+            ::table('followables')
+            ->where('migration_state', 0)
+            ->where('followable_type', 'App\Models\Bangumin')
+            ->where('relation', 'like')
+            ->get()
+            ->toArray();
+
+        if (empty($data))
+        {
+            return false;
+        }
+
+        $pinLikeCounter = new PinLikeCounter();
+        foreach ($data as $row)
+        {
+            $pinLikeCounter->set(
+                $row->user_id,
+                $row->followable_id,
+                0,
+                1,
+                $row->created_at
+            );
+
+            DB::table('followables')
+                ->where('followable_type', 'App\Models\Bangumin')
+                ->where('relation', 'like')
                 ->where('user_id', $row->user_id)
                 ->where('followable_id', $row->followable_id)
                 ->update([
