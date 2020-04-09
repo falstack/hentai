@@ -10,12 +10,16 @@ use Illuminate\Support\Facades\DB;
 class SocialCounter
 {
     protected $table;
-    protected $ab;          // 是否是 1/-1
+    protected $isAB;        // 是否是 1/-1
+    protected $isUser;      // 是否是用户关系
+    protected $fieldName;
 
-    public function __construct($tabName, $isAB = false)
+    public function __construct($tabName, $isAB = false, $isUser = false)
     {
         $this->table = $tabName;
-        $this->ab = $isAB;
+        $this->isAB = $isAB;
+        $this->isUser = $isUser;
+        $this->fieldName = $isUser ? 'author_id' : 'model_id';
     }
 
     /**
@@ -25,7 +29,7 @@ class SocialCounter
     {
         $data = null;
 
-        if ($this->ab)
+        if ($this->isAB)
         {
             $data = DB
                 ::table($this->table)
@@ -65,38 +69,34 @@ class SocialCounter
     /**
      * 删除数据
      */
-    public function del($userId, $modelId, $authorId)
+    public function del($userId, $modelId)
     {
         DB
             ::table($this->table)
+            ->where($this->fieldName, $modelId)
             ->where('user_id', $userId)
-            ->when($modelId, function ($query) use ($modelId)
-            {
-                return $query->where('model_id', $modelId);
-            })
-            ->when($authorId, function ($query) use ($authorId)
-            {
-                return $query->where('author_id', $authorId);
-            })
             ->delete();
+    }
+
+    /**
+     * 是否有过某行为
+     */
+    public function has($userId, $modelId)
+    {
+        $result = $this->get($userId, $modelId);
+
+        return $result !== 0;
     }
 
     /**
      * 获取数据
      */
-    public function get($userId, $modelId, $authorId)
+    public function get($userId, $modelId)
     {
         $value = DB
             ::table($this->table)
+            ->where($this->fieldName, $modelId)
             ->where('user_id', $userId)
-            ->when($modelId, function ($query) use ($modelId)
-            {
-                return $query->where('model_id', $modelId);
-            })
-            ->when($authorId, function ($query) use ($authorId)
-            {
-                return $query->where('author_id', $authorId);
-            })
             ->pluck('value')
             ->first();
 
@@ -106,18 +106,11 @@ class SocialCounter
     /**
      * 获得该模型的所有「正向」用户
      */
-    public function users($modelId, $authorId, $withScore = false)
+    public function users($modelId, $withScore = false)
     {
         $data = DB
             ::table($this->table)
-            ->when($modelId, function ($query) use ($modelId)
-            {
-                return $query->where('model_id', $modelId);
-            })
-            ->when($authorId, function ($query) use ($authorId)
-            {
-                return $query->where('author_id', $authorId);
-            })
+            ->where($this->fieldName, $modelId)
             ->where('value', '>', 0)
             ->pluck('value', 'user_id')
             ->toArray();
@@ -144,18 +137,11 @@ class SocialCounter
     /**
      * 获取该模型「正向」用户的个数
      */
-    public function total($modelId, $authorId)
+    public function total($modelId)
     {
         return DB
             ::table($this->table)
-            ->when($modelId, function ($query) use ($modelId)
-            {
-                return $query->where('model_id', $modelId);
-            })
-            ->when($authorId, function ($query) use ($authorId)
-            {
-                return $query->where('author_id', $authorId);
-            })
+            ->where($this->fieldName, $modelId)
             ->where('value', '>', 0)
             ->count();
     }
@@ -163,18 +149,11 @@ class SocialCounter
     /**
      * 获取该模型的分数
      */
-    public function score($modelId, $authorId)
+    public function score($modelId)
     {
         return (int)DB
             ::table($this->table)
-            ->when($modelId, function ($query) use ($modelId)
-            {
-                return $query->where('model_id', $modelId);
-            })
-            ->when($authorId, function ($query) use ($authorId)
-            {
-                return $query->where('author_id', $authorId);
-            })
+            ->where($this->fieldName, $modelId)
             ->sum('value');
     }
 
@@ -195,28 +174,17 @@ class SocialCounter
     /**
      * 一个用户获取多个关联关系
      */
-    public function batch($userId, $modelIds = [], $authorIds = [])
+    public function batch($userId, $modelIds)
     {
         $data = DB
             ::table($this->table)
             ->where('user_id', $userId)
-            ->when(count($modelIds), function ($query) use ($modelIds)
-            {
-                return $query
-                    ->whereIn('model_id', $modelIds)
-                    ->pluck('value', 'model_id');
-            })
-            ->when(count($authorIds), function ($query) use ($authorIds)
-            {
-                return $query
-                    ->whereIn('author_id', $authorIds)
-                    ->pluck('value', 'author_id');
-            })
+            ->where($this->fieldName, $modelIds)
+            ->pluck('value', $this->fieldName)
             ->toArray();
 
         $result = [];
-        $ids = count($modelIds) ? $modelIds : $authorIds;
-        foreach ($ids as $id)
+        foreach ($modelIds as $id)
         {
             $result[(int)$id] = 0;
         }
