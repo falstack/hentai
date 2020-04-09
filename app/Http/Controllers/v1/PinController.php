@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\PinLikeCounter;
+use App\Http\Modules\Counter\PinMarkCounter;
 use App\Http\Modules\Counter\PinPatchCounter;
+use App\Http\Modules\Counter\PinRewardCounter;
 use App\Http\Modules\Counter\PinVoteCounter;
 use App\Http\Repositories\PinRepository;
-use App\Http\Repositories\TagRepository;
 use App\Http\Repositories\UserRepository;
 use App\Models\Pin;
 use App\Models\PinAnswer;
@@ -74,12 +76,18 @@ class PinController extends Controller
         $user = $request->user();
         if ($user && $user->slug !== $pin->author->slug)
         {
+            $userId = $user->id;
+            $pinLikeCounter = new PinLikeCounter();
+            $pinMarkCounter = new PinMarkCounter();
+            $pinRewardCounter = new PinRewardCounter();
             $pinId = slug2id($slug);
+
             $patch['visit_count']++;
             $patch['down_vote_status'] = false;
-            $patch['up_vote_status'] = $user->hasUpvoted($pinId, Pin::class);
-            $patch['mark_status'] = $user->hasBookmarked($pinId, Pin::class);
-            $patch['reward_status'] = $user->hasFavorited($pinId, Pin::class);
+            $patch['up_vote_status'] = $pinLikeCounter->has($userId, $pinId);
+            $patch['mark_status'] = $pinMarkCounter->has($userId, $pinId);
+            $patch['reward_status'] = $pinRewardCounter->has($userId, $pinId);
+
             $pinPatchCounter->add($slug, 'visit_count', 1, true);
         }
         else

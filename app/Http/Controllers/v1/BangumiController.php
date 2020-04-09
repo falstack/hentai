@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\BangumiLikeCounter;
 use App\Http\Modules\Counter\BangumiPatchCounter;
 use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\IdolRepository;
@@ -58,8 +59,8 @@ class BangumiController extends Controller
             return $this->resOK($patch);
         }
 
-        $bangumiId = slug2id($slug);
-        $patch['is_liked'] = $user->hasLiked($bangumiId, Bangumi::class);
+        $bangumiLikeCounter = new BangumiLikeCounter();
+        $patch['is_liked'] = $bangumiLikeCounter->has($user->id, slug2id($slug));
 
         return $this->resOK($patch);
     }
