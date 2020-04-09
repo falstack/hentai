@@ -10,6 +10,6 @@ class UserFollowCounter extends SocialCounter
 {
     public function __construct()
     {
-        parent::__construct('user_follow_counter');
+        parent::__construct('user_follow_counter', true, true);
     }
 }
