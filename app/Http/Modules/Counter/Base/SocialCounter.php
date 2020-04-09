@@ -147,6 +147,26 @@ class SocialCounter
     }
 
     /**
+     * 「我的粉丝」总数
+     */
+    public function following($userId)
+    {
+        return DB
+            ::table($this->table)
+            ->where('model_id', $userId)
+            ->where('value', '>', 0)
+            ->count();
+    }
+
+    /**
+     * 「我的关注」总数
+     */
+    public function followers($userId)
+    {
+        return $this->total($userId);
+    }
+
+    /**
      * 获取该模型的分数
      */
     public function score($modelId)

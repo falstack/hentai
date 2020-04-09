@@ -33,12 +33,13 @@ class UserPatchCounter extends HashCounter
         }
 
         $userRepository = new UserRepository();
+        $userFollowCounter = new UserFollowCounter();
         $friends = $userRepository->friends($slug);
 
         return [
             'visit_count' => $user->visit_count,
-            'followers_count' => $user->followers()->count(),
-            'following_count' => $user->followings()->count(),
+            'followers_count' => $userFollowCounter->followers($user->id),
+            'following_count' => $userFollowCounter->following($user->id),
             'friends_count' => $friends['total']
         ];
     }

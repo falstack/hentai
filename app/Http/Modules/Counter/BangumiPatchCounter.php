@@ -31,10 +31,16 @@ class BangumiPatchCounter extends HashCounter
             ];
         }
 
+        $bangumiId = $bangumi->id;
+        $bangumiLikeCounter = new BangumiLikeCounter();
+
         return [
-            'publish_pin_count' => Pin::where('bangumi_slug', $slug)->whereNotNull('published_at')->count(),
-            'subscribe_user_count' => $bangumi->subscribers()->count(),
-            'like_user_count' => $bangumi->fans()->count()
+            'publish_pin_count' => Pin
+                ::where('bangumi_slug', $slug)
+                ->whereNotNull('published_at')
+                ->count(),
+            'subscribe_user_count' => 0, // TODO
+            'like_user_count' => $bangumiLikeCounter->score($bangumiId)
         ];
     }
 

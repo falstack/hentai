@@ -32,12 +32,17 @@ class PinPatchCounter extends HashCounter
             ];
         }
 
+        $pinLikeCounter = new PinLikeCounter();
+        $pinMarkCounter = new PinMarkCounter();
+        $pinRewardCounter = new PinRewardCounter();
+        $pinId = $pin->id;
+
         return [
             'visit_count' => $pin->visit_count,
             'comment_count' => $pin->comments()->count(),
-            'mark_count' => $pin->bookmarkers()->count(),
-            'reward_count' => $pin->favoriters()->count(),
-            'like_count' => $pin->upvoters()->count()
+            'mark_count' => $pinMarkCounter->total($pinId),
+            'reward_count' => $pinRewardCounter->score($pinId),
+            'like_count' => $pinLikeCounter->score($pinId)
         ];
     }
 
