@@ -2,10 +2,12 @@
 
 namespace App\Console\Jobs;
 
+use App\Http\Modules\Counter\PinCommentLikeCounter;
 use App\Http\Modules\Counter\PinLikeCounter;
-use App\Http\Repositories\PinRepository;
-use App\Http\Repositories\UserRepository;
-use App\Models\Content;
+use App\Http\Modules\Counter\PinMarkCounter;
+use App\Http\Modules\Counter\PinRewardCounter;
+use App\Http\Modules\Counter\UserFollowCounter;
+use App\Models\Comment;
 use App\Models\Pin;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +34,36 @@ class Test extends Command
      */
     public function handle()
     {
-        $this->migrationPinLike();
+        $result = $this->migrationPinLike();
+        if ($result)
+        {
+            return true;
+        }
+
+        $result = $this->migrationPinReward();
+        if ($result)
+        {
+            return true;
+        }
+
+        $result = $this->migrationPinBookmark();
+        if ($result)
+        {
+            return true;
+        }
+
+        $result = $this->migrationCommentAgree();
+        if ($result)
+        {
+            return true;
+        }
+
+        $result = $this->migrationUserFollow();
+        if ($result)
+        {
+            return true;
+        }
+
         return true;
     }
 
@@ -67,6 +98,169 @@ class Test extends Command
             DB::table('followables')
                 ->where('followable_type', 'App\Models\Pin')
                 ->where('relation', 'upvote')
+                ->where('user_id', $row->user_id)
+                ->where('followable_id', $row->followable_id)
+                ->update([
+                    'migration_state' => 1
+                ]);
+        }
+
+        return true;
+    }
+
+    protected function migrationPinReward()
+    {
+        $data = DB
+            ::table('followables')
+            ->where('migration_state', 0)
+            ->where('followable_type', 'App\Models\Pin')
+            ->where('relation', 'favorite')
+            ->get()
+            ->toArray();
+
+        if (empty($data))
+        {
+            return false;
+        }
+
+        $pinRewardCounter = new PinRewardCounter();
+        foreach ($data as $row)
+        {
+            $authorSlug = Pin::where('id', $row->followable_id)->pluck('user_slug')->first();
+
+            $pinRewardCounter->set(
+                $row->user_id,
+                $row->followable_id,
+                slug2id($authorSlug),
+                1,
+                $row->created_at
+            );
+
+            DB::table('followables')
+                ->where('followable_type', 'App\Models\Pin')
+                ->where('relation', 'favorite')
+                ->where('user_id', $row->user_id)
+                ->where('followable_id', $row->followable_id)
+                ->update([
+                    'migration_state' => 1
+                ]);
+        }
+
+        return true;
+    }
+
+    protected function migrationPinBookmark()
+    {
+        $data = DB
+            ::table('followables')
+            ->where('migration_state', 0)
+            ->where('followable_type', 'App\Models\Pin')
+            ->where('relation', 'bookmark')
+            ->get()
+            ->toArray();
+
+        if (empty($data))
+        {
+            return false;
+        }
+
+        $pinMarkCounter = new PinMarkCounter();
+        foreach ($data as $row)
+        {
+            $authorSlug = Pin::where('id', $row->followable_id)->pluck('user_slug')->first();
+
+            $pinMarkCounter->set(
+                $row->user_id,
+                $row->followable_id,
+                slug2id($authorSlug),
+                1,
+                $row->created_at
+            );
+
+            DB::table('followables')
+                ->where('followable_type', 'App\Models\Pin')
+                ->where('relation', 'bookmark')
+                ->where('user_id', $row->user_id)
+                ->where('followable_id', $row->followable_id)
+                ->update([
+                    'migration_state' => 1
+                ]);
+        }
+
+        return true;
+    }
+
+    protected function migrationCommentAgree()
+    {
+        $data = DB
+            ::table('followables')
+            ->where('migration_state', 0)
+            ->where('followable_type', 'App\Models\Comment')
+            ->where('relation', 'upvote')
+            ->get()
+            ->toArray();
+
+        if (empty($data))
+        {
+            return false;
+        }
+
+        $pinCommentLikeCounter = new PinCommentLikeCounter();
+        foreach ($data as $row)
+        {
+            $pinSlug = Comment::where('id', $row->followable_id)->pluck('pin_slug')->first();
+            $authorSlug = Pin::where('slug', $pinSlug)->pluck('user_slug')->first();
+
+            $pinCommentLikeCounter->set(
+                $row->user_id,
+                $row->followable_id,
+                slug2id($authorSlug),
+                1,
+                $row->created_at
+            );
+
+            DB::table('followables')
+                ->where('followable_type', 'App\Models\Comment')
+                ->where('relation', 'upvote')
+                ->where('user_id', $row->user_id)
+                ->where('followable_id', $row->followable_id)
+                ->update([
+                    'migration_state' => 1
+                ]);
+        }
+
+        return true;
+    }
+
+    protected function migrationUserFollow()
+    {
+        $data = DB
+            ::table('followables')
+            ->where('migration_state', 0)
+            ->where('followable_type', 'App\User')
+            ->where('relation', 'follow')
+            ->get()
+            ->toArray();
+
+        if (empty($data))
+        {
+            return false;
+        }
+
+        $pinCommentLikeCounter = new UserFollowCounter();
+        foreach ($data as $row)
+        {
+            $pinCommentLikeCounter->set(
+                $row->user_id,
+                0,
+                $row->followable_id,
+                1,
+                $row->created_at
+            );
+
+            DB::table('followables')
+                ->where('followable_type', 'App\User')
+                ->where('relation', 'follow')
                 ->where('user_id', $row->user_id)
                 ->where('followable_id', $row->followable_id)
                 ->update([
