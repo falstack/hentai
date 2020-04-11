@@ -94,7 +94,7 @@ class RichContentService
                 $titleData = [
                     'text' => $text ? Purifier::clean($text) : ''
                 ];
-                if ($banner)
+                if ($banner && isset($banner['width']))
                 {
                     $titleData['banner'] = [
                         'url' => $banner['url'],

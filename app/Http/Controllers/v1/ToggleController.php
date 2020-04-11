@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\PinCommentLikeCounter;
+use App\Http\Modules\Counter\PinLikeCounter;
+use App\Http\Modules\Counter\UserFollowCounter;
 use App\Http\Modules\RichContentService;
 use App\Http\Modules\VirtualCoinService;
 use App\Models\Comment;
@@ -69,7 +72,7 @@ class ToggleController extends Controller
             return $this->resOK(0);
         }
 
-        $result = $this->toggleAction($user, $target, $targetClass, $methodType);
+        $result = $this->toggleAction($user, $target, $targetClass, $methodType, $targetType);
         if (null === $result)
         {
             return $this->resErrServiceUnavailable();
@@ -78,7 +81,7 @@ class ToggleController extends Controller
         $result = gettype($result) === 'array' ? empty($result['detached']) : $result;
         $this->emitToggleEvent($user, $target, $targetType, $methodType, $result);
 
-        return $this->resOK($result ? 1 : -1);
+        return $this->resOK($result);
     }
 
     public function vote(Request $request)
@@ -272,14 +275,38 @@ class ToggleController extends Controller
         }
     }
 
-    protected function toggleAction($user, $target, $class, $type)
+    protected function toggleAction($user, $target, $class, $type, $targetType)
     {
         switch ($type) {
             case 'follow':
+                $counter = null;
+                if ($targetType === 'user')
+                {
+                    $counter = new UserFollowCounter();
+                }
+                if ($counter)
+                {
+                    $result = $counter->toggle($user->id, 0, $target->id);
+                    return $result;
+                }
                 return $user->toggleFollow($target, $class);
             case 'bookmark':
                 return $user->toggleBookmark($target, $class);
             case 'like':
+                $counter = null;
+                if ($targetType === 'pin')
+                {
+                    $counter = new PinLikeCounter();
+                }
+                else if ($targetType === 'comment')
+                {
+                    $counter = new PinCommentLikeCounter();
+                }
+                if ($counter)
+                {
+                    $result = $counter->toggle($user->id, 0, $target->id);
+                    return $result;
+                }
                 return $user->toggleLike($target, $class);
             case 'favorite':
                 return $user->toggleFavorite($target, $class);
