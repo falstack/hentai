@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\BangumiLikeCounter;
 use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\QuestionRepository;
 use App\Models\Bangumi;
@@ -440,7 +441,8 @@ class JoinController extends Controller
             'result_type' => 1
         ]);
 
-        if (!$bangumi->isLikedBy($user))
+        $bangumiLikeCounter = new BangumiLikeCounter();
+        if (!$bangumiLikeCounter->has($user->id, $bangumi->id))
         {
             event(new \App\Events\Bangumi\Pass($user, $bangumi));
         }

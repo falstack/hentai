@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\UserFollowCounter;
 use App\Http\Modules\Counter\UserPatchCounter;
 use App\Http\Modules\DailyRecord\UserActivity;
 use App\Http\Modules\DailyRecord\UserDailySign;
@@ -69,10 +70,8 @@ class UserController extends Controller
             return $this->resOK($patch);
         }
 
-        $targetId = User
-            ::where('slug', $targetSlug)
-            ->pluck('id')
-            ->first();
+        $targetId = slug2id($targetSlug);
+        $userId = $visitor->id;
 
         $userActivity = new UserActivity();
         $userExposure = new UserExposure();
@@ -80,9 +79,10 @@ class UserController extends Controller
         $userExposure->set($targetSlug);
         $userPatchCounter->add($targetSlug, 'visit_count', 1, true);
 
+        $userFollowCounter = new UserFollowCounter();
         $patch['visit_count']++;
-        $patch['is_following'] = $visitor->isFollowing($targetId);
-        $patch['is_followed_by'] = $visitor->isFollowedBy($targetId);
+        $patch['is_following'] = $userFollowCounter->has($userId, $targetId);
+        $patch['is_followed_by'] = $userFollowCounter->has($targetId, $userId);
 
         return $this->resOK($patch);
     }

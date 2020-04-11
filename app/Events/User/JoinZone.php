@@ -19,7 +19,7 @@ class JoinZone
     {
         $this->user = $user;
         $this->tag = $tag;
-
+        // TODO 已废弃
         $user->bookmark($tag, Tag::class);
         $user->timeline()->create([
             'event_type' => 1,

@@ -4,6 +4,7 @@
 namespace App\Http\Repositories;
 
 
+use App\Http\Modules\Counter\BangumiLikeCounter;
 use App\Http\Transformers\Bangumi\BangumiItemResource;
 use App\Models\Bangumi;
 use App\Models\BangumiQuestionRule;
@@ -140,13 +141,18 @@ class BangumiRepository extends Repository
                 return [];
             }
 
-            return $bangumi
-                ->fans(User::class)
-                ->withPivot('created_at')
-                ->orderBy('created_at', 'DESC')
-                ->pluck('followables.created_at', 'slug')
-                ->toArray();
+            $bangumiLikeCounter = new BangumiLikeCounter();
+            $data = $bangumiLikeCounter->users($bangumi->id, true);
 
+            $ids = array_keys($data);
+            $slugs = User::whereIn('id', $ids)->pluck('slug', 'id')->toArray();
+            $result = [];
+            foreach ($slugs as $id => $slug)
+            {
+                $result[$slug] = $data[array_search($id, $ids)];
+            }
+
+            return $result;
         }, ['force' => $refresh, 'is_time' => true]);
 
         return $this->filterIdsByPage($list, $page, $take);

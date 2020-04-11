@@ -9,6 +9,7 @@
 namespace App\Http\Repositories;
 
 
+use App\Http\Modules\Counter\BangumiLikeCounter;
 use App\Http\Transformers\User\UserItemResource;
 use App\Models\Bangumi;
 use App\Models\IdolFans;
@@ -237,14 +238,18 @@ class UserRepository extends Repository
                 return [];
             }
 
-            return $user
-                ->likes(Bangumi::class)
-                ->withPivot('created_at')
-                ->orderBy('created_at', 'DESC')
-                ->where('type', 0)
-                ->pluck('followables.created_at', 'slug')
-                ->toArray();
+            $bangumiLikeCounter = new BangumiLikeCounter();
+            $data = $bangumiLikeCounter->list($user->id, true);
 
+            $ids = array_keys($data);
+            $slugs = Bangumi::whereIn('id', $ids)->pluck('slug', 'id')->toArray();
+            $result = [];
+            foreach ($slugs as $id => $slug)
+            {
+                $result[$slug] = $data[array_search($id, $ids)];
+            }
+
+            return $result;
         }, ['force' => $refresh, 'is_time' => true]);
     }
 

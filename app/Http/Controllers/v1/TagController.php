@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\TagPatchCounter;
 use App\Http\Repositories\TagRepository;
 use App\Http\Transformers\Tag\TagResource;
-use App\Models\Pin;
 use App\Models\Tag;
 use App\Services\Trial\ImageFilter;
 use App\Services\Trial\WordsFilter;
@@ -46,16 +45,6 @@ class TagController extends Controller
 
         $tagPatchCounter = new TagPatchCounter();
         $patch = $tagPatchCounter->all($slug);
-        $user = $request->user();
-
-        if (!$user)
-        {
-            return $this->resOK($patch);
-        }
-
-        $tagId = slug2id($slug);
-        $patch['is_marked'] = $user->hasBookmarked($tagId, Tag::class);
-        $patch['is_master'] = $user->hasFavorited($tagId, Tag::class);
 
         return $this->resOK($patch);
     }

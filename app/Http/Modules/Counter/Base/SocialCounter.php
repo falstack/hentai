@@ -25,7 +25,7 @@ class SocialCounter
     /**
      * 创建、更新数据
      */
-    public function set($userId, $modelId, $authorId, $value = 1, $time = 0)
+    public function set($userId, $modelId, $authorId = 0, $value = 1, $time = 0)
     {
         $data = null;
 
@@ -64,6 +64,53 @@ class SocialCounter
                 'value' => $value,
                 'updated_at' => $time
             ]);
+    }
+
+    public function toggle($userId, $modelId, $authorId = 0, $value = 1)
+    {
+        $data = DB
+            ::table($this->table)
+            ->where('user_id', $userId)
+            ->where('model_id', $modelId)
+            ->where('author_id', $authorId)
+            ->first();
+
+        $time = Carbon::now();
+        if (is_null($data))
+        {
+            DB
+                ::table($this->table)
+                ->insert([
+                    'user_id' => $userId,
+                    'model_id' => $modelId,
+                    'author_id' => $authorId,
+                    'value' => $value,
+                    'created_at' => $time,
+                    'updated_at' => $time
+                ]);
+
+            return $value;
+        }
+
+        if ($this->isAB && $data->value != $value)
+        {
+            DB
+                ::table($this->table)
+                ->where('id', $data->id)
+                ->update([
+                    'value' => $value,
+                    'updated_at' => $time
+                ]);
+
+            return $value;
+        }
+
+        DB
+            ::table($this->table)
+            ->where('id', $data->id)
+            ->delete();
+
+        return 0;
     }
 
     /**
@@ -112,26 +159,50 @@ class SocialCounter
             ::table($this->table)
             ->where($this->fieldName, $modelId)
             ->where('value', '>', 0)
-            ->pluck('value', 'user_id')
+            ->orderBy('updated_at', 'DESC')
+            ->pluck('updated_at', 'user_id')
             ->toArray();
 
-        $result = [];
         if ($withScore)
         {
-            foreach ($data as $key => $val)
-            {
-                $result[$key] = (int)$val;
-            }
-        }
-        else
-        {
-            foreach ($data as $key => $val)
-            {
-                $result[] = $key;
-            }
+            return $data;
         }
 
-        return $result;
+        return array_keys($data);
+    }
+
+    public function list($userId, $withScore = false)
+    {
+        $data = DB
+            ::table($this->table)
+            ->where('user_id', $userId)
+            ->where('value', '>', 0)
+            ->orderBy('updated_at', 'DESC')
+            ->pluck('updated_at', $this->fieldName)
+            ->toArray();
+
+        if ($withScore)
+        {
+            return $data;
+        }
+
+        return array_keys($data);
+    }
+
+    /**
+     * 「我的粉丝」列表
+     */
+    public function fans($userId, $withScore = false)
+    {
+        return $this->users($userId, $withScore = false);
+    }
+
+    /**
+     * 「我的关注」列表
+     */
+    public function focus($userId, $withScore = false)
+    {
+        return $this->list($userId, $withScore = false);
     }
 
     /**
@@ -153,7 +224,7 @@ class SocialCounter
     {
         return DB
             ::table($this->table)
-            ->where('model_id', $userId)
+            ->where('author_id', $userId)
             ->where('value', '>', 0)
             ->count();
     }
@@ -163,7 +234,11 @@ class SocialCounter
      */
     public function followers($userId)
     {
-        return $this->total($userId);
+        return DB
+            ::table($this->table)
+            ->where('user_id', $userId)
+            ->where('value', '>', 0)
+            ->count();
     }
 
     /**

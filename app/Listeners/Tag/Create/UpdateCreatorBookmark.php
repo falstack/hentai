@@ -32,6 +32,7 @@ class UpdateCreatorBookmark
             return;
         }
         $user = $event->user;
+        // TODO：废弃
         $user->bookmark($event->tag, Tag::class);
 
         $tagRepository = new TagRepository();
