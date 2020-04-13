@@ -472,7 +472,8 @@ class JoinController extends Controller
             return $this->resErrNotFound();
         }
 
-        if (!$bangumi->isLikedBy($user))
+        $bangumiLikeCounter = new BangumiLikeCounter();
+        if (!$bangumiLikeCounter->has($user->id, $bangumi->id))
         {
             event(new \App\Events\Bangumi\Pass($user, $bangumi));
         }
