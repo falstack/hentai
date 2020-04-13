@@ -17,7 +17,7 @@ class AppendUserBangumiList
     public function handle(\App\Events\Bangumi\Pass $event)
     {
         $bangumiLikeCounter = new BangumiLikeCounter();
-        $bangumiLikeCounter->set($event->user->id, $event);
+        $bangumiLikeCounter->set($event->user->id, $event->bangumi->id);
         $userRepository = new UserRepository();
         $userRepository->SortAdd(
             $userRepository->userLikeBanguiCacheKey($event->user->slug),
