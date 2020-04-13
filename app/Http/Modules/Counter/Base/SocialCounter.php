@@ -218,25 +218,25 @@ class SocialCounter
     }
 
     /**
-     * 「我的粉丝」总数
+     * 「我的关注」总数
      */
     public function following($userId)
     {
         return DB
             ::table($this->table)
-            ->where('author_id', $userId)
+            ->where('user_id', $userId)
             ->where('value', '>', 0)
             ->count();
     }
 
     /**
-     * 「我的关注」总数
+     * 「我的粉丝」总数
      */
     public function followers($userId)
     {
         return DB
             ::table($this->table)
-            ->where('user_id', $userId)
+            ->where('author_id', $userId)
             ->where('value', '>', 0)
             ->count();
     }
