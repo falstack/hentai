@@ -149,7 +149,7 @@ class BangumiRepository extends Repository
             $result = [];
             foreach ($slugs as $id => $slug)
             {
-                $result[$slug] = $data[array_search($id, $ids)];
+                $result[$slug] = $data[$id];
             }
 
             return $result;
