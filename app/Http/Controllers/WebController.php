@@ -29,8 +29,6 @@ class WebController extends Controller
 {
     public function index(Request $request)
     {
-//        $test = new Test();
-//        $test->handle();
         return $this->resOK('hope happy end');
     }
 }
