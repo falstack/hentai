@@ -27,17 +27,12 @@ class SocialCounter
      */
     public function set($userId, $modelId, $authorId = 0, $value = 1, $time = 0)
     {
-        $data = null;
-
-        if ($this->isAB)
-        {
-            $data = DB
-                ::table($this->table)
-                ->where('user_id', $userId)
-                ->where('model_id', $modelId)
-                ->where('author_id', $authorId)
-                ->first();
-        }
+        $data = DB
+            ::table($this->table)
+            ->where('user_id', $userId)
+            ->where('model_id', $modelId)
+            ->where('author_id', $authorId)
+            ->first();
 
         $time = $time ? $time : Carbon::now();
 
