@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Console\Jobs\Test;
 use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\MessageRepository;
 use App\Http\Repositories\PinRepository;
@@ -28,6 +29,8 @@ class WebController extends Controller
 {
     public function index(Request $request)
     {
+//        $test = new Test();
+//        $test->handle();
         return $this->resOK('hope happy end');
     }
 }

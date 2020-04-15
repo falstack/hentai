@@ -2,6 +2,7 @@
 
 namespace App\Console\Jobs;
 
+use App\Http\Modules\Counter\BangumiLikeCounter;
 use App\Http\Modules\Counter\PinCommentLikeCounter;
 use App\Http\Modules\Counter\PinLikeCounter;
 use App\Http\Modules\Counter\PinMarkCounter;
@@ -253,10 +254,10 @@ class Test extends Command
             return false;
         }
 
-        $pinCommentLikeCounter = new UserFollowCounter();
+        $userFollowCounter = new UserFollowCounter();
         foreach ($data as $row)
         {
-            $pinCommentLikeCounter->set(
+            $userFollowCounter->set(
                 $row->user_id,
                 0,
                 $row->followable_id,
@@ -282,7 +283,7 @@ class Test extends Command
         $data = DB
             ::table('followables')
             ->where('migration_state', 0)
-            ->where('followable_type', 'App\Models\Bangumin')
+            ->where('followable_type', 'App\Models\Bangumi')
             ->where('relation', 'like')
             ->get()
             ->toArray();
@@ -292,10 +293,10 @@ class Test extends Command
             return false;
         }
 
-        $pinLikeCounter = new PinLikeCounter();
+        $bangumiLikeCounter = new BangumiLikeCounter();
         foreach ($data as $row)
         {
-            $pinLikeCounter->set(
+            $bangumiLikeCounter->set(
                 $row->user_id,
                 $row->followable_id,
                 0,
@@ -304,7 +305,7 @@ class Test extends Command
             );
 
             DB::table('followables')
-                ->where('followable_type', 'App\Models\Bangumin')
+                ->where('followable_type', 'App\Models\Bangumi')
                 ->where('relation', 'like')
                 ->where('user_id', $row->user_id)
                 ->where('followable_id', $row->followable_id)
