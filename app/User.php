@@ -238,4 +238,14 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
         return true;
     }
+
+    public function updateMsgCount($type, $count = 1)
+    {
+        $type = 'unread_' . $type . '_count';
+        if ($count < 0 && $this[$type] + $count < 0)
+        {
+            $count = -$this[$type];
+        }
+        $this->increment($type, $count);
+    }
 }

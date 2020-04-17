@@ -49,6 +49,7 @@ class PinResource extends JsonResource
         }
 
         return [
+            'id' => $this->id,
             'slug' => $this->slug,
             'user_slug' => $this->user_slug,
             'bangumi_slug' => $this->bangumi_slug,

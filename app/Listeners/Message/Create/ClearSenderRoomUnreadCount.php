@@ -32,16 +32,7 @@ class ClearSenderRoomUnreadCount
             return;
         }
 
-        $count = $senderMenuItem->count;
-        $sender = $event->sender;
-        if ($sender->unread_message_count - $count < 0)
-        {
-            $count = $sender->unread_message_count;
-        }
-        if ($count)
-        {
-            $sender->increment('unread_message_count', -$count);
-        }
+        $event->sender->updateMsgCount('message', -$senderMenuItem->count);
         $senderMenuItem->update([
             'count' => 0
         ]);

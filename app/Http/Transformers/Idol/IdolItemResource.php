@@ -20,6 +20,7 @@ class IdolItemResource extends JsonResource
         $bangumiRepository = new BangumiRepository();
 
         return [
+            'id' => $this->id,
             'slug' => $this->slug,
             'name' => $this->title,
             'rank' => $this->rank,
