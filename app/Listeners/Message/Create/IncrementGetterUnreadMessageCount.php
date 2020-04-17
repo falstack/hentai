@@ -15,8 +15,12 @@ class IncrementGetterUnreadMessageCount
 
     public function handle(\App\Events\Message\Create $event)
     {
-        User
-            ::where('slug', $event->message->getter_slug)
-            ->increment('unread_message_count');
+        $getter = User::where('slug', $event->message->getter_slug)->first();
+        if (!$getter)
+        {
+            return;
+        }
+
+        $getter->updateMsgCount('message');
     }
 }

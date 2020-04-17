@@ -15,7 +15,7 @@ class UserAuthResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'uuid' => $this->id,
+            'id' => $this->id,
             'slug' => $this->slug,
             'nickname' => $this->nickname,
             'avatar' => $this->avatar,

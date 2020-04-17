@@ -18,7 +18,7 @@ class UserItemResource extends JsonResource
         $userDailySign = new UserDailySign();
 
         return [
-            'uuid' => $this->id,
+            'id' => $this->id,
             'slug' => $this->slug,
             'nickname' => $this->nickname,
             'avatar' => $this->avatar,
