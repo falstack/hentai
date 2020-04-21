@@ -304,7 +304,8 @@ class ToggleController extends Controller
                 }
                 if ($counter)
                 {
-                    $result = $counter->toggle($user->id, 0, $target->id);
+                    $slug = $this->getCreatorSlug($target, $targetType);
+                    $result = $counter->toggle($user->id, $target->id, slug2id($slug));
                     return $result;
                 }
                 return $user->toggleLike($target, $class);
@@ -313,6 +314,21 @@ class ToggleController extends Controller
             case 'subscribe':
                 return $user->toggleSubscribe($target, $class);
             case 'up_vote':
+                $counter = null;
+                if ($targetType === 'pin')
+                {
+                    $counter = new PinLikeCounter();
+                }
+                else if ($targetType === 'comment')
+                {
+                    $counter = new PinCommentLikeCounter();
+                }
+                if ($counter)
+                {
+                    $slug = $this->getCreatorSlug($target, $targetType);
+                    $result = $counter->toggle($user->id, $target->id, slug2id($slug));
+                    return $result;
+                }
                 if ($user->hasUpvoted($target, $class))
                 {
                     $user->cancelUpVote($target, $class);

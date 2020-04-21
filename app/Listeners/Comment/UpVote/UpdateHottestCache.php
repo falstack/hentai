@@ -26,11 +26,15 @@ class UpdateHottestCache
      */
     public function handle(\App\Events\Comment\UpVote $event)
     {
-        $commentRepository = new CommentRepository();
+        if (!$event->result)
+        {
+            return;
+        }
 
+        $commentRepository = new CommentRepository();
         $commentRepository->SortAdd(
             $commentRepository->hottest_comment_cache_key($event->comment->pin_slug),
-            $event->comment->id, $event->result ? 1 : -1
+            $event->comment->id
         );
     }
 }

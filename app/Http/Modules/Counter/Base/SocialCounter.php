@@ -125,9 +125,41 @@ class SocialCounter
      */
     public function has($userId, $modelId)
     {
+        if (!$userId)
+        {
+            return false;
+        }
+
         $result = $this->get($userId, $modelId);
 
         return $result !== 0;
+    }
+
+    public function batchHas($data, $userId, $modelIds, $key)
+    {
+        foreach ($data as $i => $v)
+        {
+            $data[$i][$key] = false;
+        }
+
+        if (!$userId)
+        {
+            return $data;
+        }
+
+        $list = DB
+            ::table($this->table)
+            ->whereIn($this->fieldName, $modelIds)
+            ->where('user_id', $userId)
+            ->pluck('value', $this->fieldName)
+            ->toArray();
+
+        foreach ($list as $i => $v)
+        {
+            $data[$i][$key] = $v != 0;
+        }
+
+        return $data;
     }
 
     /**
@@ -143,6 +175,32 @@ class SocialCounter
             ->first();
 
         return $value === null ? 0 : intval($value);
+    }
+
+    /**
+     * 一个用户获取多个关联关系
+     */
+    public function batchGet($userId, $modelIds)
+    {
+        $data = DB
+            ::table($this->table)
+            ->where('user_id', $userId)
+            ->whereIn($this->fieldName, $modelIds)
+            ->pluck('value', $this->fieldName)
+            ->toArray();
+
+        $result = [];
+        foreach ($modelIds as $id)
+        {
+            $result[(int)$id] = 0;
+        }
+
+        foreach ($data as $key => $val)
+        {
+            $result[(int)$key] = (int)$val;
+        }
+
+        return $result;
     }
 
     /**
@@ -259,31 +317,5 @@ class SocialCounter
             ->orderBy('updated_at', 'DESC')
             ->pluck('model_id')
             ->toArray();
-    }
-
-    /**
-     * 一个用户获取多个关联关系
-     */
-    public function batch($userId, $modelIds)
-    {
-        $data = DB
-            ::table($this->table)
-            ->where('user_id', $userId)
-            ->where($this->fieldName, $modelIds)
-            ->pluck('value', $this->fieldName)
-            ->toArray();
-
-        $result = [];
-        foreach ($modelIds as $id)
-        {
-            $result[(int)$id] = 0;
-        }
-
-        foreach ($data as $key => $val)
-        {
-            $result[(int)$key] = (int)$val;
-        }
-
-        return $result;
     }
 }
