@@ -19,7 +19,7 @@ class PinVoteCounter extends HashCounter
     public function boot($slug)
     {
         $pinRepository = new PinRepository();
-        $pin = $pinRepository->item($slug);
+        $pin = $pinRepository->itemWithContent($slug);
         if (is_null($pin))
         {
             return [];
