@@ -10,67 +10,75 @@ use Illuminate\Support\Facades\Redis;
 
 class CacheStatCounter extends Repository
 {
-    protected $cacheKey;
     protected $table;
-    protected $todayCacheKey;
+    protected $model;
+    protected $withToday;
 
     /**
      * 作为数据仓库的 middleware，应用于按天计数的场景，不需要回写数据库
      */
-    public function __construct($table, $modal)
+    public function __construct($table, $model, $today = false)
     {
         $this->table = $table;
-        $this->cacheKey = 'total_' . $modal . '_stats';
-        $this->todayCacheKey = 'total_' . $modal . '_stats_' . strtotime(date('Y-m-d', time()));
+        $this->model = $model;
+        $this->withToday = $today;
     }
 
-    public function total()
+    public function total($id = 0)
     {
-        return (int)$this->RedisItem($this->cacheKey, function ()
+        return (int)$this->RedisItem($this->cacheKey($id), function () use ($id)
         {
             if (gettype($this->table) === 'array')
             {
                 $result = 0;
                 foreach ($this->table as $table)
                 {
-                    $result += $this->computeTotal($table);
+                    $result += $this->computeTotal($table, $id);
                 }
                 return $result;
             }
-            return $this->computeTotal($this->table);
+            return $this->computeTotal($this->table, $id);
         });
     }
 
-    public function today()
+    public function today($id = 0)
     {
-        return (int)$this->RedisItem($this->todayCacheKey, function ()
+        if (!$this->withToday)
+        {
+            return 0;
+        }
+
+        return (int)$this->RedisItem($this->cacheKey($id, true), function () use ($id)
         {
             if (gettype($this->table) === 'array')
             {
                 $result = 0;
                 foreach ($this->table as $table)
                 {
-                    $result += $this->computeToday($table);
+                    $result += $this->computeToday($table, $id);
                 }
                 return $result;
             }
-            return $this->computeToday($this->table);
+            return $this->computeToday($this->table, $id);
         });
     }
 
-    public function add($num = 1)
+    public function add($id = 0, $num = 1)
     {
-        if (Redis::EXISTS($this->cacheKey))
+        $cacheKey = $this->cacheKey($id);
+        if (Redis::EXISTS($cacheKey))
         {
-            Redis::INCRBYFLOAT($this->cacheKey, $num);
+            Redis::INCRBYFLOAT($cacheKey, $num);
         }
-        if (Redis::EXISTS($this->todayCacheKey))
+
+        $cacheKey = $this->cacheKey($id, true);
+        if ($this->withToday && Redis::EXISTS($cacheKey))
         {
-            Redis::INCRBYFLOAT($this->todayCacheKey, $num);
+            Redis::INCRBYFLOAT($cacheKey, $num);
         }
     }
 
-    protected function computeTotal($table)
+    protected function computeTotal($table, $id)
     {
         return DB
             ::table($table)
@@ -78,12 +86,17 @@ class CacheStatCounter extends Repository
             ->count();
     }
 
-    protected function computeToday($table)
+    protected function computeToday($table, $id)
     {
         return DB
             ::table($table)
             ->whereNull('deleted_at')
-            ->where('created_at', '>', Carbon::now()->today())
+            ->where('created_at', '>=', Carbon::now()->today())
             ->count();
+    }
+
+    protected function cacheKey($id, $today = false)
+    {
+        return 'total_' . $this->model . '_stats' . ':' . $id . ($today ? strtotime(date('Y-m-d', time())) : '');
     }
 }

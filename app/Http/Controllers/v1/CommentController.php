@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Modules\Counter\CommentLikeCounter;
+use App\Http\Modules\Counter\PinCommentLikeCounter;
 use App\Http\Repositories\CommentRepository;
 use App\Http\Repositories\PinRepository;
 use App\Models\Comment;
-use App\Services\Relation\RelationDetect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -80,24 +79,20 @@ class CommentController extends Controller
     public function patch(Request $request)
     {
         $ids = explode(',', $request->get('comment_ids'));
-        $commentLikeCounter = new CommentLikeCounter();
+        $pinCommentLikeCounter = new PinCommentLikeCounter();
         $result = [];
+
+        $user = $request->user();
+        $userId = is_null($user) ? 0 : $user->id;
 
         foreach ($ids as $commentId)
         {
             $result[$commentId] = [
-                'like_count' => $commentLikeCounter->get($commentId),
-                'up_vote_status' => false
+                'like_count' => $pinCommentLikeCounter->total($commentId)
             ];
         }
-        $user = $request->user();
-        if (is_null($user))
-        {
-            return $this->resOK($result);
-        }
 
-        $relationDetect = new RelationDetect();
-        $result = $relationDetect->batchDetect($result, $ids, $user->id, 'comment', 'upvote', 'up_vote_status');
+        $result = $pinCommentLikeCounter->batchHas($result, $userId, $ids, 'up_vote_status');
 
         return $this->resOK($result);
     }
