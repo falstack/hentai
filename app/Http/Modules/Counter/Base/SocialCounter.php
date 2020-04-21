@@ -306,7 +306,7 @@ class SocialCounter
     }
 
     /**
-     * 获取作者的所有未读消息
+     * 获取作者的所有消息
      */
     public function message($authorId)
     {
@@ -317,5 +317,18 @@ class SocialCounter
             ->orderBy('updated_at', 'DESC')
             ->pluck('model_id')
             ->toArray();
+    }
+
+    /**
+     * 获取作者的所有未读消息
+     */
+    public function unread($authorId)
+    {
+        return DB
+            ::table($this->table)
+            ->where('author_id', $authorId)
+            ->where('value', '>', 0)
+            ->where('read', 0)
+            ->count();
     }
 }

@@ -18,7 +18,7 @@ class UnreadMessageCounter extends CacheStatCounter
     {
         return Message
             ::where('getter_slug', $slug)
-            ->where('read', '0')
+            ->where('read', 0)
             ->count();
     }
 }
