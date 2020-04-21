@@ -20,6 +20,7 @@ class Comment extends Model
         'pin_slug',
         'trial_type',       // 审核结果，默认是 0，不在审核中
         'like_count',       // 喜欢和反对最后算出的值
+        'read',             // 是否已读
     ];
 
     public function author()
