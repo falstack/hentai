@@ -222,7 +222,13 @@ class MessageController extends Controller
             return $this->resNoContent();
         }
 
-        $user->updateMsgCount('message', -$count);
+        Message
+            ::where('getter_slug', $getterSlug)
+            ->where('sender_slug', $senderSlug)
+            ->update([
+                'read' => 1
+            ]);
+
         $menu->update([
             'count' => 0
         ]);

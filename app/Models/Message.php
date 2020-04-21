@@ -12,6 +12,7 @@ class Message extends Model
         'sender_slug',      // 触发消息的用户slug
         'getter_slug',      // 接受消息的用户slug
         'type',             // 消息的类型
+        'read',             // 是否已读
     ];
 
     public function content()
