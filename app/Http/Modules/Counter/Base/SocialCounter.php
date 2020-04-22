@@ -184,20 +184,20 @@ class SocialCounter
     {
         $data = DB
             ::table($this->table)
-            ->where('user_id', $userId)
             ->whereIn($this->fieldName, $modelIds)
+            ->where('user_id', $userId)
             ->pluck('value', $this->fieldName)
             ->toArray();
 
         $result = [];
         foreach ($modelIds as $id)
         {
-            $result[(int)$id] = 0;
+            $result[$id] = 0;
         }
 
         foreach ($data as $key => $val)
         {
-            $result[(int)$key] = (int)$val;
+            $result[$key] = (int)$val;
         }
 
         return $result;
@@ -224,6 +224,9 @@ class SocialCounter
         return array_keys($data);
     }
 
+    /**
+     * 获得该用户的所有「正向」模型
+     */
     public function list($userId, $withScore = false)
     {
         $data = DB
@@ -287,11 +290,7 @@ class SocialCounter
      */
     public function followers($userId)
     {
-        return DB
-            ::table($this->table)
-            ->where('author_id', $userId)
-            ->where('value', '>', 0)
-            ->count();
+        return $this->total($userId);
     }
 
     /**

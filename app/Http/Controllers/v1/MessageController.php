@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\PinCommentLikeCounter;
+use App\Http\Modules\Counter\PinLikeCounter;
+use App\Http\Modules\Counter\PinRewardCounter;
+use App\Http\Modules\Counter\UserFollowCounter;
 use App\Http\Repositories\MessageRepository;
 use App\Http\Repositories\Repository;
+use App\Models\Comment;
 use App\Models\Message;
 use App\Models\MessageMenu;
 use Illuminate\Http\Request;
@@ -15,15 +20,23 @@ class MessageController extends Controller
     public function getMessageTotal(Request $request)
     {
         $user = $request->user();
+        $slug = $user->slug;
+        $id = $user->id;
+
+        $pinCommentLikeCounter = new PinCommentLikeCounter();
+        $pinLikeCounter = new PinLikeCounter();
+        $pinRewardCounter = new PinRewardCounter();
+        $userFollowCounter = new UserFollowCounter();
 
         return $this->resOK([
             'channel' => 'unread_total',
-            'unread_agree_count' => $user->unread_agree_count,
-            'unread_reward_count' => $user->unread_reward_count,
-            'unread_mark_count' => $user->unread_mark_count,
-            'unread_comment_count' => $user->unread_comment_count,
-            'unread_share_count' => $user->unread_share_count,
-            'unread_message_count' => $user->unread_message_count
+            'unread_like_count' => $pinCommentLikeCounter->unread($id) + $pinLikeCounter->unread($id),
+            'unread_reward_count' => $pinRewardCounter->unread($id),
+            'unread_mark_count' => 0,
+            'unread_share_count' => 0,
+            'unread_follow_count' => $userFollowCounter->unread($id),
+            'unread_comment_count' => Comment::where('to_user_slug', $slug)->where('read', 0)->count(),
+            'unread_message_count' => Message::where('getter_slug', $slug)->where('read', 0)->count()
         ]);
     }
 
