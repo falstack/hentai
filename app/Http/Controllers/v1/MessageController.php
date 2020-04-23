@@ -57,6 +57,7 @@ class MessageController extends Controller
             {
                 return $query->where('id', '>', $lastId);
             })
+            ->orderBy('read', 'ASC')
             ->orderBy('id', 'DESC')
             ->pluck('pin_slug', 'id')
             ->take($count)
