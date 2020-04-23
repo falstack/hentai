@@ -29,6 +29,7 @@ class CommentItemResource extends JsonResource
             'like_count' => $this->upvoters()->count(),
             'up_vote_status' => false,
             'down_vote_status' => false,
+            'read' => $this->read,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at
