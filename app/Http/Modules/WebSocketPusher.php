@@ -47,7 +47,8 @@ class WebSocketPusher
 
             $pusher->push($targetFd, json_encode([
                 'channel' => 'unread_total',
-                'unread_like_count' => $pinCommentLikeCounter->unread($id) + $pinLikeCounter->unread($id),
+                'unread_pin_like_count' => $pinCommentLikeCounter->unread($id),
+                'unread_comment_like_count' =>  $pinLikeCounter->unread($id),
                 'unread_reward_count' => $pinRewardCounter->unread($id),
                 'unread_mark_count' => 0,
                 'unread_share_count' => 0,

@@ -35,6 +35,13 @@ class UserRepository extends Repository
 
             if (is_null($user))
             {
+                $user = User
+                    ::where('id', $slug)
+                    ->first();
+            }
+
+            if (is_null($user))
+            {
                 return 'nil';
             }
 

@@ -32,6 +32,14 @@ class TagRepository extends Repository
 
             if (is_null($tag))
             {
+                $tag = Tag
+                    ::where('id', $slug)
+                    ->with('content')
+                    ->first();
+            }
+
+            if (is_null($tag))
+            {
                 return 'nil';
             }
 

@@ -46,6 +46,15 @@ class PinRepository extends Repository
 
             if (is_null($pin))
             {
+                $pin = Pin
+                    ::withTrashed()
+                    ->with('content')
+                    ->where('id', $slug)
+                    ->first();
+            }
+
+            if (is_null($pin))
+            {
                 return 'nil';
             }
 

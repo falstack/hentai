@@ -28,17 +28,25 @@ class BangumiRepository extends Repository
 
         $result = $this->RedisItem("bangumi:{$slug}", function () use ($slug)
         {
-            $idol = Bangumi
+            $bangumi = Bangumi
                 ::where('slug', $slug)
                 ->with('tags')
                 ->first();
 
-            if (is_null($idol))
+            if (is_null($bangumi))
+            {
+                $bangumi = Bangumi
+                    ::where('id', $slug)
+                    ->with('tags')
+                    ->first();
+            }
+
+            if (is_null($bangumi))
             {
                 return 'nil';
             }
 
-            return new BangumiItemResource($idol);
+            return new BangumiItemResource($bangumi);
         }, $refresh);
 
         if ($result === 'nil')

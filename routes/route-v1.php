@@ -200,6 +200,14 @@ $route->group(['prefix' => 'message'], function () use ($route)
 
         $route->get('history', 'MessageController@getChatHistory');
 
+        $route->get('message_pin_comment', 'MessageController@messageOfComment');
+
+        $route->get('message_agree', 'MessageController@messageOfAgree');
+
+        $route->get('message_pin_reward', 'MessageController@messageOfReward');
+
+        $route->get('message_user_follow', 'MessageController@messageOfFollow');
+
         $route->get('get_channel', 'MessageController@getMessageChannel');
 
         $route->post('delete_channel', 'MessageController@deleteMessageChannel');

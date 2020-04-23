@@ -307,14 +307,19 @@ class SocialCounter
     /**
      * 获取作者的所有消息
      */
-    public function message($authorId)
+    public function message($authorId, $lastId = 0, $take = 20)
     {
         return DB
             ::table($this->table)
             ->where('author_id', $authorId)
             ->where('value', '>', 0)
             ->orderBy('updated_at', 'DESC')
-            ->pluck('model_id')
+            ->when($lastId != 0, function ($query) use ($lastId)
+            {
+                return $query->where('id', $lastId);
+            })
+            ->take($take)
+            ->get()
             ->toArray();
     }
 

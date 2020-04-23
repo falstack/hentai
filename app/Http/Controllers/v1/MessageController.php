@@ -7,8 +7,11 @@ use App\Http\Modules\Counter\PinCommentLikeCounter;
 use App\Http\Modules\Counter\PinLikeCounter;
 use App\Http\Modules\Counter\PinRewardCounter;
 use App\Http\Modules\Counter\UserFollowCounter;
+use App\Http\Repositories\CommentRepository;
 use App\Http\Repositories\MessageRepository;
+use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\Repository;
+use App\Http\Repositories\UserRepository;
 use App\Models\Comment;
 use App\Models\Message;
 use App\Models\MessageMenu;
@@ -30,13 +33,138 @@ class MessageController extends Controller
 
         return $this->resOK([
             'channel' => 'unread_total',
-            'unread_like_count' => $pinCommentLikeCounter->unread($id) + $pinLikeCounter->unread($id),
+            'unread_pin_like_count' => $pinCommentLikeCounter->unread($id),
+            'unread_comment_like_count' =>  $pinLikeCounter->unread($id),
             'unread_reward_count' => $pinRewardCounter->unread($id),
             'unread_mark_count' => 0,
             'unread_share_count' => 0,
             'unread_follow_count' => $userFollowCounter->unread($id),
             'unread_comment_count' => Comment::where('to_user_slug', $slug)->where('read', 0)->count(),
             'unread_message_count' => Message::where('getter_slug', $slug)->where('read', 0)->count()
+        ]);
+    }
+
+    public function messageOfComment(Request $request)
+    {
+        $lastId = $request->get('last_id') ?: 0;
+        $count = $request->get('take') ?: 20;
+        $user = $request->user();
+        $slug = $user->slug;
+
+        $list = Comment
+            ::where('to_user_slug', $slug)
+            ->when($lastId != 0, function ($query) use ($lastId)
+            {
+                return $query->where('id', '>', $lastId);
+            })
+            ->orderBy('read', 0)
+            ->orderBy('id', 'DESC')
+            ->pluck('pin_slug', 'id')
+            ->take($count)
+            ->toArray();
+
+        $pinRepository = new PinRepository();
+        $commentRepository = new CommentRepository();
+
+        $result = [];
+
+        foreach ($list as $commentId => $pinSlug)
+        {
+            $result[] = [
+                'comment' => $commentRepository->item($commentId),
+                'pin' => $pinRepository->item($pinSlug)
+            ];
+        }
+
+        return $this->resOK([
+            'result' => $result
+        ]);
+    }
+
+    public function messageOfAgree(Request $request)
+    {
+        $page = $request->get('page') ?: 1;
+        $take = $request->get('take') ?: 20;
+        $user = $request->user();
+        $userId = $user->id;
+
+        $messageRepository = new MessageRepository();
+
+        $resObj = $messageRepository->agreeList($userId, $page - 1, $take);
+        if (empty($resObj['result']))
+        {
+            return $this->resOK($resObj);
+        }
+
+        $result = [];
+        $commentRepository = new CommentRepository();
+        $userRepository = new UserRepository();
+        $pinRepository = new PinRepository();
+
+        foreach ($resObj['result'] as $row)
+        {
+            $type = $row['type'];
+
+            if ($type === 'comment')
+            {
+                $data = $commentRepository->item($row['id']);
+            }
+            else if ($type === 'pin')
+            {
+                $data = $pinRepository->item($row['id']);
+            }
+
+            $result[] = [
+                'type' => $type,
+                'data' => $data,
+                'user' => $userRepository->item($row['user_id'])
+            ];
+        }
+
+        $resObj['result'] = $result;
+
+        return $this->resOK($resObj);
+    }
+
+    public function messageOfReward(Request $request)
+    {
+        $lastId = $request->get('last_id') ?: 0;
+        $count = $request->get('take') ?: 20;
+        $user = $request->user();
+
+        $pinRewardCounter = new PinRewardCounter();
+        $message = $pinRewardCounter->message($user->id, $lastId, $count);
+        $pinRepository = new PinRepository();
+        $userRepository = new UserRepository();
+
+        foreach ($message as $i => $row)
+        {
+            $message[$i]['user'] = $userRepository->item($row['user_id']);
+            $message[$i]['pin'] = $pinRepository->item($row['model_id']);
+        }
+
+        return $this->resOK([
+            'result' => $message
+        ]);
+    }
+
+    public function messageOfFollow(Request $request)
+    {
+        $lastId = $request->get('last_id') ?: 0;
+        $count = $request->get('take') ?: 20;
+        $user = $request->user();
+
+        $userFollowCounter = new UserFollowCounter();
+        $message = $userFollowCounter->message($user->id, $lastId, $count);
+        $userRepository = new UserRepository();
+
+        foreach ($message as $i => $row)
+        {
+            $message[$i]['user'] = $userRepository->item($row['user_id']);
+        }
+
+        return $this->resOK([
+            'result' => $message
         ]);
     }
 

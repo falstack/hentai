@@ -13,6 +13,7 @@ use App\Http\Modules\RichContentService;
 use App\Http\Transformers\Message\MessageItemResource;
 use App\Models\Message;
 use App\Models\MessageMenu;
+use Illuminate\Support\Facades\DB;
 
 class MessageRepository extends Repository
 {
@@ -127,5 +128,54 @@ class MessageRepository extends Repository
         }
 
         return $result;
+    }
+
+    public function agreeList($userId, $page, $take)
+    {
+        $cache = $this->RedisSort($this->agreeListCacheKey($userId), function () use ($userId)
+        {
+            $arr = DB::SELECT("
+                SELECT *
+                FROM(
+                    SELECT `model_id` AS `id`, `user_id`, `created_at`, 'comment' as type
+                    FROM `pin_comment_like_counter`
+                    WHERE `author_id`= ?
+                    union all
+                    SELECT `model_id` AS `id`, `user_id`, `created_at`, 'pin' as type
+                    FROM `pin_like_counter`
+                    WHERE `author_id`= ?
+                ) as total
+            ", [$userId, $userId]);
+
+            $result = [];
+            foreach ($arr as $row)
+            {
+                $key = $row['type'] . ':' . $row['user_id'] . ':' . $row['id'];
+                $result[$key] = $row['created_at'];
+            }
+
+            return $result;
+        }, ['is_time' => true]);
+
+        $cache = $this->filterIdsByPage($cache, $page, $take);
+        $result = [];
+
+        foreach ($cache['result'] as $row)
+        {
+            $arr = explode(':', $row);
+            $result[] = [
+                'id' => $arr[2],
+                'type' => $arr[0],
+                'user_id' => $arr[1],
+            ];
+        }
+        $cache['result'] = $result;
+
+        return $cache;
+    }
+
+    public function agreeListCacheKey($id)
+    {
+        return "agree_list_cache_{$id}";
     }
 }
