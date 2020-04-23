@@ -70,6 +70,7 @@ class MessageController extends Controller
         foreach ($list as $commentId => $pinSlug)
         {
             $result[] = [
+                'id' => $commentId,
                 'comment' => $commentRepository->item($commentId),
                 'pin' => $pinRepository->item($pinSlug)
             ];
@@ -138,8 +139,8 @@ class MessageController extends Controller
 
         foreach ($message as $i => $row)
         {
-            $message[$i]['user'] = $userRepository->item($row->user_id);
-            $message[$i]['pin'] = $pinRepository->item($row->model_id);
+            $message[$i]->user = $userRepository->item($row->user_id);
+            $message[$i]->pin = $pinRepository->item($row->model_id);
         }
 
         return $this->resOK([
@@ -159,7 +160,7 @@ class MessageController extends Controller
 
         foreach ($message as $i => $row)
         {
-            $message[$i]['user'] = $userRepository->item($row->user_id);
+            $message[$i]->user = $userRepository->item($row->user_id);
         }
 
         return $this->resOK([
