@@ -57,7 +57,6 @@ class MessageController extends Controller
             {
                 return $query->where('id', '>', $lastId);
             })
-            ->orderBy('read', 0)
             ->orderBy('id', 'DESC')
             ->pluck('pin_slug', 'id')
             ->take($count)
@@ -107,17 +106,17 @@ class MessageController extends Controller
 
             if ($type === 'comment')
             {
-                $data = $commentRepository->item($row['id']);
+                $data = $commentRepository->item($row->id);
             }
             else if ($type === 'pin')
             {
-                $data = $pinRepository->item($row['id']);
+                $data = $pinRepository->item($row->id);
             }
 
             $result[] = [
                 'type' => $type,
                 'data' => $data,
-                'user' => $userRepository->item($row['user_id'])
+                'user' => $userRepository->item($row->user_id)
             ];
         }
 
@@ -139,8 +138,8 @@ class MessageController extends Controller
 
         foreach ($message as $i => $row)
         {
-            $message[$i]['user'] = $userRepository->item($row['user_id']);
-            $message[$i]['pin'] = $pinRepository->item($row['model_id']);
+            $message[$i]['user'] = $userRepository->item($row->user_id);
+            $message[$i]['pin'] = $pinRepository->item($row->model_id);
         }
 
         return $this->resOK([
@@ -160,7 +159,7 @@ class MessageController extends Controller
 
         foreach ($message as $i => $row)
         {
-            $message[$i]['user'] = $userRepository->item($row['user_id']);
+            $message[$i]['user'] = $userRepository->item($row->user_id);
         }
 
         return $this->resOK([
