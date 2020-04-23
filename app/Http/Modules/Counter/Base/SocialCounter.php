@@ -313,6 +313,7 @@ class SocialCounter
             ::table($this->table)
             ->where('author_id', $authorId)
             ->where('value', '>', 0)
+            ->orderBy('read', 'ASC')
             ->orderBy('updated_at', 'DESC')
             ->when($lastId != 0, function ($query) use ($lastId)
             {
