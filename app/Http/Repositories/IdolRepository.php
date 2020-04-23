@@ -25,6 +25,13 @@ class IdolRepository extends Repository
 
             if (is_null($idol))
             {
+                $idol = Idol
+                    ::where('id', $slug)
+                    ->first();
+            }
+
+            if (is_null($idol))
+            {
                 return 'nil';
             }
 
