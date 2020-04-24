@@ -108,17 +108,17 @@ class MessageController extends Controller
 
             if ($type === 'comment')
             {
-                $data = $commentRepository->item($row->id);
+                $data = $commentRepository->item($row['id']);
             }
             else if ($type === 'pin')
             {
-                $data = $pinRepository->item($row->id);
+                $data = $pinRepository->item($row['id']);
             }
 
             $result[] = [
                 'type' => $type,
                 'data' => $data,
-                'user' => $userRepository->item($row->user_id)
+                'user' => $userRepository->item($row['user_id'])
             ];
         }
 
