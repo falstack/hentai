@@ -150,8 +150,8 @@ class MessageRepository extends Repository
             $result = [];
             foreach ($arr as $row)
             {
-                $key = $row['type'] . ':' . $row['user_id'] . ':' . $row['id'];
-                $result[$key] = $row['created_at'];
+                $key = $row->type . ':' . $row->user_id . ':' . $row->id;
+                $result[$key] = $row->created_at;
             }
 
             return $result;
