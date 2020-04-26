@@ -119,7 +119,8 @@ class MessageController extends Controller
                 'id' => $row['id'],
                 'type' => $type,
                 'data' => $data,
-                'user' => $userRepository->item($row['user_id'])
+                'user' => $userRepository->item($row['user_id']),
+                'created_at' => $row['created_at']
             ];
         }
 

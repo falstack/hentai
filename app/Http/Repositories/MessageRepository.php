@@ -155,18 +155,19 @@ class MessageRepository extends Repository
             }
 
             return $result;
-        }, ['is_time' => true]);
+        }, ['is_time' => true, 'with_score' => true]);
 
-        $cache = $this->filterIdsByPage($cache, $page, $take);
+        $cache = $this->filterIdsByPage($cache, $page, $take, true);
         $result = [];
 
-        foreach ($cache['result'] as $row)
+        foreach ($cache['result'] as $row => $time)
         {
             $arr = explode(':', $row);
             $result[] = [
                 'id' => $arr[2],
                 'type' => $arr[0],
                 'user_id' => $arr[1],
+                'created_at' => $time
             ];
         }
         $cache['result'] = $result;
