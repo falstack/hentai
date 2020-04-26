@@ -35,6 +35,56 @@ class Test extends Command
      */
     public function handle()
     {
+        $this->migrationCommentAgree();
+        return true;
+    }
+
+    protected function migrationCommentAgree()
+    {
+        $data = DB
+            ::table('followables')
+            ->where('migration_state', '<>', 2)
+            ->where('followable_type', 'App\Models\Comment')
+            ->where('relation', 'upvote')
+            ->get()
+            ->toArray();
+
+        if (empty($data))
+        {
+            return false;
+        }
+
+        $pinCommentLikeCounter = new PinCommentLikeCounter();
+        foreach ($data as $row)
+        {
+            $authorSlug = Comment
+                ::where('id', $row->followable_id)
+                ->pluck('from_user_slug')
+                ->first();
+
+            $pinCommentLikeCounter->del(
+                $row->followable_id,
+                $row->user_id
+            );
+
+            $pinCommentLikeCounter->set(
+                $row->user_id,
+                $row->followable_id,
+                $authorSlug,
+                1,
+                $row->created_at
+            );
+
+            DB::table('followables')
+                ->where('followable_type', 'App\Models\Comment')
+                ->where('relation', 'upvote')
+                ->where('user_id', $row->user_id)
+                ->where('followable_id', $row->followable_id)
+                ->update([
+                    'migration_state' => 2
+                ]);
+        }
+
         return true;
     }
 }
