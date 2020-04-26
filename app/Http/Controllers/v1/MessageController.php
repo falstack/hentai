@@ -116,6 +116,7 @@ class MessageController extends Controller
             }
 
             $result[] = [
+                'id' => $row['id'],
                 'type' => $type,
                 'data' => $data,
                 'user' => $userRepository->item($row['user_id'])
