@@ -43,7 +43,7 @@ class Test extends Command
     {
         $data = DB
             ::table('followables')
-            ->where('migration_state', '<>', 2)
+            ->where('migration_state', '<>', 3)
             ->where('followable_type', 'App\Models\Comment')
             ->where('relation', 'upvote')
             ->get()
@@ -57,20 +57,26 @@ class Test extends Command
         $pinCommentLikeCounter = new PinCommentLikeCounter();
         foreach ($data as $row)
         {
-            $authorSlug = Comment
-                ::where('id', $row->followable_id)
-                ->pluck('from_user_slug')
-                ->first();
-
             $pinCommentLikeCounter->del(
                 $row->followable_id,
                 $row->user_id
             );
 
+            $authorSlug = Comment
+                ::where('id', $row->followable_id)
+                ->pluck('from_user_slug')
+                ->first();
+
+            $author_id = slug2id($authorSlug);
+            if (!$author_id)
+            {
+                continue;
+            }
+
             $pinCommentLikeCounter->set(
                 $row->user_id,
                 $row->followable_id,
-                $authorSlug,
+                $author_id,
                 1,
                 $row->created_at
             );
@@ -81,7 +87,7 @@ class Test extends Command
                 ->where('user_id', $row->user_id)
                 ->where('followable_id', $row->followable_id)
                 ->update([
-                    'migration_state' => 2
+                    'migration_state' => 3
                 ]);
         }
 
