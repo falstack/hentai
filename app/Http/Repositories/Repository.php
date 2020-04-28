@@ -238,21 +238,6 @@ class Repository
         }
     }
 
-    public function SortSet($key, $value, $score)
-    {
-        Redis::ZADD($key, $score, $value);
-    }
-
-    public function DeletePage($path)
-    {
-        $suffix = Redis::GET('last-page-version');
-        if (!$suffix)
-        {
-            return;
-        }
-        Redis::DEL("page-{$path}-{$suffix}");
-    }
-
     public function SortRemove($key, $value)
     {
         Redis::ZREM($key, $value);
