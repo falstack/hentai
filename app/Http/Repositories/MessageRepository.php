@@ -97,11 +97,11 @@ class MessageRepository extends Repository
             foreach ($menus as $menu)
             {
                 $channel = Message::roomCacheKey($menu['type'], $menu['getter_slug'], $menu['sender_slug']);
-                $result[$channel] = $menu->generateCacheScore();
+                $result[$channel] = $menu['updated_at'];
             }
 
             return $result;
-        }, ['with_score' => true]);
+        }, ['with_score' => true, 'is_time' => true]);
 
         if (empty($cache))
         {
@@ -110,18 +110,25 @@ class MessageRepository extends Repository
 
         $result = [];
         $userRepository = new UserRepository();
-        foreach ($cache as $channel => $score)
+        foreach ($cache as $channel => $time)
         {
             $arr = explode('@', $channel);
+            $senderSlug = $arr[2] == $slug ? $arr[3] : $arr[2];
+            $getterSlug = $arr[2] == $slug ? $arr[2] : $arr[3];
+
             $item = [
                 'channel' => $channel,
-                'time' => substr($score, 0, -3),
-                'count' => intval(substr($score, -3)),
+                'time' => $time,
+                'count' => Message
+                    ::where('sender_slug', $senderSlug)
+                    ->where('getter_slug', $getterSlug)
+                    ->where('read', 0)
+                    ->count(),
                 'type' => $arr[1]
             ];
             if ($arr[1] == 1)
             {
-                $item['about_user'] = $userRepository->item($arr[2] == $slug ? $arr[3] : $arr[2]);
+                $item['about_user'] = $userRepository->item($senderSlug);
                 $item['desc'] = $this->newest($arr[1], $arr[2], $arr[3]);
             }
             $result[] = $item;

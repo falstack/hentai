@@ -293,7 +293,7 @@ class MessageController extends Controller
          */
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
         $repository = new Repository();
-        $repository->SortSet($cacheKey, $channel, $menu->generateCacheScore(0));
+        $repository->SortAdd($cacheKey, $channel);
 
         return $this->resOK($channel);
     }
@@ -380,7 +380,7 @@ class MessageController extends Controller
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
         $roomId = Message::roomCacheKey($messageType, $getterSlug, $senderSlug);
         $repository = new Repository();
-        $repository->SortSet($cacheKey, $roomId, $menu->generateCacheScore(0));
+        $repository->SortAdd($cacheKey, $roomId);
 
         return $this->resNoContent();
     }
