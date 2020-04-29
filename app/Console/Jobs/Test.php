@@ -57,11 +57,6 @@ class Test extends Command
         $pinCommentLikeCounter = new PinCommentLikeCounter();
         foreach ($data as $row)
         {
-            $pinCommentLikeCounter->del(
-                $row->followable_id,
-                $row->user_id
-            );
-
             $authorSlug = Comment
                 ::where('id', $row->followable_id)
                 ->pluck('from_user_slug')
