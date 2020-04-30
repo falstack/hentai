@@ -200,7 +200,7 @@ $route->group(['prefix' => 'message'], function () use ($route)
 
         $route->get('history', 'MessageController@getChatHistory');
 
-        $route->get('unread_clear', 'MessageController@clearUnread');
+        $route->post('unread_clear', 'MessageController@clearUnread');
 
         $route->get('message_pin_comment', 'MessageController@messageOfComment');
 
