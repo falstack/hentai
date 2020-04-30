@@ -336,4 +336,15 @@ class SocialCounter
             ->where('read', 0)
             ->count();
     }
+
+    public function clearUnread($authorId)
+    {
+        DB
+            ::table($this->table)
+            ->where('author_id', $authorId)
+            ->where('read', '0')
+            ->update([
+                'read' => 1
+            ]);
+    }
 }
