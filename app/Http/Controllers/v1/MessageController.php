@@ -44,6 +44,51 @@ class MessageController extends Controller
         ]);
     }
 
+    public function clearUnread(Request $request)
+    {
+        $types = $request->get('type') ? explode(',', $request->get('type')) : [];
+        $user = $request->user();
+
+        foreach ($types as $type)
+        {
+            if ($type === 'unread_comment_count')
+            {
+                Comment
+                    ::where('to_user_slug', $user->slug)
+                    ->where('read', '0')
+                    ->update([
+                        'read' => 1
+                    ]);
+            }
+            else if ($type === 'unread_comment_like_count')
+            {
+                $counter = new PinCommentLikeCounter();
+                $counter->clearUnread($user->id);
+            }
+            else if ($type === 'unread_pin_like_count')
+            {
+                $counter = new PinLikeCounter();
+                $counter->clearUnread($user->id);
+            }
+            else if ($type === 'unread_reward_count')
+            {
+                $counter = new PinRewardCounter();
+                $counter->clearUnread($user->id);
+            }
+            else if ($type === 'unread_chat_message')
+            {
+                Message
+                    ::where('getter_slug', $user->slug)
+                    ->where('read', '0')
+                    ->update([
+                        'read' => 1
+                    ]);
+            }
+        }
+
+        return $this->resNoContent();
+    }
+
     public function messageOfComment(Request $request)
     {
         $lastId = $request->get('last_id') ?: 0;
