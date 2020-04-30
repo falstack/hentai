@@ -25,9 +25,12 @@ class IncrementGetterRoomCounter
         ]);
 
         $getterMenuItem->increment('count');
+        $repository = new Repository();
 
         $menuListCacheKey = MessageMenu::messageListCacheKey($message->getter_slug);
-        $repository = new Repository();
+        $repository->SortAdd($menuListCacheKey, $event->roomId);
+
+        $menuListCacheKey = MessageMenu::messageListCacheKey($message->sender_slug);
         $repository->SortAdd($menuListCacheKey, $event->roomId);
     }
 }
