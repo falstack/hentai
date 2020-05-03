@@ -369,6 +369,17 @@ $route->group(['prefix' => 'flow'], function () use ($route)
 
 $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route)
 {
+    $route->group(['prefix' => 'spider'], function () use ($route)
+    {
+        $route->get('get_all_user', 'SpiderController@getUsers');
+
+        $route->post('set_user', 'SpiderController@setUser');
+
+        $route->post('del_user', 'SpiderController@delUser');
+
+        $route->post('refresh_user_data', 'SpiderController@refreshUserData');
+    });
+
     $route->group(['prefix' => 'role'], function () use ($route)
     {
         $route->get('show_all_roles', 'RoleController@showAllRoles');

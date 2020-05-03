@@ -26,7 +26,8 @@ class GetResourceService
      */
     protected $siteType;
 
-    public function __construct($siteType)
+    // TODO：数据做一层缓存
+    public function __construct($siteType = 0)
     {
         $this->siteType = $siteType;
     }
@@ -45,17 +46,18 @@ class GetResourceService
     {
         if (!$id)
         {
-            return false;
+            return null;
         }
 
-        $hasUser = DB
+        $userId = DB
             ::table($this->userTable)
             ->where('site_type', $this->siteType)
             ->where('user_id', $id)
-            ->count();
+            ->pluck('id')
+            ->first();
 
         $now = Carbon::now();
-        if ($hasUser)
+        if ($userId)
         {
             DB
                 ::table($this->userTable)
@@ -77,9 +79,9 @@ class GetResourceService
         }
         else
         {
-            DB
+            $userId = DB
                 ::table($this->userTable)
-                ->insert([
+                ->insertGetId([
                     'site_type' => $this->siteType,
                     'user_id' => $id,
                     'rule' => json_encode($rule),
@@ -88,7 +90,11 @@ class GetResourceService
                 ]);
         }
 
-        return true;
+        return DB
+            ::table($this->userTable)
+            ->where('id', $userId)
+            ->get()
+            ->first();
     }
 
     public function delUser($id, $withData = false)
@@ -98,15 +104,48 @@ class GetResourceService
             return false;
         }
 
+        $user = DB
+            ::table($this->userTable)
+            ->where('site_type', $this->siteType)
+            ->where('user_id', $id)
+            ->first();
+
+        if (!$user)
+        {
+            return false;
+        }
+
+        if ($user->deleted_at)
+        {
+            DB
+                ::table($this->userTable)
+                ->where('site_type', $this->siteType)
+                ->where('user_id', $id)
+                ->update([
+                    'deleted_at' => null
+                ]);
+
+            DB
+                ::table($this->dataTable)
+                ->where('site_type', $this->siteType)
+                ->where('author_id', $id)
+                ->update([
+                    'deleted_at' => null
+                ]);
+
+            return true;
+        }
+
+        $now = Carbon::now();
+
         DB
             ::table($this->userTable)
             ->where('site_type', $this->siteType)
             ->where('user_id', $id)
             ->update([
-                'deleted_at' => null
+                'deleted_at' => $now
             ]);
 
-        $now = Carbon::now();
         if ($withData)
         {
             DB
@@ -125,11 +164,15 @@ class GetResourceService
      * TODO：当数据量过大的时候，这个 for 循环很多很多
      * 根据稿件id更新老的存量数据
      */
-    public function updateOldResources($forceRefresh = false)
+    public function updateOldResources($forceRefresh = false, $authorId = '')
     {
         $list = DB
             ::table($this->dataTable)
             ->where('site_type', $this->siteType)
+            ->when($authorId, function ($query) use ($authorId)
+            {
+                return $query->where('author_id', $authorId);
+            })
             ->whereNull('deleted_at')
             ->select(['id', 'model_id', 'model_type', 'data'])
             ->get()
@@ -233,6 +276,11 @@ class GetResourceService
         $qshell = new Qshell();
 
         return patchImage($qshell->fetch($url));
+    }
+
+    public function getAllUser()
+    {
+        return DB::table($this->userTable)->get()->toArray();
     }
 
     public function clearRepeatData()
