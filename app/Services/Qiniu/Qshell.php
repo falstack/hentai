@@ -16,6 +16,10 @@ class Qshell
     // 抓取小文件
     public function fetch($srcResUrl, $fileName = '')
     {
+        if (strpos($srcResUrl, '//') === 0)
+        {
+            $srcResUrl = "http:{$srcResUrl}";
+        }
         $auth = new \App\Services\Qiniu\Auth();
         $bucketManager = new BucketManager($auth);
 
