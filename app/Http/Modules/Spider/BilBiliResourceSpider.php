@@ -45,6 +45,7 @@ class BilBiliResourceSpider extends GetResourceService
 
     public function getUserList($id, $rule)
     {
+        // TODO 根据rule做数据获取
         $data = $this->getClient("https://api.bilibili.com/x/space/arc/search?mid={$id}&pn=1&ps=100");
         $list = $data['data']['list']['vlist'];
 
@@ -52,6 +53,11 @@ class BilBiliResourceSpider extends GetResourceService
         $now = Carbon::now();
         foreach ($list as $row)
         {
+            if ($row['mid'] != $id)
+            {
+                continue;
+            }
+
             $result[] = [
                 'source_type' => 0,
                 'site_type' => 1,
