@@ -310,7 +310,7 @@ class GetResourceService
                     {
                         return $query->orderBy('updated_at', 'DESC');
                     }
-                    return $query->orderBy('view_count', 'DESC');
+                    return $query->orderBy('score', 'DESC');
                 })
                 ->get();
 
