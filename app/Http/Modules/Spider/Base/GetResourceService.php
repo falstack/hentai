@@ -23,6 +23,7 @@ class GetResourceService
      * source_type
      * 数据列的类型，根据 user 的 rule 来填制，默认为 0
      * 0. 不在某个分类里
+     * 1. 动画区
      */
     protected $siteType;
 
@@ -214,11 +215,15 @@ class GetResourceService
     /**
      * 根据用户id获取最新的数据源
      */
-    public function getNewestResources()
+    public function getNewestResources($authorId = '')
     {
         $users = DB
             ::table($this->userTable)
             ->where('site_type', $this->siteType)
+            ->when($authorId, function ($query) use ($authorId)
+            {
+                return $query->where('user_id', $authorId);
+            })
             ->whereNull('deleted_at')
             ->pluck('rule', 'user_id')
             ->toArray();
