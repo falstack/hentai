@@ -28,8 +28,8 @@ class WebController extends Controller
 {
     public function index()
     {
-        $BilibiliResourceSpider = new BilBiliResourceSpider();
-        $BilibiliResourceSpider->getNewestResources(26671466);
+//        $BilibiliResourceSpider = new BilBiliResourceSpider();
+//        $BilibiliResourceSpider->getNewestResources();
 
         return $this->resOK('for the win');
     }

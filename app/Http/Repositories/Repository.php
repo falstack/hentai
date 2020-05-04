@@ -328,7 +328,7 @@ class Repository
 
     public function filterIdsByPage($ids, $page, $take, $withScore = false)
     {
-        $ids = gettype($ids) === 'string' ? explode(',', $ids) : $ids;
+        $ids = gettype($ids) !== 'array' ? explode(',', $ids) : $ids;
 
         if (empty($ids))
         {

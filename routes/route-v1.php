@@ -346,6 +346,8 @@ $route->group(['prefix' => 'comment'], function () use ($route)
 
 $route->group(['prefix' => 'flow'], function () use ($route)
 {
+    $route->get('spider', 'FlowController@spiderFlow');
+
     $route->group(['prefix' => 'pin'], function () use ($route)
     {
         $route->get('newest', 'FlowController@pinNewest');
