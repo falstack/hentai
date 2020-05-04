@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Modules\RichContentService;
+use App\Http\Modules\Spider\Base\GetResourceService;
 use App\Http\Repositories\FlowRepository;
 use App\Http\Repositories\IdolRepository;
 use App\Http\Repositories\PinRepository;
@@ -206,5 +207,18 @@ class FlowController extends Controller
         $idsObj['result'] = $idolRepository->list($idsObj['result']);
 
         return $this->resOK($idsObj);
+    }
+
+    public function spiderFlow(Request $request)
+    {
+        $sort = $request->get('sort') ?: 'newest';
+        $slug = $request->get('slug') ?: 0;
+        $page = $request->get('page') ?: 1;
+        $take = $request->get('take') ?: 10;
+
+        $getResourceService = new GetResourceService();
+        $dataObj = $getResourceService->getFlowData($sort, $slug, $page - 1, $take);
+
+        return $this->resOK($dataObj);
     }
 }

@@ -4,6 +4,7 @@
 namespace App\Http\Modules\Spider\Base;
 
 
+use App\Http\Repositories\Repository;
 use App\Services\Qiniu\Qshell;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,6 @@ class GetResourceService
     /**
      * source_type
      * 数据列的类型，根据 user 的 rule 来填制，默认为 0
-     * 0. 不在某个分类里
      * 1. 动画区
      */
     protected $siteType;
@@ -39,7 +39,7 @@ class GetResourceService
     public function autoload()
     {
         $this->updateOldResources();
-        // $this->getNewestResources();
+        $this->getNewestResources();
         $this->clearRepeatData();
     }
 
@@ -286,6 +286,55 @@ class GetResourceService
     public function getAllUser()
     {
         return DB::table($this->userTable)->get()->toArray();
+    }
+
+    public function getFlowData($sort, $slug, $page, $take, $refresh = false)
+    {
+        $repository = new Repository();
+        $cache = $repository->RedisList("spider-mixin-flow-{$slug}-{$sort}", function () use ($slug, $sort)
+        {
+            $list = DB
+                ::table($this->dataTable)
+                ->whereNull('deleted_at')
+                ->when($slug, function ($query) use ($slug)
+                {
+                    return $query->where('source_type', $slug);
+                })
+                ->when($sort, function ($query) use ($sort)
+                {
+                    if ($sort === 'newest')
+                    {
+                        return $query->orderBy('created_at', 'DESC');
+                    }
+                    else if ($sort === 'activity')
+                    {
+                        return $query->orderBy('updated_at', 'DESC');
+                    }
+                    return $query->orderBy('view_count', 'DESC');
+                })
+                ->get();
+
+            $result = [];
+            foreach ($list as $row)
+            {
+                $result[] = json_encode($row);
+            }
+
+            return $result;
+        }, $refresh, 'h');
+
+        $obj = $repository->filterIdsByPage($cache, $page, $take);
+        $result = array_map(function ($item)
+        {
+            $res = json_decode($item, true);
+            $res['data'] = json_decode($res['data'], true);
+
+            return $res;
+        }, $obj['result']);
+
+        $obj['result'] = $result;
+
+        return $obj;
     }
 
     public function clearRepeatData()
