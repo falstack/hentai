@@ -29,7 +29,7 @@ class WebController extends Controller
     public function index()
     {
 //        $BilibiliResourceSpider = new BilBiliResourceSpider();
-//        $BilibiliResourceSpider->getNewestResources();
+//        $BilibiliResourceSpider->autoload();
 
         return $this->resOK('for the win');
     }
