@@ -12,6 +12,7 @@ class UserIsBilibili extends UserAuthLink
 
     public function verify($userId, $verifyId)
     {
+        $verifyId = intval($verifyId);
         try
         {
             $url = 'https://api.vc.bilibili.com/session_svr/v1/session_svr/get_sessions?session_type=1&group_fold=1&unfollow_fold=0&sort_rule=2&build=0&mobi_app=web';
