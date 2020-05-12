@@ -99,13 +99,24 @@ class SpiderController extends Controller
 
     public function setChannelCookie(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('set_oauth_channel'))
+        {
+            return $this->resErrRole();
+        }
+
         $channel = $request->get('channel');
         $data = $request->get('data');
 
         $userAuthLink = new UserAuthLink($channel);
         $result = $userAuthLink->setCookie($data);
 
-        return $this->resOK($result);
+        if (!$result)
+        {
+            return $this->resErrServiceUnavailable();
+        }
+
+        return $this->resNoContent();
     }
 
     public function getChannelList(Request $request)
