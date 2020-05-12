@@ -30,7 +30,8 @@ class UserAuthResource extends JsonResource
             'providers' => [
                 'bind_qq' => !!$this->qq_unique_id,
                 'bind_wechat' => !!$this->wechat_unique_id,
-                'bind_phone' => !!$this->phone
+                'bind_phone' => !!$this->phone,
+                'bind_bilibili' => !!$this->bilibili_id
             ],
             // 钱包
             'wallet_coin' => (float)$this->virtual_coin,

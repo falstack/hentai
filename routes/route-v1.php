@@ -53,6 +53,8 @@ $route->group(['prefix' => 'user'], function () use ($route)
 
     $route->get('pins', 'UserController@publishedPin');
 
+    $route->get('batch_patch', 'UserController@batchPatch');
+
     $route->group(['middleware' => 'user'], function () use ($route)
     {
         $route->get('like_bangumi', 'UserController@likeBangumi');
@@ -61,8 +63,6 @@ $route->group(['prefix' => 'user'], function () use ($route)
 
         $route->get('patch', 'UserController@patch');
     });
-
-    $route->get('batch_patch', 'UserController@batchPatch');
 
     $route->group(['middleware' => 'auth'], function () use ($route)
     {
@@ -75,6 +75,8 @@ $route->group(['prefix' => 'user'], function () use ($route)
         $route->post('add_manager', 'UserController@addManager');
 
         $route->post('remove_manager', 'UserController@removeManager');
+
+        $route->post('oauth_channel', 'UserController@OauthChannelVerify');
     });
 });
 
@@ -380,6 +382,13 @@ $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use (
         $route->post('del_user', 'SpiderController@delUser');
 
         $route->post('refresh_user_data', 'SpiderController@refreshUserData');
+
+        $route->group(['prefix' => 'oauth'], function () use ($route)
+        {
+            $route->get('get_channel_list', 'SpiderController@getChannelList');
+
+            $route->post('set_channel_cookie', 'SpiderController@setChannelCookie');
+        });
     });
 
     $route->group(['prefix' => 'role'], function () use ($route)
