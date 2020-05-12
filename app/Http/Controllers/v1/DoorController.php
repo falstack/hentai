@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Spider\Auth\UserIsBilibili;
 use App\Http\Repositories\UserRepository;
 use App\Http\Transformers\User\UserAuthResource;
 use App\Services\Qiniu\Qshell;
@@ -898,6 +899,28 @@ class DoorController extends Controller
         $userRepository = new UserRepository();
 
         return $this->resOK($userRepository->getWechatJsSDKConfig($url));
+    }
+
+    public function OauthChannelVerify(Request $request)
+    {
+        $channel = $request->get('channel');
+        $verifyId = $request->get('id');
+        $userId = $request->user()->id;
+
+        $service = null;
+        if ($channel === 'bilibili')
+        {
+            $service = new UserIsBilibili();
+        }
+
+        if (!$service)
+        {
+            return $this->resErrBad();
+        }
+
+        $result = $service->verify($userId, $verifyId);
+
+        return $this->resOK($result);
     }
 
     private function accessIsNew($method, $access)

@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 
 use App\Console\Jobs\Test;
+use App\Http\Modules\Spider\Auth\UserIsBilibili;
 use App\Http\Modules\Spider\BilBiliResourceSpider;
 use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\MessageRepository;

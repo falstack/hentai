@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Spider\Auth\UserAuthLink;
+use App\Http\Modules\Spider\Auth\UserIsBilibili;
 use App\Http\Modules\Spider\Base\GetResourceService;
 use App\Http\Modules\Spider\BilBiliResourceSpider;
 use Illuminate\Http\Request;
@@ -93,5 +95,28 @@ class SpiderController extends Controller
         $resourceSpider->updateOldResources(true, $userId);
 
         return $this->resNoContent();
+    }
+
+    public function setChannelCookie(Request $request)
+    {
+        $channel = $request->get('channel');
+        $data = $request->get('data');
+
+        $userAuthLink = new UserAuthLink($channel);
+        $result = $userAuthLink->setCookie($data);
+
+        return $this->resOK($result);
+    }
+
+    public function getChannelList(Request $request)
+    {
+        $userIsBilibili = new UserIsBilibili();
+
+        return $this->resOK([
+            [
+                'name' => 'bilibili',
+                'status' => $userIsBilibili->status()
+            ]
+        ]);
     }
 }
