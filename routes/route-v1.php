@@ -15,6 +15,8 @@ $route->group(['prefix' => 'door'], function () use ($route)
         $route->post('/get_user_info', 'DoorController@getUserInfo');
 
         $route->post('/logout', 'DoorController@logout');
+
+        $route->post('/oauth_channel', 'DoorController@OauthChannelVerify');
     });
 
     $route->post('/bind_phone', 'DoorController@bindPhone');
@@ -75,8 +77,6 @@ $route->group(['prefix' => 'user'], function () use ($route)
         $route->post('add_manager', 'UserController@addManager');
 
         $route->post('remove_manager', 'UserController@removeManager');
-
-        $route->post('oauth_channel', 'UserController@OauthChannelVerify');
     });
 });
 
