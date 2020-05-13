@@ -7,6 +7,7 @@ use App\Http\Modules\Spider\Auth\UserAuthLink;
 use App\Http\Modules\Spider\Auth\UserIsBilibili;
 use App\Http\Modules\Spider\Base\GetResourceService;
 use App\Http\Modules\Spider\BilBiliResourceSpider;
+use App\Http\Repositories\UserRepository;
 use Illuminate\Http\Request;
 
 class SpiderController extends Controller
@@ -21,6 +22,11 @@ class SpiderController extends Controller
 
         $getResourceService = new GetResourceService();
         $users = $getResourceService->getAllUser();
+        $userRepository = new UserRepository();
+        foreach ($users as $i => $user)
+        {
+            $users[$i]->self = $userRepository->item($user->self_id);
+        }
 
         return $this->resOK([
             'user' => $users,
@@ -32,6 +38,60 @@ class SpiderController extends Controller
                 ]
             ]
         ]);
+    }
+
+    public function getUserRule(Request $request)
+    {
+        $user = $request->user();
+        $channel = $request->get('channel');
+        if (!in_array($channel, ['bilibili']))
+        {
+            return $this->resErrBad();
+        }
+
+        $channelId = $user["{$channel}_id"];
+        if (!$channelId)
+        {
+            return $this->resOK(null);
+        }
+
+        $getResourceService = new GetResourceService();
+        $spider = $getResourceService->getUser($channelId, $channel);
+
+        return $this->resOK($spider);
+    }
+
+    public function saveUserRule(Request $request)
+    {
+        $user = $request->user();
+        $channel = $request->get('channel');
+        $rule = $request->get('rule');
+
+        if (!in_array($channel, ['bilibili']))
+        {
+            return $this->resErrBad();
+        }
+
+        $channelId = $user["{$channel}_id"];
+        if (!$channelId)
+        {
+            return $this->resErrBad();
+        }
+
+        $service = null;
+        if ($channel === 'bilibili')
+        {
+            $service = new BilBiliResourceSpider();
+        }
+
+        if (!$service)
+        {
+            return $this->resErrBad();
+        }
+
+        $service->setUser($channelId, $rule);
+
+        return $this->resNoContent();
     }
 
     public function setUser(Request $request)
