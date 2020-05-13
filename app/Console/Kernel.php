@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
         Jobs\SaveBangumiScore::class,
         Jobs\UpdateBangumiRank::class,
         Jobs\AutoRefreshPinHottest::class,
+        Jobs\AutoRefreshSpiderResource::class,
     ];
 
     /**
@@ -45,5 +46,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('Test')->everyMinute()->withoutOverlapping();
         $schedule->command('AutoRefreshPinHottest')->everyFiveMinutes()->withoutOverlapping();
         $schedule->command('UpdateBangumiRank')->daily();
+        $schedule->command('AutoRefreshSpiderResource')->everyThirtyMinutes();
     }
 }
