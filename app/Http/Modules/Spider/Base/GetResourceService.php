@@ -102,6 +102,8 @@ class GetResourceService
                 ]);
         }
 
+        event(new \App\Events\Spider\AddUser($this->siteType, $id));
+
         return DB
             ::table($this->userTable)
             ->where('id', $userId)

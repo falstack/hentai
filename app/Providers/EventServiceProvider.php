@@ -152,5 +152,8 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Bangumi\Pass\RefreshUserTimeline',
             'App\Listeners\Bangumi\Pass\RefreshUserCache',
         ],
+        'App\Events\Spider\AddUser' => [
+            'App\Listeners\Spider\AddUser\LoadUserResource',
+        ],
     ];
 }
