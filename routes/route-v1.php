@@ -377,6 +377,10 @@ $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use (
     {
         $route->get('get_all_user', 'SpiderController@getUsers');
 
+        $route->get('get_user_rule', 'SpiderController@getUserRule');
+
+        $route->post('save_user_rule', 'SpiderController@saveUserRule');
+
         $route->post('set_user', 'SpiderController@setUser');
 
         $route->post('del_user', 'SpiderController@delUser');

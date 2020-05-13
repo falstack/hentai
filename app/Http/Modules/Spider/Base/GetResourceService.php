@@ -16,6 +16,9 @@ class GetResourceService
     protected $userTable = 'spider_users';
     protected $dataTable = 'spider_resource';
     protected $repeatIds = [];
+    protected $siteMap = [
+        'bilibili' => 1
+    ];
     /**
      * 资源网站的类型
      * 1. bilibili
@@ -33,6 +36,15 @@ class GetResourceService
     public function __construct($siteType = 0)
     {
         $this->siteType = $siteType;
+    }
+
+    public function getUser($userId, $channel)
+    {
+        return DB
+            ::table($this->userTable)
+            ->where('site_type', $this->siteMap[$channel])
+            ->where('user_id', $userId)
+            ->first();
     }
 
     /**
@@ -68,17 +80,14 @@ class GetResourceService
                 ->where('user_id', $id)
                 ->update([
                     'rule' => json_encode($rule),
-                    'updated_at' => $now,
-                    'deleted_at' => null
+                    'updated_at' => $now
                 ]);
 
             DB
                 ::table($this->dataTable)
                 ->where('site_type', $this->siteType)
                 ->where('author_id', $id)
-                ->update([
-                    'deleted_at' => null
-                ]);
+                ->delete();
         }
         else
         {
