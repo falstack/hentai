@@ -352,6 +352,8 @@ $route->group(['prefix' => 'flow'], function () use ($route)
 
     $route->get('index_banner', 'CmController@showBanners');
 
+    $route->post('report_banner', 'CmController@reportStat');
+
     $route->group(['prefix' => 'pin'], function () use ($route)
     {
         $route->get('newest', 'FlowController@pinNewest');

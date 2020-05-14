@@ -32,7 +32,22 @@ class CmController extends Controller
 
     public function reportStat(Request $request)
     {
+        $id = $request->get('id');
+        $type = $request->get('type');
+        if (!in_array($type, ['visit', 'click']))
+        {
+            return $this->resNoContent();
+        }
 
+        $banner = CMBanner::where('id', $id)->first();
+        if (!$banner)
+        {
+            return $this->resNoContent();
+        }
+
+        $banner->increment("{$type}_count");
+
+        return $this->resNoContent();
     }
 
     public function toggleBanner(Request $request)
