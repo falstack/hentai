@@ -350,6 +350,8 @@ $route->group(['prefix' => 'flow'], function () use ($route)
 {
     $route->get('spider', 'FlowController@spiderFlow');
 
+    $route->get('index_banner', 'CmController@showBanners');
+
     $route->group(['prefix' => 'pin'], function () use ($route)
     {
         $route->get('newest', 'FlowController@pinNewest');
@@ -393,6 +395,17 @@ $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use (
 
             $route->post('set_channel_cookie', 'SpiderController@setChannelCookie');
         });
+    });
+
+    $route->group(['prefix' => 'cm'], function () use ($route)
+    {
+        $route->get('show_all_banner', 'CmController@allBanners');
+
+        $route->post('create_banner', 'CmController@createBanner');
+
+        $route->post('update_banner', 'CmController@updateBanner');
+
+        $route->post('toggle_banner', 'CmController@toggleBanner');
     });
 
     $route->group(['prefix' => 'role'], function () use ($route)

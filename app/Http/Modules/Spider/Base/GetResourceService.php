@@ -28,10 +28,10 @@ class GetResourceService
      * 数据列的类型，根据 user 的 rule 来填制，默认为 0
      * 1. 动画区
      * 2. 游戏区
+     * 3. 学习区
      */
     protected $siteType;
 
-    // TODO：数据做一层缓存
     // TODO：计算数据热度
     public function __construct($siteType = 0)
     {
