@@ -18,4 +18,8 @@ class CMBanner extends Model
         'click_count',
         'online'
     ];
+
+    protected $casts = [
+        'online' => 'boolean'
+    ];
 }
