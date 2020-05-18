@@ -89,7 +89,7 @@ class SpiderController extends Controller
             return $this->resErrBad();
         }
 
-        $service->setUser($channelId, $rule);
+        $service->setUser($channelId, $rule, $user->id);
 
         return $this->resNoContent();
     }

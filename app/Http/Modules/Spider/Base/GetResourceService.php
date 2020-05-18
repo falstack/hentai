@@ -57,7 +57,7 @@ class GetResourceService
         $this->clearRepeatData();
     }
 
-    public function setUser($id, $rule = '')
+    public function setUser($id, $rule = '', $selfId = '')
     {
         if (!$id)
         {
@@ -96,6 +96,7 @@ class GetResourceService
                 ->insertGetId([
                     'site_type' => $this->siteType,
                     'user_id' => $id,
+                    'self_id' => $selfId,
                     'rule' => json_encode($rule),
                     'updated_at' => $now,
                     'created_at' => $now
