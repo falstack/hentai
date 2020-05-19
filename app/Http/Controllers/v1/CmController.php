@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\MenuLinkService;
 use App\Http\Repositories\Repository;
 use App\Models\CMBanner;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ class CmController extends Controller
         return $this->resOK(json_decode($result));
     }
 
-    public function reportStat(Request $request)
+    public function reportBannerStat(Request $request)
     {
         $id = $request->get('id');
         $type = $request->get('type');
@@ -131,5 +132,90 @@ class CmController extends Controller
             ->toArray();
 
         return $this->resOK($list);
+    }
+
+    public function getMenuList()
+    {
+        $menuLinkService = new MenuLinkService();
+
+        return $this->resOK($menuLinkService->menus());
+    }
+
+    public function getMenuStat()
+    {
+        $menuLinkService = new MenuLinkService();
+
+        return $this->resOK($menuLinkService->count());
+    }
+
+    public function reportMenuStat(Request $request)
+    {
+        $id = $request->get('id');
+        $type = $request->get('type');
+
+        $menuLinkService = new MenuLinkService();
+        $menuLinkService->reportLink($id, $type);
+
+        return $this->resNoContent();
+    }
+
+    public function getAllMenuList()
+    {
+        $menuLinkService = new MenuLinkService();
+
+        return $this->resOK($menuLinkService->allLinks());
+    }
+
+    public function getAllMenuType()
+    {
+        $menuLinkService = new MenuLinkService();
+
+        return $this->resOK($menuLinkService->allTypes());
+    }
+
+    public function createMenuType(Request $request)
+    {
+        $user = $request->user();
+        if ($user->cant('change_index_menu'))
+        {
+            return $this->resErrRole();
+        }
+
+        $menuLinkService = new MenuLinkService();
+        $menuLinkService->createType($request->get('name'));
+
+        return $this->resNoContent();
+    }
+
+    public function createMenuLink(Request $request)
+    {
+        $user = $request->user();
+        if ($user->cant('change_index_menu'))
+        {
+            return $this->resErrRole();
+        }
+
+        $menuLinkService = new MenuLinkService();
+        $menuLinkService->createLink(
+            $request->get('name'),
+            $request->get('href'),
+            $request->get('type')
+        );
+
+        return $this->resNoContent();
+    }
+
+    public function deleteMenuLink(Request $request)
+    {
+        $user = $request->user();
+        if ($user->cant('change_index_menu'))
+        {
+            return $this->resErrRole();
+        }
+
+        $menuLinkService = new MenuLinkService();
+        $menuLinkService->deleteLink($request->get('id'));
+
+        return $this->resNoContent();
     }
 }
