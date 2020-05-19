@@ -48,6 +48,7 @@ class MenuLinkService
                     }
                 }
 
+                $menus[$i]->count = 0;
                 $menus[$i]->children = $children;
             }
 
