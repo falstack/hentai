@@ -346,13 +346,26 @@ $route->group(['prefix' => 'comment'], function () use ($route)
     });
 });
 
+$route->group(['prefix' => 'cm'], function () use ($route)
+{
+    $route->get('index_banner', 'CmController@showBanners');
+
+    $route->post('report_banner', 'CmController@reportBannerStat');
+
+    $route->get('index_menu_list', 'CmController@getMenuList');
+
+    $route->get('index_menu_stat', 'CmController@getMenuStat');
+
+    $route->post('report_menu_click', 'CmController@reportMenuStat');
+});
+
 $route->group(['prefix' => 'flow'], function () use ($route)
 {
     $route->get('spider', 'FlowController@spiderFlow');
 
     $route->get('index_banner', 'CmController@showBanners');
 
-    $route->post('report_banner', 'CmController@reportStat');
+    $route->post('report_banner', 'CmController@reportBannerStat');
 
     $route->group(['prefix' => 'pin'], function () use ($route)
     {
@@ -408,6 +421,16 @@ $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use (
         $route->post('update_banner', 'CmController@updateBanner');
 
         $route->post('toggle_banner', 'CmController@toggleBanner');
+
+        $route->get('show_all_menu_list', 'CmController@getAllMenuList');
+
+        $route->get('show_all_menu_type', 'CmController@getAllMenuType');
+
+        $route->post('create_menu_type', 'CmController@createMenuType');
+
+        $route->post('create_menu_link', 'CmController@createMenuLink');
+
+        $route->post('delete_menu_link', 'CmController@deleteMenuLink');
     });
 
     $route->group(['prefix' => 'role'], function () use ($route)
