@@ -43,7 +43,6 @@ class MenuLinkService
                 {
                     if ($link->type == $type)
                     {
-                        unset($link->type);
                         $children[] = $link;
                     }
                 }
