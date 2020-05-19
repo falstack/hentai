@@ -22,24 +22,28 @@ class MenuLinkService
         {
             $menus = DB
                 ::table($this->type_table)
+                ->orderBy('order', 'ASC')
+                ->select('id', 'name')
                 ->get()
                 ->toArray();
 
             $links = DB
                 ::table($this->link_table)
                 ->whereNull('deleted_at')
+                ->select('id', 'name', 'href', 'type')
                 ->get()
                 ->toArray();
 
             foreach ($menus as $i => $menu)
             {
                 $children = [];
-                $type = $menu->type;
+                $type = $menu->id;
 
                 foreach ($links as $link)
                 {
                     if ($link->type == $type)
                     {
+                        unset($link->type);
                         $children[] = $link;
                     }
                 }
@@ -79,7 +83,8 @@ class MenuLinkService
             }
 
             return $result;
-        }, ['with_score']);
+
+        }, ['with_score' => true]);
     }
 
     public function createType($name)
@@ -97,12 +102,15 @@ class MenuLinkService
         }
 
         $total = DB::table($this->type_table)->count();
+        $now = Carbon::now();
 
         DB
             ::table($this->type_table)
             ->insert([
                 'name' => $name,
-                'order' => $total
+                'order' => $total,
+                'created_at' => $now,
+                'updated_at' => $now
             ]);
 
         return true;
@@ -174,7 +182,7 @@ class MenuLinkService
         DB
             ::table($this->link_table)
             ->where('id', $id)
-            ->increment('visit_count');
+            ->increment('click_count');
 
         $repository = new Repository();
         $repository->SortAdd($this->counterCacheKey(), $type, 1);
