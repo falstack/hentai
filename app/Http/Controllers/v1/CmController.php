@@ -178,7 +178,7 @@ class CmController extends Controller
         $user = $request->user();
         if ($user->cant('change_index_menu'))
         {
-            return $this->resErrRole();
+            return $this->resErrRole($user->getPermissionsViaRoles());
         }
 
         $menuLinkService = new MenuLinkService();
@@ -192,7 +192,7 @@ class CmController extends Controller
         $user = $request->user();
         if ($user->cant('change_index_menu'))
         {
-            return $this->resErrRole();
+            return $this->resErrRole($user->getPermissionsViaRoles());
         }
 
         $menuLinkService = new MenuLinkService();
