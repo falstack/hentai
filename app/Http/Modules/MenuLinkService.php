@@ -123,8 +123,7 @@ class MenuLinkService
 
         $has = DB
             ::table($this->link_table)
-            ->where('name', $name)
-            ->orWhere('href', $href)
+            ->where('href', $href)
             ->count();
 
         if ($has)
