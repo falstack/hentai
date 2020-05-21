@@ -51,13 +51,10 @@ class MenuLinkService
                 $menus[$i]->children = $children;
             }
 
-            foreach ($menus as $i => $menu)
+            $menus = array_filter($menus, function ($item)
             {
-                if (!count($menu->children))
-                {
-                    unset($menus[$i]);
-                }
-            }
+                return count($item->children);
+            });
 
             return json_encode($menus);
         });
