@@ -67,6 +67,34 @@ class Repository
         return gettype($cache) === 'string' ? $cache : json_decode(json_encode($cache));
     }
 
+    public function RedisArray($key, $func, $force = false, $exp = 'd')
+    {
+        $cache = $force ? null : Redis::GET($key);
+        if (!is_null($cache))
+        {
+            return json_decode($cache, true);
+        }
+
+        $cache = $func();
+        if (is_null($cache))
+        {
+            return [];
+        }
+
+        if (Redis::SETNX('lock_'.$key, 1))
+        {
+            Redis::pipeline(function ($pipe) use ($key, $cache, $exp)
+            {
+                $pipe->EXPIRE('lock_'.$key, 10);
+                $pipe->SET($key, json_encode($cache, JSON_UNESCAPED_UNICODE));
+                $pipe->EXPIREAT($key, $this->expire($exp));
+                $pipe->DEL('lock_'.$key);
+            });
+        }
+
+        return $cache;
+    }
+
     public function RedisHash($key, $func, $force = false, $exp = 'd')
     {
         $cache = $force ? null : Redis::HGETALL($key);

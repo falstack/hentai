@@ -18,7 +18,7 @@ class MenuLinkService
     {
         $repository = new Repository();
 
-        $str = $repository->RedisItem($this->menuCacheKey(), function ()
+        return $repository->RedisArray($this->menuCacheKey(), function ()
         {
             $menus = DB
                 ::table($this->type_table)
@@ -56,10 +56,8 @@ class MenuLinkService
                 return count($item->children);
             });
 
-            return json_encode($menus);
+            return array_values($menus);
         });
-
-        return gettype($str) === 'string' ? json_decode($str, true) : $str;
     }
 
     public function count()
@@ -186,7 +184,7 @@ class MenuLinkService
 
     protected function menuCacheKey()
     {
-        return 'menu_links_list';
+        return 'menu_links_list_arr';
     }
 
     protected function counterCacheKey()
