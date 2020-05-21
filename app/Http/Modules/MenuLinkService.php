@@ -62,7 +62,7 @@ class MenuLinkService
             return json_encode($menus);
         });
 
-        return gettype($str) === 'string' ? json_decode($str) : $str;
+        return gettype($str) === 'string' ? json_decode($str, true) : $str;
     }
 
     public function count()
