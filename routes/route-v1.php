@@ -363,6 +363,8 @@ $route->group(['prefix' => 'flow'], function () use ($route)
 {
     $route->get('spider', 'FlowController@spiderFlow');
 
+    $route->post('spider_report', 'FlowController@spiderReport');
+
     $route->group(['prefix' => 'pin'], function () use ($route)
     {
         $route->get('newest', 'FlowController@pinNewest');

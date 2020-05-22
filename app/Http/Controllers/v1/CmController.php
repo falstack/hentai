@@ -40,13 +40,15 @@ class CmController extends Controller
             return $this->resNoContent();
         }
 
-        $banner = CMBanner::where('id', $id)->first();
-        if (!$banner)
+        if ($type === 'visit')
         {
-            return $this->resNoContent();
+            CMBanner::where('id', $id)->increment('visit_count');
         }
-
-        $banner->increment("{$type}_count");
+        else
+        {
+            $ids = $id ? explode(',', $id) : [];
+            CMBanner::whereIn('id', $ids)->increment('click_count');
+        }
 
         return $this->resNoContent();
     }
