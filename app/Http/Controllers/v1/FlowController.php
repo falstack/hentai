@@ -222,4 +222,15 @@ class FlowController extends Controller
 
         return $this->resOK($dataObj);
     }
+
+    public function spiderReport(Request $request)
+    {
+        $ids = $request->get('id') ? explode(',', $request->get('id')) : [];
+        $type = $request->get('type');
+
+        $getResourceService = new GetResourceService();
+        $getResourceService->reportResource($ids, $type);
+
+        return $this->resNoContent();
+    }
 }

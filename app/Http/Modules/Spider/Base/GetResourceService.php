@@ -226,6 +226,14 @@ class GetResourceService
         return true;
     }
 
+    public function reportResource($ids, $type)
+    {
+        DB
+            ::table($this->dataTable)
+            ->whereIn('id', $ids)
+            ->increment("{$type}_count");
+    }
+
     /**
      * 根据用户id获取最新的数据源
      */
