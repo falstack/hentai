@@ -215,9 +215,10 @@ class FlowController extends Controller
         $slug = $request->get('slug') ?: 0;
         $page = $request->get('page') ?: 1;
         $take = $request->get('take') ?: 10;
+        $randId = $request->get('rand_id') ?: 1;
 
         $getResourceService = new GetResourceService();
-        $dataObj = $getResourceService->getFlowData($sort, $slug, $page - 1, $take);
+        $dataObj = $getResourceService->getFlowData($sort, $slug, $page - 1, $take, $randId);
 
         return $this->resOK($dataObj);
     }
