@@ -233,4 +233,18 @@ class FlowController extends Controller
 
         return $this->resNoContent();
     }
+
+    public function spiderHots(Request $request)
+    {
+        $day = $request->get('day');
+        if (!in_array(intval($day), [1, 3, 7]))
+        {
+            return $this->resErrBad();
+        }
+
+        $getResourceService = new GetResourceService();
+        $result = $getResourceService->spiderHots($day);
+
+        return $this->resOK($result);
+    }
 }
