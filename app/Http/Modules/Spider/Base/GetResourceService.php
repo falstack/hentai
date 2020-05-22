@@ -302,14 +302,15 @@ class GetResourceService
         return DB::table($this->userTable)->get()->toArray();
     }
 
-    public function getFlowData($sort, $slug, $page, $take, $refresh = false)
+    public function getFlowData($sort, $slug, $page, $take, $randId, $refresh = false)
     {
         $repository = new Repository();
-        $cache = $repository->RedisList("spider-mixin-flow-{$slug}-{$sort}", function () use ($slug, $sort)
+        $cache = $repository->RedisList("spider-mixin-flow-{$slug}-{$sort}-{$randId}", function () use ($slug, $sort, $randId)
         {
             $list = DB
                 ::table($this->dataTable)
                 ->whereNull('deleted_at')
+                ->where(DB::raw('id % 10'), $randId)
                 ->when($slug, function ($query) use ($slug)
                 {
                     return $query->where('source_type', $slug);
