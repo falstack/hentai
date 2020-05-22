@@ -82,12 +82,6 @@ class GetResourceService
                     'rule' => json_encode($rule),
                     'updated_at' => $now
                 ]);
-
-            DB
-                ::table($this->dataTable)
-                ->where('site_type', $this->siteType)
-                ->where('author_id', $id)
-                ->delete();
         }
         else
         {
@@ -234,6 +228,38 @@ class GetResourceService
             ->increment("{$type}_count");
     }
 
+    public function spiderHots($day, $refresh = false)
+    {
+        $repository = new Repository();
+        $cache = $repository->RedisList("spider-hot-flow-{$day}", function () use ($day)
+        {
+            $list = DB
+                ::table($this->dataTable)
+                ->whereNull('deleted_at')
+                ->orderBy('click_count', 'DESC')
+                ->take(8)
+                ->get();
+
+            $result = [];
+            foreach ($list as $row)
+            {
+                $result[] = json_encode($row);
+            }
+
+            return $result;
+        }, $refresh, 'h');
+
+        $result = array_map(function ($item)
+        {
+            $res = json_decode($item, true);
+            $res['data'] = json_decode($res['data'], true);
+
+            return $res;
+        }, $cache);
+
+        return $result;
+    }
+
     /**
      * 根据用户id获取最新的数据源
      */
@@ -264,6 +290,20 @@ class GetResourceService
             catch (\Exception $e)
             {
                 $list = [];
+            }
+
+            foreach ($list as $i => $row)
+            {
+                $has = DB
+                    ::table($this->dataTable)
+                    ->where('model_id', $row['model_id'])
+                    ->where('site_type', $row['site_type'])
+                    ->count();
+
+                if ($has)
+                {
+                    unset($list[$i]);
+                }
             }
 
             DB::table($this->dataTable)->insert($list);
