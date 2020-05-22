@@ -245,6 +245,10 @@ class FlowController extends Controller
         $getResourceService = new GetResourceService();
         $result = $getResourceService->spiderHots($day);
 
-        return $this->resOK($result);
+        return $this->resOK([
+            'result' => $result,
+            'no_more' => true,
+            'total' => 0
+        ]);
     }
 }
