@@ -8,9 +8,11 @@ use App\Http\Modules\Counter\BangumiLikeCounter;
 use App\Http\Transformers\Bangumi\BangumiItemResource;
 use App\Models\Bangumi;
 use App\Models\BangumiQuestionRule;
+use App\Models\BangumiSerialization;
 use App\Models\Idol;
 use App\Models\Pin;
 use App\User;
+use function foo\func;
 use Illuminate\Support\Carbon;
 
 class BangumiRepository extends Repository
@@ -326,6 +328,16 @@ class BangumiRepository extends Repository
         {
             $this->SortRemove($this->hottest_pin_cache_key($bangumiSlug, $time), $pinSlug);
         }
+    }
+
+    public function bangumiWithSerialization() : array
+    {
+        $bangumis = $this->RedisArray('bangumi:serialization', function() {
+            $bangumis = Bangumi::with('serialization')->where('serialization_status', 1)->get();
+            return $bangumis->toArray();
+        });
+
+        return $bangumis;
     }
 
     public function bangumiIdolsCacheKey($slug)

@@ -89,6 +89,8 @@ $route->group(['prefix' => 'search'], function () use ($route)
 
 $route->group(['prefix' => 'bangumi'], function () use ($route)
 {
+    $route->get('timeline', 'BangumiController@timeline');
+
     $route->get('show', 'BangumiController@show');
 
     $route->get('rank', 'BangumiController@rank250');
@@ -388,8 +390,12 @@ $route->group(['prefix' => 'flow'], function () use ($route)
     });
 });
 
-$route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route)
-{
+$route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route) {
+    $route->group(['prefix' => 'bangumi'], function () use ($route) {
+        $route->get('serializations', 'BangumiController@allSerialization');
+        $route->post('set_serialization', 'BangumiController@setSerialization');
+    });
+
     $route->group(['prefix' => 'spider'], function () use ($route)
     {
         $route->get('get_all_user', 'SpiderController@getUsers');
