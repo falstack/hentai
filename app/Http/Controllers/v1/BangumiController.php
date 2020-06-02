@@ -483,7 +483,7 @@ class BangumiController extends Controller
 
     public function bangumiList(Request $request)
     {
-        $bangumis = Bangumi::get();
+        $bangumis = Bangumi::with('serialization')->paginate(15);
 
         return $this->resOK($bangumis);
     }
@@ -497,9 +497,10 @@ class BangumiController extends Controller
         $serialization = null;
 
         try {
-            $bangumi = Bangumi::firstOrFail($bangumiId);
-            $serialization = BangumiSerialization::firstOrFail($serializationId);
+            $bangumi = Bangumi::where('id', $bangumiId)->firstOrFail();
+            $serialization = BangumiSerialization::where('id', $serializationId)->firstOrFail();
         } catch (\Exception $e) {
+            var_dump($e);
             return $this->resErrNotFound();
         }
 
