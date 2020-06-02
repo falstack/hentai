@@ -392,8 +392,9 @@ $route->group(['prefix' => 'flow'], function () use ($route)
 
 $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route) {
     $route->group(['prefix' => 'bangumi'], function () use ($route) {
+        $route->get('list', 'BangumiController@bangumiList');
         $route->get('serializations', 'BangumiController@allSerialization');
-        $route->post('set_serialization', 'BangumiController@setSerialization');
+        $route->post('set_serialization', 'BangumiController@setBangumiSerializing');
     });
 
     $route->group(['prefix' => 'spider'], function () use ($route)
