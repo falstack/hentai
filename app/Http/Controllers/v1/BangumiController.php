@@ -522,13 +522,13 @@ class BangumiController extends Controller
         $bangumiRepository = new BangumiRepository();
         $bangumis = $bangumiRepository->bangumiWithSerialization();
         $serializations = [
+            0 => [],
             1 => [],
             2 => [],
             3 => [],
             4 => [],
             5 => [],
             6 => [],
-            7 => [],
         ];
 
         foreach ($bangumis as $bangumi) {
