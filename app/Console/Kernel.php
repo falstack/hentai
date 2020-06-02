@@ -43,6 +43,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ComputeSignCount')->dailyAt('00:30');
         $schedule->command('ComputeUserDailyStat')->dailyAt('00:01');
         $schedule->command('ClearSearchRepeatData')->dailyAt('05:00');
+        $schedule->command('SaveBangumiSerialize')->hourly();
         $schedule->command('GetHottestBangumi')->everyMinute()->withoutOverlapping();
         $schedule->command('GetNewsBangumi')->hourly()->withoutOverlapping();
         $schedule->command('UpdateIdolMarketPrice')->hourly()->withoutOverlapping();
