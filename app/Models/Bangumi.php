@@ -59,4 +59,9 @@ class Bangumi extends Model
             'slug'
         );
     }
+
+    public function serialization()
+    {
+        return $this->hasOne(BangumiSerialization::class, 'bangumi_id', 'id');
+    }
 }

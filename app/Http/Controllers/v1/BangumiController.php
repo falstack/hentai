@@ -10,10 +10,14 @@ use App\Http\Repositories\IdolRepository;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\UserRepository;
 use App\Models\Bangumi;
+use App\Models\BangumiSerialization;
 use App\Models\Search;
 use App\Services\Spider\BangumiSource;
 use App\Services\Spider\Query;
+use Carbon\Carbon;
+use Carbon\Exceptions\Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -447,5 +451,91 @@ class BangumiController extends Controller
         }
 
         return $this->resNoContent();
+    }
+
+    public function allSerialization(Request $request)
+    {
+        $site = $request->get('site', 0);
+
+        if (0 == $site) {
+            $serializations = BangumiSerialization::get();
+        } else {
+            $serializations = BangumiSerialization::where('site', $site)->get();
+        }
+
+        $site = [
+            1 => 'bilibili',
+            2 => 'acfun',
+            3 => '爱奇艺',
+            4 => '腾讯视频',
+            5 => '芒果 tv',
+        ];
+        $data = [];
+        foreach ($serializations as $serialization) {
+            $data[] = [
+                'id' => $serialization->id,
+                'title' => sprintf("%s - %s", $serialization->title, $site[$serialization->site]),
+            ];
+        }
+
+        return $this->resOK($data);
+    }
+
+    public function bangumiList(Request $request)
+    {
+        $bangumis = Bangumi::get();
+
+        return $this->resOK($bangumis);
+    }
+
+    public function setBangumiSerializing(Request $request)
+    {
+        $bangumiId = $request->get('bangumi_id');
+        $serializationId = $request->get('serialization_id');
+
+        $bangumi = null;
+        $serialization = null;
+
+        try {
+            $bangumi = Bangumi::firstOrFail($bangumiId);
+            $serialization = BangumiSerialization::firstOrFail($serializationId);
+        } catch (\Exception $e) {
+            return $this->resErrNotFound();
+        }
+
+        $bangumi['serialization_status'] = $serialization['status'];
+        $bangumi['serialization_id'] = $serialization['id'];
+        $serialization['bangumi_id'] = $bangumi['id'];
+
+        try {
+            DB::beginTransaction();
+            $bangumi->save();
+        } catch (\Exception $e) {
+            DB::rollBack();
+        }
+
+        return $this->resOK();
+    }
+
+    public function timeline(Request $request)
+    {
+        $bangumiRepository = new BangumiRepository();
+        $bangumis = $bangumiRepository->bangumiWithSerialization();
+        $serializations = [
+            1 => [],
+            2 => [],
+            3 => [],
+            4 => [],
+            5 => [],
+            6 => [],
+            7 => [],
+        ];
+
+        foreach ($bangumis as $bangumi) {
+            $broadcastTime = Carbon::createFromFormat("Y-m-d H:i:s", $bangumi['serialization']['broadcast_time'], 'Asia/Shanghai');
+            $serializations[$broadcastTime->dayOfWeek][] = $bangumi;
+        }
+
+        return $this->resOK($serializations);
     }
 }

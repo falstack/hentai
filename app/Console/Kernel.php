@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Console\Commands\KeyGenerateCommand;
+use App\Jobs\Job;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 
@@ -22,9 +24,11 @@ class Kernel extends ConsoleKernel
         Jobs\GetHottestBangumi::class,
         Jobs\UpdateIdolMarketPrice::class,
         Jobs\SaveBangumiScore::class,
+        Jobs\SaveBangumiSerialize::class,
         Jobs\UpdateBangumiRank::class,
         Jobs\AutoRefreshPinHottest::class,
         Jobs\AutoRefreshSpiderResource::class,
+        KeyGenerateCommand::class,
     ];
 
     /**
