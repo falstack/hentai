@@ -29,9 +29,6 @@ class WebController extends Controller
 {
     public function index()
     {
-//        $BilibiliResourceSpider = new BilBiliResourceSpider();
-//        $BilibiliResourceSpider->autoload();
-
         return $this->resOK('for the win');
     }
 }
