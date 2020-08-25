@@ -17,9 +17,13 @@ $route->group(['prefix' => 'door'], function () use ($route)
         $route->post('/logout', 'DoorController@logout');
 
         $route->post('/oauth_channel', 'DoorController@OauthChannelVerify');
+
+        $route->post('/bind_phone', 'DoorController@bindPhone');
+
+        $route->post('/bind_weapp_user', 'DoorController@bindWechatUser');
     });
 
-    $route->post('/bind_phone', 'DoorController@bindPhone');
+    $route->post('/get_wechat_phone', 'DoorController@getWechatPhone');
 
     $route->post('/wechat_mini_app_login', 'DoorController@wechatMiniAppLogin');
 

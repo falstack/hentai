@@ -72,7 +72,7 @@ class DoorController extends Controller
 
         if ($type === 'sign_up')
         {
-            $mustNew = true;
+            $mustNew = false;
             $mustOld = false;
         }
         else if ($type === 'sign_in')
@@ -197,7 +197,11 @@ class DoorController extends Controller
 
         if (!$this->accessIsNew('phone', $access))
         {
-            return $this->resErrBad('该手机号已绑定另外一个账号');
+            $user = User
+                ::where('phone', $access)
+                ->first();
+
+            return $this->resOK($user->api_token);
         }
 
         $data = [
@@ -543,9 +547,7 @@ class DoorController extends Controller
      * @Post("/door/bind_phone")
      *
      * @Parameters({
-     *      @Parameter("id", description="用户id", type="number", required=true),
      *      @Parameter("phone", description="手机号", type="number", required=true),
-     *      @Parameter("password", description="6至16位的密码", type="string", required=true),
      *      @Parameter("authCode", description="6位数字的短信验证码", type="number", required=true)
      * })
      *
@@ -557,9 +559,7 @@ class DoorController extends Controller
     public function bindPhone(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'slug' => 'required|string',
             'phone' => 'required|digits:11',
-            'password' => 'required|min:6|max:16',
             'authCode' => 'required|digits:6'
         ]);
 
@@ -585,28 +585,145 @@ class DoorController extends Controller
             return $this->resErrBad('该手机号已绑定另外一个账号');
         }
 
-        $slug = $request->get('slug');
-        $hasPhone = User
-            ::where('slug', $slug)
-            ->pluck('phone')
-            ->first();
+        $user = $request->user();
 
-        if ($hasPhone)
+        if ($user->phone)
         {
             $pattern = '/(\d{3})(\d{4})(\d{4})/i';
             $replacement = '$1****$3';
-            $maskPhone = preg_replace($pattern, $replacement, $phone);
+            $maskPhone = preg_replace($pattern, $replacement, $user->phone);
 
             return $this->resErrBad('您的账号已绑定了手机号：' . $maskPhone);
         }
 
-        User::where('slug', $slug)
-            ->update([
-                'phone' => $phone,
-                'password' => $request->get('password')
-            ]);
+        $user->update([
+            'phone' => $phone
+        ]);
 
         return $this->resOK('手机号绑定成功');
+    }
+
+    public function bindWechatUser(Request $request)
+    {
+        $appName = $request->get('app_name');
+        if (!in_array($appName, ['moe_idol', 'search_bad_history']))
+        {
+            return $this->resErrBad();
+        }
+
+        $iv = $request->get('iv');
+        $code = $request->get('code');
+        $encryptedData = $request->get('encrypted_data');
+
+        $client = new Client();
+        $appId = config("app.oauth2.wechat_mini_app.{$appName}.client_id");
+        $appSecret = config("app.oauth2.wechat_mini_app.{$appName}.client_secret");
+        $resp = $client->get(
+            "https://api.weixin.qq.com/sns/jscode2session?appid={$appId}&secret={$appSecret}&js_code={$code}&grant_type=authorization_code",
+            [
+                'Accept' => 'application/json'
+            ]
+        );
+        $body = json_decode($resp->body, true);
+
+        if (!isset($body['session_key']))
+        {
+            return $this->resErrServiceUnavailable('微信授权失败');
+        }
+
+        $tool = new WXBizDataCrypt($appId, $body['session_key']);
+        $code = $tool->decryptData($encryptedData, $iv, $data);
+
+        if ($code)
+        {
+            return $this->resErrServiceUnavailable('微信服务异常：' . $code);
+        }
+
+        $data = json_decode($data, true);
+        $uniqueId = $data['unionId'];
+        $isNewUser = $this->accessIsNew('wechat_unique_id', $uniqueId);
+
+        if (!$isNewUser)
+        {
+            return $this->resErrBad('该微信号已绑定另外一个账号');
+        }
+
+        $user = $request->user();
+        $user->update([
+            'wechat_open_id' => $data['openId'],
+            'wechat_unique_id' => $uniqueId
+        ]);
+
+        return $this->resNoContent();
+    }
+
+    public function getWechatPhone(Request $request)
+    {
+        $appName = $request->get('app_name');
+        if (!in_array($appName, ['moe_idol', 'search_bad_history']))
+        {
+            return $this->resErrBad();
+        }
+
+        $iv = $request->get('iv');
+        $code = $request->get('code');
+        $encryptedData = $request->get('encrypted_data');
+
+        $client = new Client();
+        $appId = config("app.oauth2.wechat_mini_app.{$appName}.client_id");
+        $appSecret = config("app.oauth2.wechat_mini_app.{$appName}.client_secret");
+        $resp = $client->get(
+            "https://api.weixin.qq.com/sns/jscode2session?appid={$appId}&secret={$appSecret}&js_code={$code}&grant_type=authorization_code",
+            [
+                'Accept' => 'application/json'
+            ]
+        );
+        $body = json_decode($resp->body, true);
+
+        if (!isset($body['session_key']))
+        {
+            return $this->resErrServiceUnavailable('微信授权失败');
+        }
+
+        $tool = new WXBizDataCrypt($appId, $body['session_key']);
+        $code = $tool->decryptData($encryptedData, $iv, $data);
+
+        if ($code)
+        {
+            return $this->resErrServiceUnavailable('微信服务异常：' . $code);
+        }
+
+        $data = json_decode($data, true);
+        $phone = $data['purePhoneNumber'];
+
+        if (!$phone)
+        {
+            return $this->resErrServiceUnavailable('获取手机号失败');
+        }
+
+        $type = $request->get('type');
+        $user = $request->user();
+
+        if ($type === 'bind_phone' && $user)
+        {
+            if (!$this->accessIsNew('phone', $phone))
+            {
+                return $this->resErrBad('该手机号已绑定另外一个账号');
+            }
+
+            $user->update([
+                'phone' => $phone
+            ]);
+
+            return $this->resNoContent();
+        }
+
+        $messageCode = $this->createMessageAuthCode($phone, $type);
+
+        return $this->resOK([
+            'phone_number' => $phone,
+            'message_code' => $messageCode
+        ]);
     }
 
     // 微信小程序注册用户或获取当前用户的 token
@@ -617,10 +734,11 @@ class DoorController extends Controller
         {
             return $this->resErrBad();
         }
-        $user = $request->get('user');
-        $encryptedData = $request->get('encrypted_data');
+
         $iv = $request->get('iv');
+        $user = $request->get('user');
         $sessionKey = $request->get('session_key');
+        $encryptedData = $request->get('encrypted_data');
 
         $appId = config("app.oauth2.wechat_mini_app.{$appName}.client_id");
 
@@ -629,7 +747,7 @@ class DoorController extends Controller
 
         if ($code)
         {
-            return $this->resErrServiceUnavailable();
+            return $this->resErrServiceUnavailable('微信服务异常：' . $code);
         }
 
         $data = json_decode($data, true);
@@ -726,10 +844,11 @@ class DoorController extends Controller
         {
             return $this->resErrBad();
         }
-        $user = $request->get('user');
-        $encryptedData = $request->get('encrypted_data');
+
         $iv = $request->get('iv');
+        $user = $request->get('user');
         $sessionKey = $request->get('session_key');
+        $encryptedData = $request->get('encrypted_data');
 
         $appId = config("app.oauth2.qq_mini_app.{$appName}.client_id");
 
@@ -738,7 +857,7 @@ class DoorController extends Controller
 
         if ($code)
         {
-            return $this->resErrServiceUnavailable();
+            return $this->resErrServiceUnavailable('微信服务异常：' . $code);
         }
 
         $data = json_decode($data, true);
