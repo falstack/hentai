@@ -657,6 +657,60 @@ class DoorController extends Controller
         return $this->resNoContent();
     }
 
+    public function bindQQUser(Request $request)
+    {
+        $appName = $request->get('app_name');
+        if (!in_array($appName, ['moe_idol', 'search_bad_history']))
+        {
+            return $this->resErrBad();
+        }
+
+        $iv = $request->get('iv');
+        $code = $request->get('code');
+        $encryptedData = $request->get('encrypted_data');
+
+        $client = new Client();
+        $appId = config("app.oauth2.qq_mini_app.{$appName}.client_id");
+        $appSecret = config("app.oauth2.qq_mini_app.{$appName}.client_secret");
+        $resp = $client->get(
+            "https://api.q.qq.com/sns/jscode2session?appid={$appId}&secret={$appSecret}&js_code={$code}&grant_type=authorization_code",
+            [
+                'Accept' => 'application/json'
+            ]
+        );
+        $body = json_decode($resp->body, true);
+
+        if (!isset($body['session_key']))
+        {
+            return $this->resErrServiceUnavailable('QQ服务调用失败');
+        }
+
+        $tool = new WXBizDataCrypt($appId, $body['session_key']);
+        $code = $tool->decryptData($encryptedData, $iv, $data);
+
+        if ($code)
+        {
+            return $this->resErrServiceUnavailable('QQ服务异常：' . $code);
+        }
+
+        $data = json_decode($data, true);
+        $uniqueId = $data['unionId'];
+        $isNewUser = $this->accessIsNew('qq_unique_id', $uniqueId);
+
+        if (!$isNewUser)
+        {
+            return $this->resErrBad('该QQ号已绑定另外一个账号');
+        }
+
+        $user = $request->user();
+        $user->update([
+            'qq_open_id' => $data['openId'],
+            'qq_unique_id' => $uniqueId,
+        ]);
+
+        return $this->resNoContent();
+    }
+
     public function getWechatPhone(Request $request)
     {
         $appName = $request->get('app_name');
@@ -857,7 +911,7 @@ class DoorController extends Controller
 
         if ($code)
         {
-            return $this->resErrServiceUnavailable('微信服务异常：' . $code);
+            return $this->resErrServiceUnavailable('QQ服务异常：' . $code);
         }
 
         $data = json_decode($data, true);

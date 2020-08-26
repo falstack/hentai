@@ -21,6 +21,8 @@ $route->group(['prefix' => 'door'], function () use ($route)
         $route->post('/bind_phone', 'DoorController@bindPhone');
 
         $route->post('/bind_weapp_user', 'DoorController@bindWechatUser');
+
+        $route->post('/bind_qq_user', 'DoorController@bindQQUser');
     });
 
     $route->post('/get_wechat_phone', 'DoorController@getWechatPhone');
@@ -28,6 +30,10 @@ $route->group(['prefix' => 'door'], function () use ($route)
     $route->post('/wechat_mini_app_login', 'DoorController@wechatMiniAppLogin');
 
     $route->post('/wechat_mini_app_get_token', 'DoorController@wechatMiniAppToken');
+
+    $route->post('/weapp_mini_app_login', 'DoorController@wechatMiniAppLogin');
+
+    $route->post('/weapp_mini_app_get_token', 'DoorController@wechatMiniAppToken');
 
     $route->post('/qq_mini_app_login', 'DoorController@qqMiniAppLogin');
 
