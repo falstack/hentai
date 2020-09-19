@@ -46,10 +46,11 @@ class ImageController extends Controller
                     "width": $(imageInfo.width),
                     "mime": "$(mimeType)",
                     "size": $(fsize),
-                    "url": "$(key)"
+                    "url": "$(key)",
+                    "meta": $(avinfo)
                 }
             }',
-            'mimeLimit' => 'image/jpeg;image/png;image/jpg;image/gif'
+            'mimeLimit' => 'image/jpeg;image/png;image/jpg;image/gif;audio/mp3;audio/mp4'
         ]);
 
         return $this->resOK($uptoken);

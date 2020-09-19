@@ -400,11 +400,29 @@ $route->group(['prefix' => 'flow'], function () use ($route)
     });
 });
 
-$route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route) {
-    $route->group(['prefix' => 'bangumi'], function () use ($route) {
+$route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route)
+{
+    $route->group(['prefix' => 'bangumi'], function () use ($route)
+    {
         $route->get('list', 'BangumiController@bangumiList');
+
         $route->get('serializations', 'BangumiController@allSerialization');
+
         $route->post('set_serialization', 'BangumiController@setBangumiSerializing');
+    });
+
+    $route->group(['prefix' => 'live_room'], function () use ($route)
+    {
+        $route->group(['prefix' => 'voice'], function () use ($route)
+        {
+            $route->get('list', 'LiveRoomController@idolVoiceList');
+
+            $route->post('create', 'LiveRoomController@createIdolVoice');
+
+            $route->post('update', 'LiveRoomController@updateIdolVoice');
+
+            $route->post('delete', 'LiveRoomController@deleteIdolVoice');
+        });
     });
 
     $route->group(['prefix' => 'spider'], function () use ($route)
