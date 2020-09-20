@@ -23,6 +23,31 @@ use Illuminate\Validation\Rule;
 
 class BangumiController extends Controller
 {
+    public function all(Request $request)
+    {
+        $curPage = $request->get('cur_page') ?: 0;
+        $toPage = $request->get('to_page') ?: 1;
+        $take = $request->get('take') ?: 100;
+
+        $start = ($toPage - 1) * $take;
+        $count = ($toPage - $curPage) * $take;
+
+        $ids = Bangumi
+            ::orderBy('id', 'DESC')
+            ->skip($start)
+            ->take($count)
+            ->pluck('id');
+
+        $bangumiRepository = new BangumiRepository();
+        $list = $bangumiRepository->list($ids);
+        $total = Bangumi::count();
+
+        return $this->resOK([
+            'result' => $list,
+            'total' => $total
+        ]);
+    }
+
     public function show(Request $request)
     {
         $slug = $request->get('slug');

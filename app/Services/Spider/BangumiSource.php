@@ -165,7 +165,7 @@ class BangumiSource
                 'alias' => $alias,
                 'type' => $type,
                 'published_at' => $source['published_at'] ?? null,
-                'source_id' => $source['id']
+                'source_id' => $source['id'] ?? 0
             ]);
 
         $bangumiSlug = id2slug($bangumi->id);
@@ -173,7 +173,7 @@ class BangumiSource
             'slug' => $bangumiSlug
         ]);
 
-        if ($type === 0)
+        if ($type === 0 && $source['id'])
         {
             $this->getBangumiIdols($source['id'], $bangumiSlug);
             $this->importBangumiTags($source['id'], $bangumiSlug);
@@ -258,7 +258,7 @@ class BangumiSource
                 'title' => $source['name'],
                 'avatar' => preg_match('/calibur/', $source['avatar']) ? $source['avatar'] : $QShell->fetch($source['avatar']),
                 'intro' => $source['intro'],
-                'source_id' => $source['id'],
+                'source_id' => $source['id'] ?? 0,
                 'stock_price' => 1,
                 'alias' => $alias,
                 'bangumi_slug' => $bangumiSlug
