@@ -101,6 +101,8 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
 {
     $route->get('timeline', 'BangumiController@timeline');
 
+    $route->get('all', 'BangumiController@all');
+
     $route->get('show', 'BangumiController@show');
 
     $route->get('rank', 'BangumiController@rank250');
