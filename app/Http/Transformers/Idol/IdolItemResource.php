@@ -28,6 +28,7 @@ class IdolItemResource extends JsonResource
             'alias' => explode('|', $this->alias),
             'avatar' => patchImage($this->avatar, 'default-poster'),
             'is_newbie' => $this->is_newbie,
+            'source_id' => $this->source_id,
             'market_price' => $this->market_price,
             'stock_price' => $this->stock_price,
             'fans_count' => $this->fans_count,
