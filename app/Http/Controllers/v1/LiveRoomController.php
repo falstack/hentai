@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Repositories\Repository;
 use App\Models\IdolVoice;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
 
 class LiveRoomController extends Controller
 {
