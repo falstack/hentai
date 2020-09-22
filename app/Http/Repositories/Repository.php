@@ -37,7 +37,7 @@ class Repository
         $cache = $force ? null : Redis::GET($key);
         if (!is_null($cache))
         {
-            return preg_match('/^({"|\[\\\\")/', $cache) ? json_decode($cache) : $cache;
+            return json_decode($cache, true);
         }
 
         $cache = $func();
@@ -46,25 +46,18 @@ class Repository
             return null;
         }
 
-        $type = gettype($cache);
-        $encodeCache = $cache;
-        if ($type === 'object' || $type === 'array')
-        {
-            $encodeCache = json_encode($cache, JSON_UNESCAPED_UNICODE);
-        }
-
         if (Redis::SETNX('lock_'.$key, 1))
         {
-            Redis::pipeline(function ($pipe) use ($key, $encodeCache, $exp)
+            Redis::pipeline(function ($pipe) use ($key, $cache, $exp)
             {
                 $pipe->EXPIRE('lock_'.$key, 10);
-                $pipe->SET($key, $encodeCache);
+                $pipe->SET($key, json_encode($cache, JSON_UNESCAPED_UNICODE));
                 $pipe->EXPIREAT($key, $this->expire($exp));
                 $pipe->DEL('lock_'.$key);
             });
         }
 
-        return gettype($cache) === 'string' ? $cache : json_decode(json_encode($cache));
+        return json_decode(json_encode($cache), true);
     }
 
     public function RedisArray($key, $func, $force = false, $exp = 'd')
