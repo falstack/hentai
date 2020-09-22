@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Repositories\LiveRoomRepository;
 use App\Models\IdolVoice;
 use Illuminate\Http\Request;
 
@@ -101,14 +102,6 @@ class LiveRoomController extends Controller
     }
 
     /**
-     * 通过 text 关键字搜索声源
-     */
-    public function searchIdolVoice(Request $request)
-    {
-
-    }
-
-    /**
      * 创建一个实时聊天
      */
     public function createLiveChat(Request $request)
@@ -170,5 +163,13 @@ class LiveRoomController extends Controller
     public function trendLiveChat(Request $request)
     {
 
+    }
+
+    public function allVoice(Request $request)
+    {
+        $liveRoomRepository = new LiveRoomRepository();
+        $list = $liveRoomRepository->allVoice();
+
+        return $this->resOK($list);
     }
 }

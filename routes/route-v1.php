@@ -402,6 +402,14 @@ $route->group(['prefix' => 'flow'], function () use ($route)
     });
 });
 
+$route->group(['prefix' => 'live_room'], function () use ($route)
+{
+    $route->group(['prefix' => 'voice'], function () use ($route)
+    {
+        $route->get('all', 'LiveRoomController@allVoice');
+    });
+});
+
 $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route)
 {
     $route->group(['prefix' => 'bangumi'], function () use ($route)
