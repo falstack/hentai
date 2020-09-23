@@ -407,6 +407,8 @@ $route->group(['prefix' => 'live_room'], function () use ($route)
     $route->group(['prefix' => 'voice'], function () use ($route)
     {
         $route->get('all', 'LiveRoomController@allVoice');
+
+        $route->post('create', 'LiveRoomController@createUserVoice');
     });
 });
 

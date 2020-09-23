@@ -5,6 +5,7 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\LiveRoomRepository;
 use App\Models\IdolVoice;
+use App\Services\Qiniu\Qshell;
 use Illuminate\Http\Request;
 
 class LiveRoomController extends Controller
@@ -101,6 +102,16 @@ class LiveRoomController extends Controller
         return $this->resOK();
     }
 
+    public function createUserVoice(Request $request)
+    {
+//        $src = $request->get('src');
+//
+//        $qshell = new Qshell();
+//        $res = $qshell->audio($src);
+
+        return $this->resOK($request->all());
+    }
+
     /**
      * 创建一个实时聊天
      */
@@ -167,8 +178,11 @@ class LiveRoomController extends Controller
 
     public function allVoice(Request $request)
     {
+        $type = $request->get('type');
+        $slug = $request->get('slug');
+
         $liveRoomRepository = new LiveRoomRepository();
-        $list = $liveRoomRepository->allVoice();
+        $list = $liveRoomRepository->allVoice($type, $slug);
 
         return $this->resOK($list);
     }
