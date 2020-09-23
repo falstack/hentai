@@ -10,12 +10,17 @@ use App\Models\IdolVoice;
 
 class LiveRoomRepository extends Repository
 {
-    public function allVoice()
+    public function allVoice($type, $slug)
     {
-        $result = $this->RedisArray('live-room-voice-all', function ()
+        $result = $this->RedisArray("live-room-voice-all:{$type}:{$slug}", function () use ($type, $slug)
         {
             $list = IdolVoice
-                ::get()
+                ::where('from_type', $type)
+                ->when($slug, function ($query) use ($slug)
+                {
+                    return $query->where('from_slug', $slug);
+                })
+                ->get()
                 ->toArray();
 
             $result = [];
@@ -34,23 +39,13 @@ class LiveRoomRepository extends Repository
             return $result;
         });
 
-        $idolRepository = new IdolRepository();
-        $userRepository = new UserRepository();
+        $repository = $type == '0' ? new IdolRepository() : new UserRepository();
 
-        return array_map(function ($item) use ($idolRepository, $userRepository)
+        return array_map(function ($item) use ($repository)
         {
             $res = json_decode($item, true);
 
-            $fromType = $res['from_type'];
-
-            if ($fromType == '0')
-            {
-                $user = $idolRepository->item($res['from_slug']);
-            }
-            else if ($fromType == '1')
-            {
-                $user = $userRepository->item($res['from_slug']);
-            }
+            $user = $repository->item($res['from_slug']);
 
             $res['reader'] = [
                 'id' => $user['id'],
@@ -62,6 +57,8 @@ class LiveRoomRepository extends Repository
             $meta = json_decode($res['meta'], true);
             $res['duration'] = $meta['duration'];
             $res['source_id'] = $res['id'];
+            $res['meta'] = $meta;
+            $res['alias'] = $user['alias'] ? implode(',', $user['alias']) : $user['nickname'];
 
             return $res;
         }, $result);
