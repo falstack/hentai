@@ -19,17 +19,15 @@ class CmController extends Controller
         $repository = new Repository();
         $result = $repository->RedisItem($this->bannerCacheKey, function ()
         {
-            $list = CMBanner
+            return CMBanner
                 ::where('online', 1)
                 ->orderBy('id', 'DESC')
                 ->select('id', 'type', 'image', 'title', 'link')
                 ->get()
                 ->toArray();
-
-            return json_encode($list);
         });
 
-        return $this->resOK(json_decode($result));
+        return $this->resOK($result);
     }
 
     public function reportBannerStat(Request $request)

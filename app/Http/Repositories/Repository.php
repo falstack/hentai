@@ -37,7 +37,7 @@ class Repository
         $cache = $force ? null : Redis::GET($key);
         if (!is_null($cache))
         {
-            return json_decode($cache, true);
+            return json_decode($cache);
         }
 
         $cache = $func();
@@ -57,7 +57,7 @@ class Repository
             });
         }
 
-        return json_decode(json_encode($cache), true);
+        return json_decode(json_encode($cache));
     }
 
     public function RedisArray($key, $func, $force = false, $exp = 'd')

@@ -70,11 +70,6 @@ class TagRepository extends Repository
             return TagResource::collection($tag);
         }, $refresh);
 
-        if (gettype($result) === 'string')
-        {
-            $result = json_decode($result, true);
-        }
-
         return $this->filterIdsByPage($result, $page, $count);
     }
 
@@ -104,11 +99,6 @@ class TagRepository extends Repository
             return TagResource::collection($tag);
         });
 
-        if (gettype($result) === 'string')
-        {
-            $result = json_decode($result);
-        }
-
         return $this->filterIdsByPage($result, $page, $take);
     }
 
@@ -128,10 +118,6 @@ class TagRepository extends Repository
             return TagResource::collection($tag);
         });
 
-        if (gettype($result) === 'string')
-        {
-            $result = json_decode($result, true);
-        }
         return $result;
     }
 
