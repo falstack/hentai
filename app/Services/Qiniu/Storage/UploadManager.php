@@ -63,9 +63,9 @@ final class UploadManager
     /**
      * 上传文件到七牛
      *
-     * @param $upToken    上传凭证
-     * @param $key        上传文件名
-     * @param $filePath   上传文件的路径
+     * @param $upToken    string
+     * @param $key        string
+     * @param $filePath   string
      * @param $params     自定义变量，规格参考
      *                    http://developer.qiniu.com/docs/v6/api/overview/up/response/vars.html#xvar
      * @param $mime       上传数据的mimeType

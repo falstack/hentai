@@ -49,7 +49,7 @@ class Qshell
     }
 
     // 抓取音频
-    public function audio($path)
+    public function audio($path, $userId)
     {
         $auth = new \App\Services\Qiniu\Auth();
         $timeout = 3600;
@@ -68,7 +68,7 @@ class Qshell
         $now = time();
         $str = str_rand();
         $uploadManager = new UploadManager();
-        $res = $uploadManager->putFile($uptoken, "audio/{$now}/{$str}", $path);
+        $res = $uploadManager->putFile($uptoken, "audio/{$userId}{$now}/{$str}.mp3", $path);
 
         return $res;
     }
