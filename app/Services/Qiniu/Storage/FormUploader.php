@@ -44,7 +44,7 @@ final class FormUploader
         }
 
         //enable crc32 check by default
-        $fields['crc32'] = \App\Services\Qiniu\crc32_data($data);
+        $fields['crc32'] = self::crc32_data($data);
 
         if ($params) {
             foreach ($params as $k => $v) {
@@ -52,7 +52,7 @@ final class FormUploader
             }
         }
 
-        list($accessKey, $bucket, $err) = \App\Services\Qiniu\explodeUpToken($upToken);
+        list($accessKey, $bucket, $err) = self::explodeUpToken($upToken);
         if ($err != null) {
             return array(null, $err);
         }
@@ -138,5 +138,26 @@ final class FormUploader
         }
 
         return $value;
+    }
+
+    protected static function crc32_data($data)
+    {
+        $hash = hash('crc32b', $data);
+        $array = unpack('N', pack('H*', $hash));
+        return sprintf('%u', $array[1]);
+    }
+
+    protected static function explodeUpToken($upToken)
+    {
+        $items = explode(':', $upToken);
+        if (count($items) != 3) {
+            return array(null, null, "invalid uptoken");
+        }
+        $accessKey = $items[0];
+        $putPolicy = json_decode(base64_decode($items[2]));
+        $scope = $putPolicy->scope;
+        $scopeItems = explode(':', $scope);
+        $bucket = $scopeItems[0];
+        return array($accessKey, $bucket, null);
     }
 }
