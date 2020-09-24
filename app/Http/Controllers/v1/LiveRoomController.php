@@ -7,6 +7,7 @@ use App\Http\Repositories\LiveRoomRepository;
 use App\Models\IdolVoice;
 use App\Services\Qiniu\Qshell;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class LiveRoomController extends Controller
 {
@@ -108,7 +109,9 @@ class LiveRoomController extends Controller
 
         $qshell = new Qshell();
         $res = $qshell->audio($file);
-
+        Log::info('audio', [
+            'file' => $file
+        ]);
         return $this->resOK([
             'all' => $request->all(),
             'res' => $res
