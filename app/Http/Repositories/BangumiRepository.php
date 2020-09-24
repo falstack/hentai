@@ -8,11 +8,9 @@ use App\Http\Modules\Counter\BangumiLikeCounter;
 use App\Http\Transformers\Bangumi\BangumiItemResource;
 use App\Models\Bangumi;
 use App\Models\BangumiQuestionRule;
-use App\Models\BangumiSerialization;
 use App\Models\Idol;
 use App\Models\Pin;
 use App\User;
-use function foo\func;
 use Illuminate\Support\Carbon;
 
 class BangumiRepository extends Repository
@@ -95,7 +93,7 @@ class BangumiRepository extends Repository
 
     public function release()
     {
-        $result = $this->RedisItem('bangumi-release', function ()
+        return $this->RedisItem('bangumi-release', function ()
         {
             $list = Bangumi
                 ::where('update_week', '<>', 0)
@@ -108,10 +106,8 @@ class BangumiRepository extends Repository
                 $result[intval($i - 1)][] = $this->item($slug);
             }
 
-            return json_encode($result);
+            return $result;
         });
-
-        return gettype($result) === 'string' ? json_decode($result) : $result;
     }
 
     public function hot($page, $take, $refresh = false)
