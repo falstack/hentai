@@ -110,7 +110,8 @@ class LiveRoomController extends Controller
         $qshell = new Qshell();
         $res = $qshell->audio($file);
         Log::info('audio', [
-            'file' => $file
+            'file' => $file,
+            'get' => $request->get('file')
         ]);
         return $this->resOK([
             'all' => $request->all(),
