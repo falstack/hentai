@@ -43,22 +43,22 @@ class LiveRoomRepository extends Repository
 
         return array_map(function ($item) use ($repository)
         {
-            $res = json_decode($item, true);
+            $res = json_decode($item);
 
-            $user = $repository->item($res['from_slug']);
+            $user = $repository->item($res->from_slug);
 
-            $res['reader'] = [
-                'id' => $user['id'],
-                'slug' => $user['slug'],
-                'name' => $user['name'] ?? $user['nickname'],
-                'avatar' => $user['avatar']
+            $res->reader = [
+                'id' => $user->id,
+                'slug' => $user->slug,
+                'name' => $user->name ?? $user->nickname,
+                'avatar' => $user->avatar
             ];
 
-            $meta = json_decode($res['meta'], true);
-            $res['duration'] = $meta['duration'];
-            $res['source_id'] = $res['id'];
-            $res['meta'] = $meta;
-            $res['alias'] = $user['alias'] ? implode(',', $user['alias']) : $user['nickname'];
+            $meta = json_decode($res->meta);
+            $res->duration = $meta->duration;
+            $res->source_id = $res->id;
+            $res->meta = $meta;
+            $res->alias = $user->alias ? implode(',', $user->alias) : $user->nickname;
 
             return $res;
         }, $result);
