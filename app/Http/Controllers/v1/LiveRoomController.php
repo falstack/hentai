@@ -106,13 +106,11 @@ class LiveRoomController extends Controller
     public function createUserVoice(Request $request)
     {
         $file = $request->file('file');
+        $userId = $request->get('user_id');
 
         $qshell = new Qshell();
-        $res = $qshell->audio($file->path());
-        Log::info('audio', [
-            'file' => $file,
-            'path' => $file->path()
-        ]);
+        $res = $qshell->audio($file->path(), $userId);
+
         return $this->resOK([
             'all' => $request->all(),
             'res' => $res
