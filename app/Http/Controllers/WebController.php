@@ -29,6 +29,6 @@ class WebController extends Controller
 {
     public function index()
     {
-        return $this->resOK(sprintf('%.1f', '1.123') * 1000);
+        return $this->resOK('for the win');
     }
 }
