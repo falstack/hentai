@@ -56,9 +56,8 @@ class LiveRoomRepository extends Repository
 
             $meta = json_decode($res->meta);
             $res->duration = $meta->duration;
-            $res->source_id = $res->id;
             $res->meta = $meta;
-            $res->alias = $user->alias ? implode(',', $user->alias) : $user->nickname;
+            $res->alias = isset($user->alias) ? implode(',', $user->alias) : '';
 
             return $res;
         }, $result);

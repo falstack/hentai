@@ -109,20 +109,31 @@ class LiveRoomController extends Controller
         $user = $request->user();
 
         $qshell = new Qshell();
-        $res = $qshell->audio($file->path(), $user->id);
+        $audio = $qshell->audio($file->path(), $user->id);
 
-        $voice = IdolVoice::create([
+        $res = IdolVoice::create([
             'from_slug' => $user->slug,
             'from_type' => 1,
-            'src' => $res['url'],
+            'src' => $audio['url'],
             'meta' => json_encode([
-                'size' => $res['meta']['format']['size'],
+                'size' => $audio['meta']['format']['size'],
                 'duration' => $request->get('duration')
             ]),
             'text' => ''
         ]);
 
-        return $this->resOK($voice);
+        $meta = json_decode($res->meta);
+        $res->duration = $meta->duration;
+        $res->meta = $meta;
+        $res->alias = '';
+        $res->reader = [
+            'id' => $user->id,
+            'slug' => $user->slug,
+            'name' => $user->nickname,
+            'avatar' => $user->avatar
+        ];
+
+        return $this->resOK($res);
     }
 
     /**
