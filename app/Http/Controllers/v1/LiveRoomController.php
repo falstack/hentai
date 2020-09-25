@@ -117,7 +117,7 @@ class LiveRoomController extends Controller
             'src' => $res['url'],
             'meta' => json_encode([
                 'size' => $res['meta']['format']['size'],
-                'duration' => number_format($res['meta']['format']['duration'], 1) * 1000
+                'duration' => sprintf('%.1f', $res['meta']['format']['duration']) * 1000
             ]),
             'text' => ''
         ]);
