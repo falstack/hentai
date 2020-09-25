@@ -411,6 +411,8 @@ $route->group(['prefix' => 'live_room'], function () use ($route)
         $route->group(['middleware' => 'auth'], function () use ($route)
         {
             $route->post('create', 'LiveRoomController@createUserVoice');
+
+            $route->post('update', 'LiveRoomController@updateUserVoice');
         });
     });
 });
