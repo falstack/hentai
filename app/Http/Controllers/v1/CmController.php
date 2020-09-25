@@ -17,7 +17,7 @@ class CmController extends Controller
     public function showBanners(Request $request)
     {
         $repository = new Repository();
-        $result = $repository->RedisItem($this->bannerCacheKey, function ()
+        $result = $repository->RedisArray($this->bannerCacheKey, function ()
         {
             return CMBanner
                 ::where('online', 1)

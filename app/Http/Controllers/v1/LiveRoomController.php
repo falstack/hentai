@@ -106,15 +106,23 @@ class LiveRoomController extends Controller
     public function createUserVoice(Request $request)
     {
         $file = $request->file('file');
-        $userId = $request->get('user_id');
+        $user = $request->user();
 
         $qshell = new Qshell();
-        $res = $qshell->audio($file->path(), $userId);
+        $res = $qshell->audio($file->path(), $user->id);
 
-        return $this->resOK([
-            'all' => $request->all(),
-            'res' => $res
+        $voice = IdolVoice::create([
+            'from_slug' => $user->slug,
+            'from_type' => 1,
+            'src' => $res['url'],
+            'meta' => json_encode([
+                'size' => $res['meta']['format']['size'],
+                'duration' => number_format($res['meta']['format']['duration'], 1) * 1000
+            ]),
+            'text' => ''
         ]);
+
+        return $this->resOK($voice);
     }
 
     /**

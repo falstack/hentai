@@ -56,7 +56,7 @@ class TagRepository extends Repository
 
     public function children($slug, $page, $count = 10, $refresh = false)
     {
-        $result = $this->RedisItem("tag-{$slug}-children", function () use ($slug)
+        $result = $this->RedisArray("tag-{$slug}-children", function () use ($slug)
         {
             $tag = Tag
                 ::where('parent_slug', $slug)
@@ -85,7 +85,7 @@ class TagRepository extends Repository
 
     public function hottest($page, $take)
     {
-        $result = $this->RedisItem('hottest-channel', function ()
+        $result = $this->RedisArray('hottest-channel', function ()
         {
             $tag = Tag
                 ::orderBy('activity_stat', 'desc')
@@ -104,7 +104,7 @@ class TagRepository extends Repository
 
     public function search()
     {
-        $result = $this->RedisItem('tag-all-search', function ()
+        $result = $this->RedisArray('tag-all-search', function ()
         {
             $tag = Tag
                 ::whereIn('parent_slug', [
@@ -123,7 +123,7 @@ class TagRepository extends Repository
 
     public function bookmarks($slug, $refresh = false)
     {
-        $result = $this->RedisItem("user-bookmark-tags:{$slug}", function () use ($slug)
+        $result = $this->RedisArray("user-bookmark-tags:{$slug}", function () use ($slug)
         {
             // TODO：废弃
             return [

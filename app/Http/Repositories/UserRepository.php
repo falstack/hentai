@@ -262,7 +262,7 @@ class UserRepository extends Repository
 
     public function managers($refresh = false)
     {
-        $cache = $this->RedisItem('school-managers', function ()
+        $cache = $this->RedisArray('school-managers', function ()
         {
             $roles = Role
                 ::pluck('name')
