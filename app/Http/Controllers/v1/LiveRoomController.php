@@ -111,6 +111,11 @@ class LiveRoomController extends Controller
         $qshell = new Qshell();
         $res = $qshell->audio($file->path(), $user->id);
 
+        Log::info('audio', [
+            'res' => $res,
+            'duration' => $res['meta']['format']['duration']
+        ]);
+
         $voice = IdolVoice::create([
             'from_slug' => $user->slug,
             'from_type' => 1,
