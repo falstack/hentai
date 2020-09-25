@@ -68,8 +68,13 @@ class Qshell
         $now = time();
         $str = str_rand();
         $uploadManager = new UploadManager();
-        $res = $uploadManager->putFile($uptoken, "audio/{$userId}{$now}/{$str}.mp3", $path);
+        list($ret, $err) = $uploadManager->putFile($uptoken, "audio/{$userId}{$now}/{$str}.mp3", $path);
 
-        return $res;
+        if ($err !== null)
+        {
+            return '';
+        }
+
+        return $ret['data'];
     }
 }

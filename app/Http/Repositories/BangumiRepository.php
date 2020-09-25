@@ -93,7 +93,7 @@ class BangumiRepository extends Repository
 
     public function release()
     {
-        return $this->RedisItem('bangumi-release', function ()
+        return $this->RedisArray('bangumi-release', function ()
         {
             $list = Bangumi
                 ::where('update_week', '<>', 0)
