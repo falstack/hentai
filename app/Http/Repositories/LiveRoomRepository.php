@@ -10,7 +10,7 @@ use App\Models\IdolVoice;
 
 class LiveRoomRepository extends Repository
 {
-    public function allVoice($type, $slug)
+    public function allVoice($type, $slug, $refresh = false)
     {
         $result = $this->RedisArray("live-room-voice-all:{$type}:{$slug}", function () use ($type, $slug)
         {
@@ -37,7 +37,7 @@ class LiveRoomRepository extends Repository
             }
 
             return $result;
-        });
+        }, $refresh);
 
         $repository = $type == '0' ? new IdolRepository() : new UserRepository();
 
