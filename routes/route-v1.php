@@ -413,6 +413,8 @@ $route->group(['prefix' => 'live_room'], function () use ($route)
             $route->post('create', 'LiveRoomController@createUserVoice');
 
             $route->post('update', 'LiveRoomController@updateUserVoice');
+
+            $route->post('delete', 'LiveRoomController@deleteUserVoice');
         });
     });
 });

@@ -163,6 +163,29 @@ class LiveRoomController extends Controller
         return $this->resOK();
     }
 
+    public function deleteUserVoice(Request $request)
+    {
+        $user = $request->user();
+        $id = $request->get('id');
+
+        $audio = IdolVoice::where('id', $id)->first();
+        if (is_null($audio))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if ($audio->from_slug !== $user->slug)
+        {
+            return $this->resErrRole();
+        }
+
+        $audio->delete();
+        $liveRoomRepository = new LiveRoomRepository();
+        $liveRoomRepository->allVoice('1', $user->slug, true);
+
+        return $this->resOK();
+    }
+
     /**
      * 创建一个实时聊天
      */
