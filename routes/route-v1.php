@@ -404,6 +404,8 @@ $route->group(['prefix' => 'flow'], function () use ($route)
 
 $route->group(['prefix' => 'live_room'], function () use ($route)
 {
+    $route->get('show', 'LiveRoomController@show');
+
     $route->group(['prefix' => 'voice'], function () use ($route)
     {
         $route->get('all', 'LiveRoomController@allVoice');
@@ -416,6 +418,13 @@ $route->group(['prefix' => 'live_room'], function () use ($route)
 
             $route->post('delete', 'LiveRoomController@deleteUserVoice');
         });
+    });
+
+    $route->group(['middleware' => 'auth'], function () use ($route)
+    {
+        $route->get('drafts', 'LiveRoomController@drafts');
+
+        $route->post('publish', 'LiveRoomController@publishLive');
     });
 });
 

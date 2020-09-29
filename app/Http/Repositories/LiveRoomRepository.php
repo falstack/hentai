@@ -7,9 +7,44 @@ namespace App\Http\Repositories;
 use App\Http\Transformers\Question\QuestionItemResource;
 use App\Models\BangumiQuestion;
 use App\Models\IdolVoice;
+use App\Models\LiveRoom;
 
 class LiveRoomRepository extends Repository
 {
+    public function item($id, $refresh = false)
+    {
+        if (!$id)
+        {
+            return null;
+        }
+
+        $result = $this->RedisItem("live-room-{$id}", function () use ($id)
+        {
+            $res = LiveRoom
+                ::where('id', $id)
+                ->first();
+
+            if (is_null($res))
+            {
+                return 'nil';
+            }
+
+            $content = json_decode($res->content);
+
+            $res->content = $content->content;
+            $res->readers = $content->readers;
+
+            return $res;
+        }, $refresh);
+
+        if ($result === 'nil')
+        {
+            return null;
+        }
+
+        return $result;
+    }
+
     public function allVoice($type, $slug, $refresh = false)
     {
         $result = $this->RedisArray("live-room-voice-all:{$type}:{$slug}", function () use ($type, $slug)
