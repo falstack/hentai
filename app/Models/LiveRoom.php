@@ -18,6 +18,6 @@ class LiveRoom extends Model
         'title',
         'desc',
         'content',
-        'visit_state'
+        'visit_state',  // 0：草稿，1：所有人可见，2：审核中仅自己可见
     ];
 }

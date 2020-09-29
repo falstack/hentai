@@ -5,12 +5,28 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\LiveRoomRepository;
 use App\Models\IdolVoice;
+use App\Models\LiveRoom;
 use App\Services\Qiniu\Qshell;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class LiveRoomController extends Controller
 {
+    public function show(Request $request)
+    {
+        $id = $request->get('id');
+
+        $liveRoomRepository = new LiveRoomRepository();
+
+        $data = $liveRoomRepository->item($id);
+
+        if (is_null($data))
+        {
+            return $this->resErrNotFound();
+        }
+
+        return $this->resOK($data);
+    }
+
     /**
      * 拿角色的声源列表
      */
@@ -186,30 +202,72 @@ class LiveRoomController extends Controller
         return $this->resOK();
     }
 
-    /**
-     * 创建一个实时聊天
-     */
-    public function createLiveChat(Request $request)
+    public function publishLive(Request $request)
     {
+        $user = $request->user();
+        $id = $request->get('id');
+        $readers = $request->get('readers');
+        $content = $request->get('content');
+        $title = $request->get('title');
+        $desc = $request->get('desc');
+        $isPublish = $request->get('is_publish');
+        $liveRoomRepository = new LiveRoomRepository();
 
+        if ($id)
+        {
+            $live = LiveRoom
+                ::where('id', $id)
+                ->first();
+
+            if (is_null($live))
+            {
+                return $this->resErrNotFound();
+            }
+
+            if ($live->author_id != $user->id)
+            {
+                return $this->resErrRole();
+            }
+
+            $needPublish = $live->visit_state == 0 && $isPublish;
+            $live->update([
+                'content' => json_encode([
+                    'content' => $content,
+                    'readers' => $readers
+                ]),
+                'title' => $title,
+                'desc' => $desc,
+                'visit_state' => $isPublish ? 1 : 0
+            ]);
+
+            $liveRoomRepository->item($live->id, true);
+            if ($needPublish)
+            {
+                // TODO：trial
+            }
+
+            return $this->resOK($live->id);
+        }
+
+        $live = LiveRoom::create([
+            'content' => json_encode([
+                'content' => $content,
+                'readers' => $readers
+            ]),
+            'title' => $title,
+            'desc' => $desc,
+            'visit_state' => $isPublish ? 1 : 0,
+            'author_id' => $user->id
+        ]);
+
+        if ($isPublish)
+        {
+            // TODO：refresh list cache
+            // TODO：trial
+        }
+
+        return $this->resOK($live->id);
     }
-
-    /**
-     * 更新一个实时聊天
-     */
-    public function updateLiveChat(Request $request)
-    {
-
-    }
-
-    /**
-     * 发布一个实时聊天
-     */
-    public function publishLiveChat(Request $request)
-    {
-
-    }
-
     /**
      * 删除一个实时聊天
      */
@@ -227,19 +285,22 @@ class LiveRoomController extends Controller
     }
 
     /**
-     * 用户的声源列表
-     */
-    public function userVoiceList(Request $request)
-    {
-
-    }
-
-    /**
      * 用户实时聊天草稿箱
      */
-    public function userLiveChatDraft(Request $request)
+    public function drafts(Request $request)
     {
+        $user = $request->user();
+        $list = LiveRoom
+            ::where('author_id', $user->id)
+            ->where('visit_state', 0)
+            ->select('id', 'title', 'desc', 'updated_at')
+            ->orderBy('updated_at', 'DESC')
+            ->get()
+            ->toArray();
 
+        return $this->resOK([
+            'result' => $list
+        ]);
     }
 
     /**
