@@ -424,6 +424,8 @@ $route->group(['prefix' => 'live_room'], function () use ($route)
     {
         $route->get('drafts', 'LiveRoomController@drafts');
 
+        $route->post('delete', 'LiveRoomController@delete');
+
         $route->post('publish', 'LiveRoomController@publishLive');
     });
 });
