@@ -4,6 +4,7 @@
 namespace App\Http\Repositories;
 
 
+use App\Http\Transformers\LiveRoom\LiveRoomItemResource;
 use App\Http\Transformers\Question\QuestionItemResource;
 use App\Models\BangumiQuestion;
 use App\Models\IdolVoice;
@@ -34,7 +35,7 @@ class LiveRoomRepository extends Repository
             $res->content = $content->content;
             $res->readers = $content->readers;
 
-            return $res;
+            return new LiveRoomItemResource($res);
         }, $refresh);
 
         if ($result === 'nil')

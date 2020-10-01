@@ -17,14 +17,14 @@ class LiveRoomController extends Controller
 
         $liveRoomRepository = new LiveRoomRepository();
 
-        $data = $liveRoomRepository->item($id);
+        $live = $liveRoomRepository->item($id);
 
-        if (is_null($data))
+        if (is_null($live))
         {
             return $this->resErrNotFound();
         }
 
-        return $this->resOK($data);
+        return $this->resOK($live);
     }
 
     /**
@@ -271,9 +271,34 @@ class LiveRoomController extends Controller
     /**
      * 删除一个实时聊天
      */
-    public function deleteLiveChat(Request $request)
+    public function delete(Request $request)
     {
+        $user = $request->user();
+        $id = $request->get('id');
 
+        $live = LiveRoom
+            ::where('id', $id)
+            ->first();
+
+        if (is_null($live))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if ($live->author_id !== $user->id)
+        {
+            return $this->resErrRole();
+        }
+
+        $live->delete();
+
+        if ($live->visit_state != 0)
+        {
+            $liveRoomRepository = new LiveRoomRepository();
+            $liveRoomRepository->item($live->id, true);
+        }
+
+        return $this->resNoContent();
     }
 
     /**
