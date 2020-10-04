@@ -406,6 +406,11 @@ $route->group(['prefix' => 'live_room'], function () use ($route)
 {
     $route->get('show', 'LiveRoomController@show');
 
+    $route->group(['prefix' => 'list'], function () use ($route)
+    {
+        $route->get('activity', 'LiveRoomController@activeLiveChat');
+    });
+
     $route->group(['prefix' => 'voice'], function () use ($route)
     {
         $route->get('all', 'LiveRoomController@allVoice');

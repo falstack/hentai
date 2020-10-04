@@ -18,6 +18,12 @@ class LiveRoom extends Model
         'title',
         'desc',
         'content',
+        'count_view',
+        'count_like',
+        'count_mark',
+        'count_reward',
+        'count_comment',
+        'count_share',
         'visit_state',  // 0：草稿，1：所有人可见，2：审核中仅自己可见
     ];
 }
