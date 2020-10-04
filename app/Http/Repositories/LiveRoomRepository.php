@@ -46,6 +46,20 @@ class LiveRoomRepository extends Repository
         return $result;
     }
 
+    public function activityIds($take, $seenIds, $refresh = false)
+    {
+        $ids = $this->RedisSort('live-room-activity-ids', function ()
+        {
+            return LiveRoom
+                ::where('visit_state', 1)
+                ->orderBy('updated_at', 'DESC')
+                ->pluck('updated_at', 'id');
+
+        }, ['force' => $refresh, 'is_time' => true]);
+
+        return $this->filterIdsBySeenIds($ids, $seenIds, $take);
+    }
+
     public function allVoice($type, $slug, $refresh = false)
     {
         $result = $this->RedisArray("live-room-voice-all:{$type}:{$slug}", function () use ($type, $slug)

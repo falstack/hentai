@@ -331,9 +331,22 @@ class LiveRoomController extends Controller
     /**
      * 热门的实时聊天列表
      */
-    public function trendLiveChat(Request $request)
+    public function activeLiveChat(Request $request)
     {
+        $seenIds = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
+        $take = $request->get('take') ?: 10;
+        $liveRoomRepository = new LiveRoomRepository();
 
+        $idsObj = $liveRoomRepository->activityIds($take, $seenIds);
+
+        if (empty($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $idsObj['result'] = $liveRoomRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
     }
 
     public function allVoice(Request $request)
