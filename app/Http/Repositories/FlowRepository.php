@@ -6,6 +6,7 @@ namespace App\Http\Repositories;
 
 use App\Models\Idol;
 use App\Models\IdolFans;
+use App\Models\LiveRoom;
 use App\Models\Pin;
 use Illuminate\Support\Facades\DB;
 
@@ -333,8 +334,13 @@ class FlowRepository extends Repository
         return "flow-idol:{$order}-{$slug}}";
     }
 
-    private function flow_pin_cache_key(string $from, string $order, string $slug, $id = 0)
+    private function flow_live_cache_key(string $from, string $order, string $slug, $randId = 0)
     {
-        return "flow-pin-{$order}:{$from}-{$slug}-{$id}";
+        return "flow-live-{$order}:{$from}-{$slug}-{$randId}";
+    }
+
+    private function flow_pin_cache_key(string $from, string $order, string $slug, $randId = 0)
+    {
+        return "flow-pin-{$order}:{$from}-{$slug}-{$randId}";
     }
 }
