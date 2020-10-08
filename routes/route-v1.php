@@ -400,6 +400,13 @@ $route->group(['prefix' => 'flow'], function () use ($route)
 
         $route->get('activity', 'FlowController@idolActivity');
     });
+
+    $route->group(['prefix' => 'live'], function () use ($route)
+    {
+        $route->get('newest', 'FlowController@liveNewest');
+
+        $route->get('activity', 'FlowController@liveActivity');
+    });
 });
 
 $route->group(['prefix' => 'live_room'], function () use ($route)

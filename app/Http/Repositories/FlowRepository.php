@@ -329,6 +329,41 @@ class FlowRepository extends Repository
         return $this->filterIdsBySeenIds($ids, $seenIds, $take);
     }
 
+    public function liveNewest($from, $id, $take, $lastId)
+    {
+        $ids = $this->RedisSort($this->flow_live_cache_key($from, self::$order[0], $id), function () use ($from, $id)
+        {
+            return LiveRoom
+                ::where('visit_state', 1)
+                ->when($from === 'user', function ($query) use ($id)
+                {
+                    return $query->where('author_id', $id);
+                })
+                ->orderBy('id', 'DESC')
+                ->pluck('id', 'id');
+        });
+
+        return $this->filterIdsByMaxId($ids, $lastId, $take);
+    }
+
+    public function liveActivity($from, $id, $take, $seenIds)
+    {
+        $ids = $this->RedisSort($this->flow_live_cache_key($from, self::$order[1], $id), function () use ($from, $id)
+        {
+            return LiveRoom
+                ::where('visit_state', 1)
+                ->when($from === 'user', function ($query) use ($id)
+                {
+                    return $query->where('author_id', $id);
+                })
+                ->orderBy('updated_at', 'DESC')
+                ->pluck('updated_at', 'id');
+
+        }, ['is_time' => true]);
+
+        return $this->filterIdsBySeenIds($ids, $seenIds, $take);
+    }
+
     private function flow_idol_cache_key(string $order, string $slug)
     {
         return "flow-idol:{$order}-{$slug}}";
