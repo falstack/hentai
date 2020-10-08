@@ -7,6 +7,7 @@ use App\Http\Modules\RichContentService;
 use App\Http\Modules\Spider\Base\GetResourceService;
 use App\Http\Repositories\FlowRepository;
 use App\Http\Repositories\IdolRepository;
+use App\Http\Repositories\LiveRoomRepository;
 use App\Http\Repositories\PinRepository;
 use App\Models\Content;
 use Illuminate\Http\Request;
@@ -250,5 +251,57 @@ class FlowController extends Controller
             'no_more' => true,
             'total' => 0
         ]);
+    }
+
+    public function liveNewest(Request $request)
+    {
+        $flowRepository = new FlowRepository();
+
+        $take = $request->get('take') ?: 10;
+        $id = $request->get('id') ?: $flowRepository::$indexSlug;
+        $from = $request->get('from') ?: 'index';
+        $lastId = $request->get('last_id') ?: '';
+
+        if (!in_array($from, $flowRepository::$from))
+        {
+            return $this->resErrBad();
+        }
+
+        $idsObj = $flowRepository->liveNewest($from, $id, $take, $lastId);
+        if (empty($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $liveRoomRepository = new LiveRoomRepository();
+        $idsObj['result'] = $liveRoomRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
+    }
+
+    public function liveActivity(Request $request)
+    {
+        $flowRepository = new FlowRepository();
+
+        $take = $request->get('take') ?: 10;
+        $slug = $request->get('slug') ?: $flowRepository::$indexSlug;
+        $from = $request->get('from') ?: 'index';
+        $seenIds = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
+
+        if (!in_array($from, $flowRepository::$from))
+        {
+            return $this->resErrBad();
+        }
+
+        $idsObj = $flowRepository->liveActivity($from, $slug, $take, $seenIds);
+        if (empty($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $liveRoomRepository = new LiveRoomRepository();
+        $idsObj['result'] = $liveRoomRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
     }
 }
