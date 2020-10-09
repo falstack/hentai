@@ -149,6 +149,9 @@ class LiveRoomController extends Controller
             'avatar' => $user->avatar
         ];
 
+        $liveRoomRepository = new LiveRoomRepository();
+        $liveRoomRepository->allVoice(1, $user->slug);
+
         return $this->resOK($res);
     }
 
