@@ -135,8 +135,8 @@ class LiveRoomController extends Controller
             'from_type' => 1,
             'src' => $audio['url'],
             'meta' => json_encode([
-                'size' => $audio['meta']['format']['size'],
-                'duration' => $request->get('duration')
+                'size' => intval($audio['meta']['format']['size']),
+                'duration' => intval($request->get('duration'))
             ]),
             'text' => ''
         ]);
