@@ -67,6 +67,9 @@ class LiveRoomController extends Controller
             'text' => $text
         ]);
 
+        $liveRoomRepository = new LiveRoomRepository();
+        $liveRoomRepository->allVoice(0, '', true);
+
         return $this->resCreated($voice);
     }
 
@@ -150,7 +153,7 @@ class LiveRoomController extends Controller
         ];
 
         $liveRoomRepository = new LiveRoomRepository();
-        $liveRoomRepository->allVoice(1, $user->slug);
+        $liveRoomRepository->allVoice(1, $user->slug, true);
 
         return $this->resOK($res);
     }
