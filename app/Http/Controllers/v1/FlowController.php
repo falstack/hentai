@@ -48,8 +48,13 @@ class FlowController extends Controller
         $take = $request->get('take') ?: 10;
         $slug = $request->get('slug') ?: $flowRepository::$indexSlug;
         $from = $request->get('from') ?: 'index';
-        $randId = $request->get('rand_id') ?: 1;
+        $randId = $request->get('rand_id') ?: '';
         $seenIds = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
+
+        if ($from !== 'index')
+        {
+            $randId = '';
+        }
 
         if (!in_array($from, $flowRepository::$from))
         {
@@ -75,8 +80,12 @@ class FlowController extends Controller
         $take = $request->get('take') ?: 10;
         $slug = $request->get('slug') ?: $flowRepository::$indexSlug;
         $from = $request->get('from') ?: 'index';
-        $randId = $request->get('rand_id') ?: 1;
+        $randId = $request->get('rand_id') ?: '';
         $seenIds = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
+        if ($from !== 'index')
+        {
+            $randId = '';
+        }
 
         if (!in_array($from, $flowRepository::$from))
         {
@@ -216,7 +225,7 @@ class FlowController extends Controller
         $slug = $request->get('slug') ?: 0;
         $page = $request->get('page') ?: 1;
         $take = $request->get('take') ?: 10;
-        $randId = $request->get('rand_id') ?: 1;
+        $randId = $request->get('rand_id') ?: '';
 
         $getResourceService = new GetResourceService();
         $dataObj = $getResourceService->getFlowData($sort, $slug, $page - 1, $take, $randId);
