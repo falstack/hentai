@@ -70,7 +70,10 @@ class FlowRepository extends Repository
                 ::whereNotNull('published_at')
                 ->where('trial_type', 0)
                 ->where('can_up', 1)
-                ->where(DB::raw('id % 10'), $randId)
+                ->when($randId, function ($query) use ($randId)
+                {
+                    return $query->where(DB::raw('id % 10'), $randId);
+                })
                 ->when($from === 'bangumi', function ($query) use ($slug)
                 {
                     return $query->where('bangumi_slug', $slug);
@@ -93,7 +96,10 @@ class FlowRepository extends Repository
                 ::whereNotNull('published_at')
                 ->where('trial_type', 0)
                 ->where('can_up', 1)
-                ->where(DB::raw('id % 10'), $randId)
+                ->when($randId, function ($query) use ($randId)
+                {
+                    return $query->where(DB::raw('id % 10'), $randId);
+                })
                 ->when($from === 'bangumi', function ($query) use ($slug)
                 {
                     return $query->where('bangumi_slug', $slug);

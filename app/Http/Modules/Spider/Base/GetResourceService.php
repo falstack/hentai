@@ -358,7 +358,10 @@ class GetResourceService
             $list = DB
                 ::table($this->dataTable)
                 ->whereNull('deleted_at')
-                ->where(DB::raw('id % 10'), $randId)
+                ->when($randId, function ($query) use ($randId)
+                {
+                    return $query->where(DB::raw('id % 10'), $randId);
+                })
                 ->when($slug, function ($query) use ($slug)
                 {
                     return $query->where('source_type', $slug);
